@@ -1,0 +1,47 @@
+{
+    "rest": [
+        {
+            "method": "GET",
+            "path": "/todos",
+            "status": 200,
+            "response": [
+                {
+                    "id": 1,
+                    "title": "Buy groceries",
+                    "completed": false
+                },
+                {
+                    "id": 2,
+                    "title": "Walk the dog",
+                    "completed": true
+                }
+            ]
+        },
+        {
+            "method": "POST",
+            "path": "/todos",
+            "status": 201,
+            "response": {
+                "id": 3,
+                "title": "Read a book",
+                "completed": false
+            }
+        },
+        {
+            "method": "PUT",
+            "path": "/todos/1",
+            "status": 200,
+            "response": {
+                "id": 1,
+                "title": "Buy groceries and cook dinner",
+                "completed": false
+            }
+        },
+        {
+            "method": "DELETE",
+            "path": "/todos/2",
+            "status": 204,
+            "response": null
+        }
+    ]
+}
