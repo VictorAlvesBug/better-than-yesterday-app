@@ -1,107 +1,113 @@
 {
-    "users": [
-        {
-            "id": "ad50726d466b4f59937f210c5344188d",
-            "nickname": "Vitão",
-            "email": "victoralvesbug@gmail.com",
-            "createdAt": "2024-06-01"
-        },
-        {
-            "id": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
-            "nickname": "Fátima",
-            "email": "butia245@gmail.com",
-            "createdAt": "2024-06-01"
-        },
-        {
-            "id": "2216fe3e553145c5b12b29358a15c771",
-            "nickname": "Thiago",
-            "email": "thiago.245.thiago@gmail.com",
-            "createdAt": "2024-06-01"
-        }
-    ],
-    "habits": [
-        {
-            "id": "3e7536df6a734ad0be43fc9653e2d74b",
-            "name": "Leitura",
-            "createdAt": "2024-06-01"
-        },
-        {
-            "id": "75f460343d0946938e987f64b3be9d2d",
-            "name": "Exercícios",
-            "createdAt": "2024-06-01"
-        }
-    ],
-    "plans": [
-        {
-            "id": "65352d6fb37d421799f9f5fb17a42c04",
-            "habitId": "3e7536df6a734ad0be43fc9653e2d74b",
-            "description": "Ler 10 páginas por dia em 2026",
-            "startsAt": "2026-01-01",
-            "endsAt": "2026-12-31",
-            "status": "active",
-            "type": "public",
-            "restsPerWeek": 1,
-            "createdAt": "2024-06-01"
-        },
-        {
-            "id": "1c3037b85030421cbe3236492338eef1",
-            "habitId": "75f460343d0946938e987f64b3be9d2d",
-            "description": "Treinar 5 vezes por semana em 2026",
-            "startsAt": "2026-01-01",
-            "endsAt": "2026-12-31",
-            "status": "active",
-            "type": "public",
-            "restsPerWeek": 2,
-            "createdAt": "2024-06-01"
-        }
-    ],
-    "planParticipants": [
-        {
-            "id": "d9f8e7c6b5a4321f0e9d8c7b6a5f4e3d",
-            "planId": "65352d6fb37d421799f9f5fb17a42c04",
-            "userId": "ad50726d466b4f59937f210c5344188d",
-            "joinedAt": "2024-06-01",
-            "status": "active"
-        },
-        {
-            "id": "e8c7b6a5f4e3d2c1b0a9d8c7b6a5f4e3d",
-            "planId": "1c3037b85030421cbe3236492338eef1",
-            "userId": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
-            "joinedAt": "2024-06-01",
-            "status": "active"
-        },
-        {
-            "id": "f7a6b5c4d3e2f1a0b9d8c7b6a5f4e3d2c",
-            "planId": "1c3037b85030421cbe3236492338eef1",
-            "userId": "2216fe3e553145c5b12b29358a15c771",
-            "joinedAt": "2024-06-01",
-            "status": "blocked"
-        }
-    ],
-    "checkins": [
-        {
-            "id": "a1b2c3d4e5f67890abcdef1234567890",
-            "planId": "65352d6fb37d421799f9f5fb17a42c04",
-            "userId": "ad50726d466b4f59937f210c5344188d",
-            "date": "2026-02-13",
-            "title": "Leitura diária",
-            "description": "Consegui ler 10 páginas hoje! Me sinto mais próximo do meu objetivo de leitura diária. Estou animado para continuar essa jornada e ver meu progresso ao longo do tempo."
-        },
-        {
-            "id": "b1c2d3e4f5a67890abcdef1234567890",
-            "planId": "1c3037b85030421cbe3236492338eef1",
-            "userId": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
-            "date": "2026-02-14",
-            "title": "Treino de hoje",
-            "description": "Hoje foi um dia de treino intenso! Consegui completar minha rotina de exercícios e me sinto mais forte. Estou determinado a manter esse ritmo e alcançar meus objetivos de fitness ao longo do ano."
-        },
-        {
-            "id": "c1d2e3f4a5b67890abcdef1234567890",
-            "planId": "1c3037b85030421cbe3236492338eef1",
-            "userId": "2216fe3e553145c5b12b29358a15c771",
-            "date": "2026-02-14",
-            "title": "Treinão TOP",
-            "description": "Tá pago!!"
-        }
-    ]
+  "users": [
+    {
+      "id": "ad50726d466b4f59937f210c5344188d",
+      "nickname": "Vitão",
+      "email": "victoralvesbug@gmail.com",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
+      "nickname": "Fátima",
+      "email": "butia245@gmail.com",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "2216fe3e553145c5b12b29358a15c771",
+      "nickname": "Thiago",
+      "email": "thiago.245.thiago@gmail.com",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "af25bfe959114e77a8f002b1a554b542",
+      "nickname": "John Doe Son",
+      "email": "john.doe@email.com",
+      "createdAt": "2020-01-10"
+    }
+  ],
+  "habits": [
+    {
+      "id": "3e7536df6a734ad0be43fc9653e2d74b",
+      "name": "Leitura",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "75f460343d0946938e987f64b3be9d2d",
+      "name": "Exercícios",
+      "createdAt": "2024-06-01"
+    }
+  ],
+  "plans": [
+    {
+      "id": "65352d6fb37d421799f9f5fb17a42c04",
+      "habitId": "3e7536df6a734ad0be43fc9653e2d74b",
+      "description": "Ler 10 páginas por dia em 2026",
+      "startsAt": "2026-01-01",
+      "endsAt": "2026-12-31",
+      "status": "active",
+      "type": "public",
+      "restsPerWeek": 1,
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "1c3037b85030421cbe3236492338eef1",
+      "habitId": "75f460343d0946938e987f64b3be9d2d",
+      "description": "Treinar 5 vezes por semana em 2026",
+      "startsAt": "2026-01-01",
+      "endsAt": "2026-12-31",
+      "status": "active",
+      "type": "public",
+      "restsPerWeek": 2,
+      "createdAt": "2024-06-01"
+    }
+  ],
+  "planParticipants": [
+    {
+      "id": "d9f8e7c6b5a4321f0e9d8c7b6a5f4e3d",
+      "planId": "65352d6fb37d421799f9f5fb17a42c04",
+      "userId": "ad50726d466b4f59937f210c5344188d",
+      "joinedAt": "2024-06-01",
+      "status": "active"
+    },
+    {
+      "id": "e8c7b6a5f4e3d2c1b0a9d8c7b6a5f4e3d",
+      "planId": "1c3037b85030421cbe3236492338eef1",
+      "userId": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
+      "joinedAt": "2024-06-01",
+      "status": "active"
+    },
+    {
+      "id": "f7a6b5c4d3e2f1a0b9d8c7b6a5f4e3d2c",
+      "planId": "1c3037b85030421cbe3236492338eef1",
+      "userId": "2216fe3e553145c5b12b29358a15c771",
+      "joinedAt": "2024-06-01",
+      "status": "blocked"
+    }
+  ],
+  "checkins": [
+    {
+      "id": "a1b2c3d4e5f67890abcdef1234567890",
+      "planId": "65352d6fb37d421799f9f5fb17a42c04",
+      "userId": "ad50726d466b4f59937f210c5344188d",
+      "date": "2026-02-13",
+      "title": "Leitura diária",
+      "description": "Consegui ler 10 páginas hoje! Me sinto mais próximo do meu objetivo de leitura diária. Estou animado para continuar essa jornada e ver meu progresso ao longo do tempo."
+    },
+    {
+      "id": "b1c2d3e4f5a67890abcdef1234567890",
+      "planId": "1c3037b85030421cbe3236492338eef1",
+      "userId": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
+      "date": "2026-02-14",
+      "title": "Treino de hoje",
+      "description": "Hoje foi um dia de treino intenso! Consegui completar minha rotina de exercícios e me sinto mais forte. Estou determinado a manter esse ritmo e alcançar meus objetivos de fitness ao longo do ano."
+    },
+    {
+      "id": "c1d2e3f4a5b67890abcdef1234567890",
+      "planId": "1c3037b85030421cbe3236492338eef1",
+      "userId": "2216fe3e553145c5b12b29358a15c771",
+      "date": "2026-02-14",
+      "title": "Treinão TOP",
+      "description": "Tá pago!!"
+    }
+  ]
 }

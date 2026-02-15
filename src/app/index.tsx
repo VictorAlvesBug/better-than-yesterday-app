@@ -1,7 +1,7 @@
-import { PlanTrackerPage } from '../pages/plan-tracker';
+import { LoginPage } from '../pages/login';
 import '../styles/global.css';
 
 export default function Index() {
-  return <PlanTrackerPage />;
-  // return <LoginPage />;
+  //return <PlanTrackerPage />;
+  return <LoginPage />;
 }
