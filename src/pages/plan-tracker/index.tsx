@@ -1,10 +1,10 @@
-import { Header } from '@/src/components/header';
-import { Feather } from '@expo/vector-icons';
+import Card from '@/src/components/card';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Image,
+  Button,
   Pressable,
   ScrollView,
   Text,
@@ -59,6 +59,14 @@ type Checkin = {
   date: string;
   title: string;
   description: string;
+};
+
+type CheckinWithParticipant = {
+  id: string;
+  participantName: string;
+  date: string;
+  title: string;
+  photo: string;
 };
 
 export function PlanTrackerPage() {
@@ -138,19 +146,28 @@ export function PlanTrackerPage() {
   }, [planParticipants, users]);
 
   // checkins do plano de leitura, mais recentes primeiro
-  const readingCheckins = useMemo(() => {
+  /*const readingCheckins = useMemo(() => {
     return checkins
       .filter((c) => c.planId === READING_PLAN_ID)
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .slice(0, 5); // últimos 5
-  }, [checkins]);
+  }, [checkins]);*/
+
+  const readingCheckins: CheckinWithParticipant[] = [];
+  readingCheckins.push({
+    id: 'checkin1',
+    participantName: 'John Doe',
+    date: 'Hoje, 09:15',
+    title: 'Test',
+    photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
+  });
 
   const sequenceLabel = '12 dias sem falhar'; // placeholder: depois você calcula baseado em checkins
 
   if (loading) {
     return (
       <View
-        className="flex-1 bg-slate-200 justify-center items-center"
+        className="items-center justify-center flex-1 bg-slate-200"
         style={{ marginTop: statusBarHeight }}
       >
         <ActivityIndicator size="large" color="#0f766e" />
@@ -165,7 +182,7 @@ export function PlanTrackerPage() {
       style={{ marginTop: statusBarHeight }}
     >
       {/* Header */}
-      <Header />
+      {/* <Header /> */}
 
       {/* Conteúdo rolável */}
       <ScrollView
@@ -174,142 +191,133 @@ export function PlanTrackerPage() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
-        <View className="px-4 pt-2 pb-8">
-          {/* Card principal: Nome do plano / hábito */}
-          <View className="relative w-full bg-white rounded-lg p-4 mb-4">
-            {/* Badge (nome do hábito) */}
-            <Text className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-3 py-1 rounded-full">
-              {habit?.name ?? 'Hábito'}
-            </Text>
+        <View className="flex flex-col items-center justify-center w-full bg-gradient-to-r from-purple-600 to-indigo-600">
+          <View className="flex flex-row items-center justify-between w-full">
+            <Pressable className="flex items-center justify-center w-10 h-10 p-10">
+              <Ionicons name="menu" size={24} color="#fff" />
+            </Pressable>
 
-            {/* Título (Descrição do plano) */}
-            <Text className="text-xl font-black text-gray-800 mb-4">
-              {plan?.description ?? 'Plano de hábito'}
-            </Text>
-
-            {/* Imagem (ainda estática) */}
-            <Image
-              source={{ uri: 'https://picsum.photos/200/300' }}
-              className="w-full h-40 bg-gray-200 rounded-lg mb-4"
-            />
-
-            {/* Sequência de dias sem falhar */}
-            <View className="flex-row items-center justify-between mt-2">
-              <Text className="text-sm text-gray-600">Sequência atual</Text>
-              <Text className="text-lg font-bold text-emerald-600">
-                {sequenceLabel}
+            <View className="flex flex-col items-center justify-center">
+              <Text className="text-xl font-bold text-center text-white">
+                BTY
               </Text>
             </View>
 
-            {/* Ranking atual - usando participantes ativos */}
-            <View className="mt-3 border-t border-slate-200 pt-3">
-              <Text className="text-sm font-semibold text-gray-700 mb-2">
-                Ranking atual
-              </Text>
-              <View className="gap-2">
-                {readingParticipants.length === 0 && (
-                  <Text className="text-xs text-gray-500">
-                    Nenhum participante ativo ainda.
-                  </Text>
-                )}
+            <Pressable className="flex items-center justify-center w-10 h-10 p-10">
+              <Ionicons name="people-outline" size={24} color="#fff" />
+            </Pressable>
+          </View>
+          <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
+            <Text className="text-2xl font-bold text-white">
+              {habit?.name ?? 'Treino 5x na semana'}
+            </Text>
+            <Text className="text-white text-md">
+              {habit?.name ?? '5x por semana'}
+            </Text>
+          </View>
+        </View>
 
-                {readingParticipants.map((participant, index) => (
-                  <View
-                    key={participant.id}
-                    className="flex-row items-center justify-between"
-                  >
-                    <Text className="text-sm text-gray-700">
-                      {index + 1}º {participant.nickname}
-                    </Text>
-                    <Text className="text-xs text-emerald-600 font-semibold">
-                      {/* Aqui você pode depois exibir dias/faltas reais */}
-                      participante ativo
-                    </Text>
-                  </View>
-                ))}
+        <View className="flex flex-col items-start justify-center gap-6 px-4 -mt-1">
+          <View className="flex flex-row items-center justify-between flex-1 w-full gap-4 mb-6">
+            <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
+              <View className="flex flex-row items-center justify-start gap-2">
+                <Ionicons name="flame-outline" size={20} color="#e48d0a" />
+                <Text className="text-gray-500">Sequência</Text>
               </View>
+              <Text className="text-3xl font-bold text-black">7</Text>
+              <Text className="text-xs font-semibold text-gray-500">
+                dias seguidos
+              </Text>
+            </Card>
+            <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
+              <View className="flex flex-row items-center justify-start gap-2">
+                <Ionicons name="medal-outline" size={20} color="#7d23ce" />
+                <Text className="text-gray-500">Posição</Text>
+              </View>
+              <Text className="text-3xl font-bold text-black">#3</Text>
+              <Text className="text-xs font-semibold text-gray-500">
+                de 8 pessoas
+              </Text>
+            </Card>
+          </View>
+
+          <Card className="flex flex-col items-start justify-center flex-1 w-full gap-3">
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="font-bold text-black text-md">Progresso</Text>
+              <Text className="font-bold text-purple-700 text-md">
+                14/20 dias
+              </Text>
             </View>
+            <View className="w-full h-3 bg-gray-200 rounded-full">
+              <View className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full w-[70%]"></View>
+            </View>
+            <View className="flex flex-row items-center justify-between w-full">
+              <Text className="text-gray-500">Termina em 23 dias</Text>
+              <Text className="font-semibold text-purple-700">70%</Text>
+            </View>
+          </Card>
+
+          <View className="flex flex-row items-center justify-center flex-1 w-full gap-3 px-4 py-2 border border-green-300 shadow-md bg-green-50 rounded-xl">
+            <Ionicons name="gift-outline" size={24} color="#00aa00" />
+            <View className="flex flex-col items-start justify-center flex-1 gap-1">
+              <Text className="text-lg font-semibold text-green-700">
+                2 folgas disponíveis
+              </Text>
+              <Text className="text-green-700">Use com sabedoria!</Text>
+            </View>
+            <Button title="Usar" color="#00aa00" />
           </View>
 
           {/* Lista dos últimos check-ins dos participantes */}
-          <View className="w-full bg-white rounded-lg p-4 mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-3">
-              Últimos check-ins
+          <View className="mt-2 -mb-5">
+            <Text className="mb-3 text-lg font-bold text-gray-700 fond-bold">
+              Check-ins Recentes
             </Text>
+            {readingCheckins.length === 0 && (
+              <Text className="text-xs text-gray-500">
+                Faça seu primeiro check-in hoje para aparecer aqui!
+              </Text>
+            )}
+          </View>
 
-            <View className="gap-2">
-              {readingCheckins.length === 0 && (
-                <Text className="text-xs text-gray-500">
-                  Nenhum check-in registrado ainda.
-                </Text>
-              )}
+          {readingCheckins.map((checkin) => {
+            // const user = users.find((u) => u.id === checkin.userId);
+            return (
+              <View
+                key={checkin.id}
+                className="flex flex-col items-start justify-center w-full gap-3 pb-4 overflow-hidden bg-white shadow-md rounded-xl"
+              >
+                <View className="w-full bg-red-200 h-44"></View>
 
-              {readingCheckins.map((checkin) => {
-                const user = users.find((u) => u.id === checkin.userId);
-                return (
-                  <View
-                    key={checkin.id}
-                    className="flex-row items-center justify-between"
-                  >
-                    <View className="flex-1 pr-2">
-                      <Text className="text-sm font-medium text-gray-800">
-                        {user?.nickname ?? 'Participante'}
-                      </Text>
-                      <Text className="text-xs text-gray-500" numberOfLines={1}>
-                        {checkin.date} • {checkin.title}
-                      </Text>
-                    </View>
-                    <Text className="text-xs text-emerald-600 font-semibold">
-                      ✔ Check-in
+                <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
+                  <View className="flex items-center justify-center w-10 h-10 bg-purple-700 rounded-full">
+                    <Text className="text-white text-md">
+                      {checkin.participantName
+                        .split(' ')
+                        .map((namePart) => namePart[0])
+                        .join('')}
                     </Text>
                   </View>
-                );
-              })}
-            </View>
-          </View>
+                  <View className="flex flex-col items-start justify-center w-full px-4 py-2">
+                    <Text className="text-sm font-medium text-gray-800">
+                      {checkin.participantName}
+                    </Text>
+                    <Text className="text-xs text-gray-500" numberOfLines={1}>
+                      {checkin.date}
+                    </Text>
+                  </View>
+                </View>
 
-          {/* Ações principais do plano */}
-          <View className="w-full bg-white rounded-lg p-4 gap-3 mb-4">
-            {/* Botão para adicionar check-in */}
-            <Pressable className="w-full bg-emerald-600 py-3 rounded-lg items-center justify-center active:opacity-80">
-              <Text className="text-sm font-semibold text-white">
-                Adicionar check-in de hoje
-              </Text>
-            </Pressable>
-
-            {/* Botão para usar uma folga */}
-            <Pressable className="w-full bg-amber-500 py-3 rounded-lg items-center justify-center active:opacity-80">
-              <Text className="text-sm font-semibold text-white">
-                Usar uma folga disponível
-              </Text>
-              <Text className="text-[11px] text-amber-100 mt-1">
-                Você tem 2 folgas acumuladas
-              </Text>
-            </Pressable>
-
-            {/* Botão para pagar multa */}
-            <Pressable className="w-full bg-red-500 py-3 rounded-lg items-center justify-center active:opacity-80">
-              <Text className="text-sm font-semibold text-white">
-                Pagar multa
-              </Text>
-              <Text className="text-[11px] text-red-100 mt-1">
-                Gerar PIX individual deste plano ou consolidado de todos
-              </Text>
-            </Pressable>
-
-            {/* Botão para abandonar plano */}
-            <Pressable className="w-full border border-red-400 py-3 rounded-lg items-center justify-center active:opacity-80">
-              <Text className="text-sm font-semibold text-red-600">
-                Abandonar plano
-              </Text>
-            </Pressable>
-          </View>
+                <Text className="px-6 text-md">{checkin.title}</Text>
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
 
       {/* Botão flutuante fixo (atalho para novo check-in, por exemplo) */}
-      <Pressable className="absolute bottom-6 right-6 w-14 h-14 bg-blue-500 rounded-full items-center justify-center shadow-xl active:opacity-80">
-        <Feather name="plus" size={24} color="white" />
+      <Pressable className="absolute items-center justify-center w-16 h-16 bg-purple-700 rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
+        <Feather name="camera" size={24} color="white" />
       </Pressable>
     </View>
   );
