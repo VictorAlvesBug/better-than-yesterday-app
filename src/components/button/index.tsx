@@ -1,17 +1,22 @@
 import { Pressable, Text } from 'react-native';
 
 type ButtonProps = {
-  text: string;
-  action: () => void;
+  action?: () => void;
+  children?: React.ReactNode | string;
+  className?: string;
 };
 
-export function Button({ text, action }: ButtonProps) {
+export function Button({ action, children, className }: ButtonProps) {
   return (
     <Pressable
-      className="bg-blue-500 px-6 py-3 rounded-full flex justify-center items-center"
+      className={`flex items-center justify-center px-6 py-3 bg-blue-500 rounded-full ${className || ''}`}
       onPress={action}
     >
-      <Text className="text-lg font-bold text-white">{text}</Text>
+      {typeof children === 'string' ? (
+        <Text className="text-lg font-bold text-white">{children}</Text>
+      ) : (
+        children
+      )}
     </Pressable>
   );
 }

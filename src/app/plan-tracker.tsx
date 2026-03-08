@@ -69,7 +69,7 @@ type CheckinWithParticipant = {
   photo: string;
 };
 
-export function PlanTrackerPage() {
+export default function PlanTrackerScreen() {
   const [users, setUsers] = useState<User[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -78,6 +78,8 @@ export function PlanTrackerPage() {
   );
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   useEffect(() => {
     async function loadData() {
@@ -162,8 +164,6 @@ export function PlanTrackerPage() {
     photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
   });
 
-  const sequenceLabel = '12 dias sem falhar'; // placeholder: depois você calcula baseado em checkins
-
   if (loading) {
     return (
       <View
@@ -178,13 +178,42 @@ export function PlanTrackerPage() {
 
   return (
     <View
-      className="flex-1 bg-slate-200"
+      className="relative flex-1 bg-slate-200"
       style={{ marginTop: statusBarHeight }}
     >
-      {/* Header */}
-      {/* <Header /> */}
+      {isDrawerOpen && (
+        <View className="absolute z-30 flex flex-row w-full h-full">
+          <View className="flex flex-col w-[80%] bg-white">
+            <View className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10 bg-gradient-to-r from-purple-600 to-indigo-600">
+              <View className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-full">
+                <Ionicons name="trophy-outline" size={24} color="#ffffff" />
+              </View>
+              <View className="flex flex-col items-start justify-center flex-1">
+                <Text className="font-semibold text-white">João Silva</Text>
+                <Text className="font-thin text-white">Ranking: #42</Text>
+              </View>
+              <Pressable
+                className="flex flex-row items-center justify-center w-10 h-10"
+                onPress={() => setIsDrawerOpen(false)}
+              >
+                <Ionicons name="close-outline" size={26} color="#ffffff" />
+              </Pressable>
+            </View>
+            <View className="flex flex-col">
+              <Text>PLANOS ATIVOS</Text>
+              <View>
+                <View className="w-2 h-2 bg-green-500 rounded-full"></View>
+                <Text>Treino 5x na semana</Text>
+              </View>
+            </View>
+          </View>
+          <Pressable
+            className="flex-1 bg-black opacity-40"
+            onPress={() => setIsDrawerOpen(false)}
+          ></Pressable>
+        </View>
+      )}
 
-      {/* Conteúdo rolável */}
       <ScrollView
         style={{ flex: 1 }}
         className="flex-1"
@@ -193,7 +222,10 @@ export function PlanTrackerPage() {
       >
         <View className="flex flex-col items-center justify-center w-full bg-gradient-to-r from-purple-600 to-indigo-600">
           <View className="flex flex-row items-center justify-between w-full">
-            <Pressable className="flex items-center justify-center w-10 h-10 p-10">
+            <Pressable
+              className="flex items-center justify-center w-10 h-10 p-10"
+              onPress={() => setIsDrawerOpen(true)}
+            >
               <Ionicons name="menu" size={24} color="#fff" />
             </Pressable>
 

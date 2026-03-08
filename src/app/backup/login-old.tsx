@@ -1,32 +1,14 @@
-import LoginForm from '@/src/components/LoginForm';
 import { useAuth } from '@/src/context/auth';
+import { AuthUser } from '@/src/utils/middleware';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
-export function LoginPage() {
-  const { user, isLoading, signOut } = useAuth();
+export default function LoginOld(user: AuthUser) {
+  const { signOut } = useAuth();
   const router = useRouter(); // ← ADICIONE ISTO
   const [name, setName] = useState(user?.name ?? '');
   const [pixKey, setPixKey] = useState(user?.email ?? '');
-
-  if (isLoading) {
-    return (
-      <View className="items-center justify-center flex-1">
-        <ActivityIndicator />
-      </View>
-    );
-  }
-
-  if (!user) {
-    return <LoginForm />;
-  }
 
   return (
     <View className="justify-center flex-1 px-6 bg-slate-100">
@@ -85,7 +67,7 @@ export function LoginPage() {
         className="items-center justify-center w-full py-3 bg-blue-600 rounded-lg active:opacity-80"
         onPress={() => {
           // Aqui você pode salvar name/pixKey em contexto/API antes se quiser
-          router.replace('/(app)/manage-plans'); // ← ADICIONE ISTO
+          router.replace('/plan-tracker'); // ← ADICIONE ISTO
         }}
       >
         <Text className="text-sm font-semibold text-white">Entrar</Text>
