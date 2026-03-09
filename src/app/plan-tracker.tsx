@@ -10,6 +10,8 @@ import {
   Text,
   View,
 } from 'react-native';
+import CheckinCard from '../components/checkin-card';
+import SideDrawer from '../components/side-drawer';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -79,7 +81,7 @@ export default function PlanTrackerScreen() {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -163,6 +165,13 @@ export default function PlanTrackerScreen() {
     title: 'Test',
     photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
   });
+  readingCheckins.push({
+    id: 'checkin1',
+    participantName: 'Victor Bug',
+    date: 'Ontem, 07:20',
+    title: 'Hoje foi em jejum!',
+    photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
+  });
 
   if (loading) {
     return (
@@ -181,38 +190,10 @@ export default function PlanTrackerScreen() {
       className="relative flex-1 bg-slate-200"
       style={{ marginTop: statusBarHeight }}
     >
-      {isDrawerOpen && (
-        <View className="absolute z-30 flex flex-row w-full h-full">
-          <View className="flex flex-col w-[80%] bg-white">
-            <View className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10 bg-gradient-to-r from-purple-600 to-indigo-600">
-              <View className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-full">
-                <Ionicons name="trophy-outline" size={24} color="#ffffff" />
-              </View>
-              <View className="flex flex-col items-start justify-center flex-1">
-                <Text className="font-semibold text-white">João Silva</Text>
-                <Text className="font-thin text-white">Ranking: #42</Text>
-              </View>
-              <Pressable
-                className="flex flex-row items-center justify-center w-10 h-10"
-                onPress={() => setIsDrawerOpen(false)}
-              >
-                <Ionicons name="close-outline" size={26} color="#ffffff" />
-              </Pressable>
-            </View>
-            <View className="flex flex-col">
-              <Text>PLANOS ATIVOS</Text>
-              <View>
-                <View className="w-2 h-2 bg-green-500 rounded-full"></View>
-                <Text>Treino 5x na semana</Text>
-              </View>
-            </View>
-          </View>
-          <Pressable
-            className="flex-1 bg-black opacity-40"
-            onPress={() => setIsDrawerOpen(false)}
-          ></Pressable>
-        </View>
-      )}
+      <SideDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -314,35 +295,7 @@ export default function PlanTrackerScreen() {
 
           {readingCheckins.map((checkin) => {
             // const user = users.find((u) => u.id === checkin.userId);
-            return (
-              <View
-                key={checkin.id}
-                className="flex flex-col items-start justify-center w-full gap-3 pb-4 overflow-hidden bg-white shadow-md rounded-xl"
-              >
-                <View className="w-full bg-red-200 h-44"></View>
-
-                <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
-                  <View className="flex items-center justify-center w-10 h-10 bg-purple-700 rounded-full">
-                    <Text className="text-white text-md">
-                      {checkin.participantName
-                        .split(' ')
-                        .map((namePart) => namePart[0])
-                        .join('')}
-                    </Text>
-                  </View>
-                  <View className="flex flex-col items-start justify-center w-full px-4 py-2">
-                    <Text className="text-sm font-medium text-gray-800">
-                      {checkin.participantName}
-                    </Text>
-                    <Text className="text-xs text-gray-500" numberOfLines={1}>
-                      {checkin.date}
-                    </Text>
-                  </View>
-                </View>
-
-                <Text className="px-6 text-md">{checkin.title}</Text>
-              </View>
-            );
+            return <CheckinCard key={checkin.id} {...checkin} />;
           })}
         </View>
       </ScrollView>
