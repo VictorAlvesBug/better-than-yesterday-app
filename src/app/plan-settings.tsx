@@ -24,24 +24,23 @@ export default function PlanSettingsScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={['#7c3aed', '#4f46e5']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={{ flex: 1 }}
+          colors={['#8f10ed', '#5038f6']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
         >
-          <View className="flex flex-row items-center justify-center">
+          <View className="flex flex-row items-center justify-center w-full">
             <Pressable
-              className="flex items-center justify-center w-10 h-10 p-10"
+              className="flex items-center justify-center w-20 h-20"
               onPress={() => router.back()}
             >
               <Ionicons name="arrow-back-outline" size={24} color="#fff" />
             </Pressable>
-            <Text className="flex-1 text-lg font-bold text-white">
-              Treino 5x na semana (alinhar a esquerda)
+            <Text className="flex-1 text-lg font-bold text-left text-white">
+              Treino 5x na semana
             </Text>
             <Pressable
-              className="flex items-center justify-center w-10 h-10 p-10"
+              className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
               <Ionicons name="share-social-outline" size={24} color="#fff" />
@@ -90,7 +89,14 @@ export default function PlanSettingsScreen() {
                 }
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                className="items-center justify-center flex-1 m-1 rounded-xl"
+                style={{
+                  flex: 1,
+                  margin: 4,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
               >
                 <Text
                   className={`font-semibold text-lg ${currentTab === 'Ranking' ? 'text-white' : 'text-gray-500'}`}
@@ -111,7 +117,14 @@ export default function PlanSettingsScreen() {
                 }
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
-                className="items-center justify-center flex-1 m-1 rounded-xl"
+                style={{
+                  flex: 1,
+                  margin: 4,
+                  borderRadius: 12,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
               >
                 <Text
                   className={`font-semibold text-lg ${currentTab === 'Check-in' ? 'text-white' : 'text-gray-500'}`}

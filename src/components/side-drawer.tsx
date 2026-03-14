@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -33,6 +34,8 @@ type SideDrawerProps = {
 };
 
 export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
+  const router = useRouter();
+
   const activePlans = ['Treinar 5x na semana', 'Leitura diária'];
   const finishedPlans = [
     {
@@ -53,10 +56,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
         className={`flex flex-col w-[80%] bg-white transition-all duration-500 ${isOpen ? 'right-0' : 'right-[100%]'}`}
       >
         <LinearGradient
-          colors={['#7c3aed', '#4f46e5']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={{ flex: 1 }}
+          colors={['#8f10ed', '#5038f6']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
           className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
           <View className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-full">
@@ -125,10 +127,13 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             />
             <Text className="font-semibold text-gray-700">Sobre nós</Text>
           </View>
-          <View className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4">
+          <Pressable
+            onPress={() => router.push('/login')}
+            className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
+          >
             <Ionicons name="log-out-outline" size={20} color="#b91c1c" />
             <Text className="font-semibold text-red-700">Sair</Text>
-          </View>
+          </Pressable>
         </View>
       </View>
       <Pressable

@@ -11,15 +11,19 @@ export default function LoginScreen() {
 
   return (
     <LinearGradient
-      colors={['#7c3aed', '#4f46e5']}
+      colors={['#9810fa', '#3a29ad']}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
-      style={{ flex: 1 }}
       className="flex items-center justify-center flex-1"
     >
       <View className="flex items-center justify-center flex-1 w-[90%] max-w-[450px]">
-        <View className="flex items-center justify-center mb-8 bg-purple-700 rounded-full w-28 h-28">
-          <Ionicons name="trophy-outline" size={60} color="#ffdf20" />
+        <View className="flex items-center justify-center mb-8 bg-[#991ded] rounded-full w-28 h-28">
+          <Ionicons
+            name="trophy-outline"
+            size={60}
+            color="#ffdf20"
+            style={{ fontWeight: '700' }}
+          />
         </View>
         <Text className="px-8 mb-2 text-4xl font-bold text-white">BTY</Text>
         <Text className="px-8 mb-2 text-lg font-semibold text-white">

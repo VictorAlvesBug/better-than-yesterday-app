@@ -208,18 +208,18 @@ export default function PlanTrackerScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={['#7c3aed', '#4f46e5']}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-          style={{ flex: 1 }}
+          colors={['#8f10ed', '#5038f6']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-between w-full">
             <Pressable
-              className="flex items-center justify-center w-10 h-10 p-10"
+              className="flex items-center justify-center w-20 h-20"
               onPress={() => setIsDrawerOpen(true)}
+              hitSlop={10}
             >
-              <Ionicons name="trophy-outline" size={24} color="#ffffff" />
+              <Ionicons name="menu" size={24} color="white" />
             </Pressable>
 
             <View className="flex flex-col items-center justify-center">
@@ -229,10 +229,10 @@ export default function PlanTrackerScreen() {
             </View>
 
             <Pressable
-              className="flex items-center justify-center w-10 h-10 p-10"
+              className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
-              <Ionicons name="people-outline" size={24} color="#fff" />
+              <Ionicons name="people-outline" size={26} color="#fff" />
             </Pressable>
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
