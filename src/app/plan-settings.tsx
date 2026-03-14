@@ -4,7 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import Card from '../components/card';
+import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
+import Ranking from '../components/ranking';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -107,11 +108,11 @@ export default function PlanSettingsScreen() {
             </Pressable>
             <Pressable
               className={`h-full flex-1 overflow-hidden`}
-              onPress={() => setCurrentTab('Check-in')}
+              onPress={() => setCurrentTab('Check-ins')}
             >
               <LinearGradient
                 colors={
-                  currentTab === 'Check-in'
+                  currentTab === 'Check-ins'
                     ? ['#7c3aed', '#4f46e5']
                     : ['transparent', 'transparent']
                 }
@@ -127,17 +128,16 @@ export default function PlanSettingsScreen() {
                 }}
               >
                 <Text
-                  className={`font-semibold text-lg ${currentTab === 'Check-in' ? 'text-white' : 'text-gray-500'}`}
+                  className={`font-semibold text-lg ${currentTab === 'Check-ins' ? 'text-white' : 'text-gray-500'}`}
                 >
-                  Check-in
+                  Check-ins
                 </Text>
               </LinearGradient>
             </Pressable>
           </View>
 
-          <Card className="flex flex-col items-start justify-center flex-1 w-full gap-3">
-            <Text>Content</Text>
-          </Card>
+          { currentTab === 'Ranking' && <Ranking /> }
+          { currentTab === 'Check-ins' && <CheckinsWithReviewsList planId={'abc'} /> }
         </View>
       </ScrollView>
     </View>

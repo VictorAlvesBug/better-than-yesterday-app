@@ -1,4 +1,5 @@
 import Card from '@/src/components/card';
+import { Checkin } from '@/types/checkin.type';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -56,22 +57,7 @@ type PlanParticipant = {
   status: 'active' | 'blocked';
 };
 
-type Checkin = {
-  id: string;
-  planId: string;
-  userId: string;
-  date: string;
-  title: string;
-  description: string;
-};
 
-type CheckinWithParticipant = {
-  id: string;
-  name: string;
-  date: string;
-  title: string;
-  photoUrl: string;
-};
 
 export default function PlanTrackerScreen() {
   const [users, setUsers] = useState<User[]>([]);
@@ -161,34 +147,50 @@ export default function PlanTrackerScreen() {
       .slice(0, 5); // últimos 5
   }, [checkins]);*/
 
-  const readingCheckins: CheckinWithParticipant[] = [];
+  const readingCheckins: Checkin[] = [];
   readingCheckins.push({
     id: 'checkin1',
+    planId: '',
+    userId: '',
     name: 'John Doe',
     date: '2026-03-14 09:15',
     title: 'Test',
     photoUrl: 'https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg',
+    reviews: [],
+    status: 'Validated'
   });
   readingCheckins.push({
     id: 'checkin2',
+    planId: '',
+    userId: '',
     name: 'Victor Bug',
     date: '2026-03-13 07:20',
     title: 'Hoje foi em jejum!',
     photoUrl: 'https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all',
+    reviews: [],
+    status: 'Validated'
   });
   readingCheckins.push({
     id: 'checkin3',
+    planId: '',
+    userId: '',
     name: 'Teste',
     date: '2026-02-11 12:10',
     title: 'Lorem ipsum dolor sit amet!',
     photoUrl: 'https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg',
+    reviews: [],
+    status: 'Validated'
   });
   readingCheckins.push({
     id: 'checkin4',
+    planId: '',
+    userId: '',
     name: 'Teste da Silva',
     date: '2026-03-08 12:10',
     title: 'Lorem ipsu44m dolor sit amet! 😋🔥',
-    photoUrl: 'https://www.shutterstock.com/shutterstock/videos/3463357099/thumb/1.jpg?ip=x480',
+    photoUrl: '',
+    reviews: [],
+    status: 'Validated'
   });
 
   if (loading) {
