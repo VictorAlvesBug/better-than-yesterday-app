@@ -8,7 +8,7 @@ type CardProps = {
 
 export default function Card({ children, className }: CardProps) {
   return (
-    <View className={`p-4 bg-white rounded-xl shadow-md ${className || ''}`}>
+    <View className={`p-4 bg-white rounded-2xl shadow-md ${className || ''}`}>
       {children}
     </View>
   );

@@ -67,10 +67,10 @@ type Checkin = {
 
 type CheckinWithParticipant = {
   id: string;
-  participantName: string;
+  name: string;
   date: string;
   title: string;
-  photo: string;
+  photoUrl: string;
 };
 
 export default function PlanTrackerScreen() {
@@ -164,17 +164,31 @@ export default function PlanTrackerScreen() {
   const readingCheckins: CheckinWithParticipant[] = [];
   readingCheckins.push({
     id: 'checkin1',
-    participantName: 'John Doe',
-    date: 'Hoje, 09:15',
+    name: 'John Doe',
+    date: '2026-03-14 09:15',
     title: 'Test',
-    photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
+    photoUrl: 'https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg',
   });
   readingCheckins.push({
     id: 'checkin2',
-    participantName: 'Victor Bug',
-    date: 'Ontem, 07:20',
+    name: 'Victor Bug',
+    date: '2026-03-13 07:20',
     title: 'Hoje foi em jejum!',
-    photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
+    photoUrl: 'https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all',
+  });
+  readingCheckins.push({
+    id: 'checkin3',
+    name: 'Teste',
+    date: '2026-02-11 12:10',
+    title: 'Lorem ipsum dolor sit amet!',
+    photoUrl: 'https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg',
+  });
+  readingCheckins.push({
+    id: 'checkin4',
+    name: 'Teste da Silva',
+    date: '2026-03-08 12:10',
+    title: 'Lorem ipsu44m dolor sit amet! 😋🔥',
+    photoUrl: 'https://www.shutterstock.com/shutterstock/videos/3463357099/thumb/1.jpg?ip=x480',
   });
 
   if (loading) {
@@ -245,7 +259,7 @@ export default function PlanTrackerScreen() {
           </View>
         </LinearGradient>
 
-        <View className="flex flex-col items-start justify-center gap-6 px-4 -mt-1">
+        <View className="flex flex-col items-start justify-center gap-6 px-4 -mt-4">
           <View className="flex flex-row items-center justify-between flex-1 w-full gap-4 mb-6">
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-2">
