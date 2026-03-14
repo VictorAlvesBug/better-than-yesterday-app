@@ -1,7 +1,9 @@
 import Card from '@/src/components/card';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import React, { useEffect, useMemo, useState } from 'react';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Button,
@@ -79,11 +81,13 @@ export default function PlanTrackerScreen() {
     [],
   );
   const [checkins, setCheckins] = useState<Checkin[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  useEffect(() => {
+  const router = useRouter();
+
+  /*useEffect(() => {
     async function loadData() {
       try {
         const [usersRes, habitsRes, plansRes, participantsRes, checkinsRes] =
@@ -122,7 +126,7 @@ export default function PlanTrackerScreen() {
     }
 
     loadData();
-  }, []);
+  }, []);*/
 
   const plan = useMemo(
     () => plans.find((p) => p.id === READING_PLAN_ID),
@@ -166,7 +170,7 @@ export default function PlanTrackerScreen() {
     photo: 'https://fastly.picsum.photos/id/599/200/200.jpg',
   });
   readingCheckins.push({
-    id: 'checkin1',
+    id: 'checkin2',
     participantName: 'Victor Bug',
     date: 'Ontem, 07:20',
     title: 'Hoje foi em jejum!',
@@ -185,6 +189,8 @@ export default function PlanTrackerScreen() {
     );
   }
 
+  console.log(statusBarHeight);
+
   return (
     <View
       className="relative flex-1 bg-slate-200"
@@ -201,13 +207,19 @@ export default function PlanTrackerScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
-        <View className="flex flex-col items-center justify-center w-full bg-gradient-to-r from-purple-600 to-indigo-600">
+        <LinearGradient
+          colors={['#7c3aed', '#4f46e5']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={{ flex: 1 }}
+          className="flex flex-col items-center justify-center w-full"
+        >
           <View className="flex flex-row items-center justify-between w-full">
             <Pressable
               className="flex items-center justify-center w-10 h-10 p-10"
               onPress={() => setIsDrawerOpen(true)}
             >
-              <Ionicons name="menu" size={24} color="#fff" />
+              <Ionicons name="trophy-outline" size={24} color="#ffffff" />
             </Pressable>
 
             <View className="flex flex-col items-center justify-center">
@@ -216,7 +228,10 @@ export default function PlanTrackerScreen() {
               </Text>
             </View>
 
-            <Pressable className="flex items-center justify-center w-10 h-10 p-10">
+            <Pressable
+              className="flex items-center justify-center w-10 h-10 p-10"
+              onPress={() => router.push('/plan-settings')}
+            >
               <Ionicons name="people-outline" size={24} color="#fff" />
             </Pressable>
           </View>
@@ -228,7 +243,7 @@ export default function PlanTrackerScreen() {
               {habit?.name ?? '5x por semana'}
             </Text>
           </View>
-        </View>
+        </LinearGradient>
 
         <View className="flex flex-col items-start justify-center gap-6 px-4 -mt-1">
           <View className="flex flex-row items-center justify-between flex-1 w-full gap-4 mb-6">
@@ -262,7 +277,13 @@ export default function PlanTrackerScreen() {
               </Text>
             </View>
             <View className="w-full h-3 bg-gray-200 rounded-full">
-              <View className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full w-[70%]"></View>
+              <LinearGradient
+                colors={['#7c3aed', '#4f46e5']}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={{ flex: 1 }}
+                className="h-full rounded-full w-[70%]"
+              ></LinearGradient>
             </View>
             <View className="flex flex-row items-center justify-between w-full">
               <Text className="text-gray-500">Termina em 23 dias</Text>

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -51,7 +52,13 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       <View
         className={`flex flex-col w-[80%] bg-white transition-all duration-500 ${isOpen ? 'right-0' : 'right-[100%]'}`}
       >
-        <View className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10 bg-gradient-to-r from-purple-600 to-indigo-600">
+        <LinearGradient
+          colors={['#7c3aed', '#4f46e5']}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={{ flex: 1 }}
+          className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
+        >
           <View className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-full">
             <Ionicons name="trophy-outline" size={24} color="#ffffff" />
           </View>
@@ -65,7 +72,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           >
             <Ionicons name="close-outline" size={26} color="#ffffff" />
           </Pressable>
-        </View>
+        </LinearGradient>
         <View className="flex flex-col">
           <View className="flex flex-col">
             <Text className="px-6 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase">

@@ -6,11 +6,12 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "betterthanyesterdayapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bug.betterthanyesterdayapp"
+      "bundleIdentifier": "com.bug.betterthanyesterdayapp",
+      "userInterfaceStyle": "light"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +22,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.bug.betterthanyesterdayapp"
+      "package": "com.bug.betterthanyesterdayapp",
+      "userInterfaceStyle": "light"
     },
     "web": {
       "output": "server",

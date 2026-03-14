@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useRef } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -9,7 +10,13 @@ export default function LoginScreen() {
   const buttonRef = useRef(null);
 
   return (
-    <View className="flex items-center justify-center flex-1 bg-gradient-to-b from-purple-600 to-indigo-600">
+    <LinearGradient
+      colors={['#7c3aed', '#4f46e5']}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={{ flex: 1 }}
+      className="flex items-center justify-center flex-1"
+    >
       <View className="flex items-center justify-center flex-1 w-[90%] max-w-[450px]">
         <View className="flex items-center justify-center mb-8 bg-purple-700 rounded-full w-28 h-28">
           <Ionicons name="trophy-outline" size={60} color="#ffdf20" />
@@ -54,6 +61,6 @@ export default function LoginScreen() {
           </View>
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
