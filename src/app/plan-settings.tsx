@@ -136,7 +136,7 @@ export default function PlanSettingsScreen() {
             </Pressable>
           </View>
 
-          { currentTab === 'Ranking' && <Ranking /> }
+          { currentTab === 'Ranking' && <Ranking planId={'abc'} /> }
           { currentTab === 'Check-ins' && <CheckinsWithReviewsList planId={'abc'} /> }
         </View>
       </ScrollView>
