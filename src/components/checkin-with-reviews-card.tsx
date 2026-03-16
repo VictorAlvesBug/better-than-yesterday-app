@@ -1,5 +1,5 @@
 import { CheckinReview, CheckinStatus } from '@/types/checkin.type';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { formatDate } from '../utils/dateUtils';
@@ -71,12 +71,12 @@ function renderReviews(reviews: CheckinReview[]){
 
   return ( 
     <View className="flex flex-row items-center justify-start w-full gap-3 px-6">
-      {validationReviews.length > 0 && <View className="flex flex-row items-center justify-center gap-1">
-        <Ionicons name="checkmark-circle" size={16} color="#619b7a" />
+      {validationReviews.length > 0 && <View className="flex flex-row items-center justify-center gap-2">
+        <FontAwesome5 name="check-circle" size={14} color="#619b7a" />
         <Text className="text-[#619b7a] font-bold">{validationReviews.length} {validationText}</Text>
       </View>} 
-      {rejectionReviews.length > 0 && <View className="flex flex-row items-center justify-center gap-1">
-        <Ionicons name="flag" size={16} color="#bd405c" />
+      {rejectionReviews.length > 0 && <View className="flex flex-row items-center justify-center gap-2">
+        <FontAwesome6 name="flag" size={14} color="#bd405c" />
         <Text className="text-[#bd405c] font-bold">{rejectionReviews.length} {rejectionText}</Text>
       </View>}
     </View>
@@ -87,13 +87,13 @@ function renderReviewButtons(){
   return (<View className="flex flex-row items-center justify-between w-full gap-2 px-4">
     <Pressable className="bg-[#d9ffea] py-2 rounded-xl flex-1">
       <View className="flex flex-row items-center justify-center w-full gap-2">
-        <Ionicons name="checkmark-circle" size={16} color="#619b7a" />
+        <FontAwesome5 name="check-circle" size={14} color="#619b7a" />
         <Text className="text-[#619b7a] font-bold">Validar</Text>
       </View>
     </Pressable>
     <Pressable className="bg-[#fceff1] px-4 py-2 rounded-xl flex-1">
       <View className="flex flex-row items-center justify-center w-full gap-2">
-        <Ionicons name="flag" size={16} color="#bd405c" />
+        <FontAwesome6 name="flag" size={14} color="#bd405c" />
         <Text className="text-[#bd405c] font-bold">Rejeitar</Text>
       </View>
     </Pressable>

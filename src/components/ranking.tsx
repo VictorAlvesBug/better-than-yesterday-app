@@ -53,7 +53,7 @@ export default function Ranking({ planId }: RankingProps) {
   return (
     <>
     {rankingItems.length === 0 && <View className="flex flex-row items-center justify-center gap-4">
-            {/* <Ionicons name="ban" size={20} color="#6b7280" /> */}
+            {/* <FontAwesome name="ban" size={20} color="#6b7280" /> */}
             <Text className="text-base text-gray-500">Check-ins insuficientes para ranking...</Text>
           </View>}
               { rankingItems.map(item => <RankingItemCard key={item.position} {...item} totalCount={totalCheckinsCount} />) }

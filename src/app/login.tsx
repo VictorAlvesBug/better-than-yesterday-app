@@ -1,8 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useRef } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -18,11 +18,10 @@ export default function LoginScreen() {
     >
       <View className="flex items-center justify-center flex-1 w-[90%] max-w-[450px]">
         <View className="flex items-center justify-center mb-8 bg-[#991ded] rounded-full w-28 h-28">
-          <Ionicons
-            name="trophy-outline"
+          <FontAwesome6
+            name="trophy"
             size={60}
             color="#ffdf20"
-            style={{ fontWeight: '700' }}
           />
         </View>
         <Text className="px-8 mb-2 text-4xl font-bold text-white">BTY</Text>
@@ -30,7 +29,7 @@ export default function LoginScreen() {
           Better Than Yesterday
         </Text>
         <View className="flex flex-row items-center justify-center gap-2 px-8 mb-12">
-          <Ionicons name="trending-up-outline" size={18} color="#7bf1a8" />
+          <FontAwesome6 name="arrow-trend-up" size={18} color="#7bf1a8" light />
           <Text className="font-thin text-white">
             Construa hábitos. Ganhe recompensas.
           </Text>
@@ -40,7 +39,10 @@ export default function LoginScreen() {
           onPress={() => router.push('/plan-tracker')}
         >
           <View className="flex flex-row items-center justify-center gap-3 py-4 bg-white rounded-xl">
-            <Ionicons name="logo-google" size={24} color="#4285F4" />
+            <Image 
+              source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
+              style={{ width: 24, height: 24 }}
+            />
             <Text className="text-lg font-semibold text-black">
               Continuar com Google
             </Text>

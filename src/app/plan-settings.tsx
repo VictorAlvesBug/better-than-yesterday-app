@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -35,7 +35,7 @@ export default function PlanSettingsScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => router.back()}
             >
-              <Ionicons name="arrow-back-outline" size={24} color="#fff" />
+              <FontAwesome5 name="arrow-left" size={20} color="#fff" />
             </Pressable>
             <Text className="flex-1 text-lg font-bold text-left text-white">
               Treino 5x na semana
@@ -44,7 +44,7 @@ export default function PlanSettingsScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
-              <Ionicons name="share-social-outline" size={24} color="#fff" />
+              <FontAwesome name="share" size={20} color="#fff" />
             </Pressable>
           </View>
 

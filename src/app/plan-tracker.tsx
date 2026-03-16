@@ -1,17 +1,16 @@
 import Card from '@/src/components/card';
 import { Checkin } from '@/types/checkin.type';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Button,
   Pressable,
   ScrollView,
   Text,
-  View,
+  View
 } from 'react-native';
 import CheckinCard from '../components/checkin-card';
 import SideDrawer from '../components/side-drawer';
@@ -235,7 +234,7 @@ export default function PlanTrackerScreen() {
               onPress={() => setIsDrawerOpen(true)}
               hitSlop={10}
             >
-              <Ionicons name="menu" size={24} color="white" />
+              <FontAwesome name="bars" size={20} color="white" />
             </Pressable>
 
             <View className="flex flex-col items-center justify-center">
@@ -248,7 +247,7 @@ export default function PlanTrackerScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
-              <Ionicons name="people-outline" size={26} color="#fff" />
+              <FontAwesome6 name="user-group" size={20} color="#fff" />
             </Pressable>
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
@@ -265,7 +264,7 @@ export default function PlanTrackerScreen() {
           <View className="flex flex-row items-center justify-between flex-1 w-full gap-4 mb-6">
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-2">
-                <Ionicons name="flame-outline" size={20} color="#e48d0a" />
+                <FontAwesome5 name="fire" size={18} color="#e48d0a" />
                 <Text className="text-gray-500">Sequência</Text>
               </View>
               <Text className="text-3xl font-bold text-black">7</Text>
@@ -275,7 +274,7 @@ export default function PlanTrackerScreen() {
             </Card>
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-2">
-                <Ionicons name="medal-outline" size={20} color="#7d23ce" />
+                <FontAwesome5 name="award" size={18} color="#7d23ce" />
                 <Text className="text-gray-500">Posição</Text>
               </View>
               <Text className="text-3xl font-bold text-black">#3</Text>
@@ -301,21 +300,22 @@ export default function PlanTrackerScreen() {
                 className="h-full rounded-full w-[70%]"
               ></LinearGradient>
             </View>
-            <View className="flex flex-row items-center justify-between w-full">
-              <Text className="text-gray-500">Termina em 23 dias</Text>
+            <View className="flex flex-row items-center justify-between w-full gap-2">
+              <FontAwesome5 name="calendar" size={16} color="#6b7280" />
+              <Text className="flex-1 text-gray-500">Termina em 23 dias</Text>
               <Text className="font-semibold text-purple-700">70%</Text>
             </View>
           </Card>
 
-          <View className="flex flex-row items-center justify-center flex-1 w-full gap-3 px-4 py-2 border border-green-300 shadow-md bg-green-50 rounded-xl">
-            <Ionicons name="gift-outline" size={24} color="#00aa00" />
-            <View className="flex flex-col items-start justify-center flex-1 gap-1">
-              <Text className="text-lg font-semibold text-green-700">
+          <View className="flex flex-row items-center justify-center flex-1 w-full gap-4 px-4 border border-green-300 shadow-md bg-green-50 rounded-xl">
+            <FontAwesome6 name="gift" size={20} color="#03a540" />
+            <View className="flex flex-col items-start justify-center flex-1">
+              <Text className="text-lg font-semibold text-[#03a540]">
                 2 folgas disponíveis
               </Text>
-              <Text className="text-green-700">Use com sabedoria!</Text>
+              <Text className="text-[#03a540]">Use com sabedoria!</Text>
             </View>
-            <Button title="Usar" color="#00aa00" />
+            <Pressable className="bg-[#03a540] rounded-lg px-4 py-2"><Text className="font-semibold text-white">Usar</Text></Pressable>
           </View>
 
           {/* Lista dos últimos check-ins dos participantes */}
@@ -339,7 +339,7 @@ export default function PlanTrackerScreen() {
 
       {/* Botão flutuante fixo (atalho para novo check-in, por exemplo) */}
       <Pressable className="absolute items-center justify-center w-16 h-16 bg-purple-700 rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
-        <Feather name="camera" size={24} color="white" />
+        <FontAwesome6 name="camera" size={24} color="white" />
       </Pressable>
     </View>
   );
