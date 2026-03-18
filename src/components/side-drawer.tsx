@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { formatInteger, formatMoney } from '../utils/numberUtils';
 
 type TextBalanceProps = {
   balance: number;
@@ -11,14 +12,9 @@ type TextBalanceProps = {
 function TextBalanceForFinishedPlan({ balance }: TextBalanceProps) {
   const isPositive = balance >= 0;
 
-  const formatter = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  });
-
   const signal = isPositive ? '+' : '-';
 
-  const formattedBalance = `${signal}${formatter.format(Math.abs(balance))}`;
+  const formattedBalance = `${signal}${formatMoney(Math.abs(balance))}`;
   return (
     <Text
       className={`font-semibold ${isPositive ? 'text-green-500' : 'text-red-400'}`}
@@ -66,7 +62,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           </View>
           <View className="flex flex-col items-start justify-center flex-1">
             <Text className="font-semibold text-white">João Silva</Text>
-            <Text className="font-thin text-white">Ranking: #42</Text>
+            <Text className="font-thin text-white">
+              Ranking: #{formatInteger(42)}
+            </Text>
           </View>
           <Pressable
             className="flex flex-row items-center justify-center w-10 h-10"
@@ -106,24 +104,40 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           </View>
           <View className="w-[calc(100%-2rem)] h-[1px] bg-gray-300 mx-auto my-6"></View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome name="home" size={18} color="#374151" className="w-4 text-center" />
+            <FontAwesome
+              name="home"
+              size={18}
+              color="#374151"
+              className="w-4 text-center"
+            />
             <Text className="font-semibold text-gray-700">Início</Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome name="plus" size={18} color="#374151" className="w-4 text-center" />
+            <FontAwesome
+              name="plus"
+              size={18}
+              color="#374151"
+              className="w-4 text-center"
+            />
             <Text className="font-semibold text-gray-700">
               Gerenciar Planos
             </Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome name="gear" size={18} color="#374151" className="w-4 text-center" />
+            <FontAwesome
+              name="gear"
+              size={18}
+              color="#374151"
+              className="w-4 text-center"
+            />
             <Text className="font-semibold text-gray-700">Configurações</Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <FontAwesome
               name="info"
               size={18}
-              color="#374151" className="w-4 text-center"
+              color="#374151"
+              className="w-4 text-center"
             />
             <Text className="font-semibold text-gray-700">Sobre nós</Text>
           </View>

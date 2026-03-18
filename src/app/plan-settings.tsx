@@ -1,11 +1,18 @@
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import BackButton from '../components/back-button';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import Ranking from '../components/ranking';
+import {
+  formatInteger,
+  formatMoney,
+  formatMoneyCompact,
+  formatPercent,
+} from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -31,46 +38,47 @@ export default function PlanSettingsScreen() {
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-center w-full">
-            <Pressable
-              className="flex items-center justify-center w-20 h-20"
-              onPress={() => router.back()}
-            >
-              <FontAwesome5 name="arrow-left" size={20} color="#fff" />
-            </Pressable>
+            <BackButton />
             <Text className="flex-1 text-lg font-bold text-left text-white">
               Treino 5x na semana
             </Text>
             <Pressable
               className="flex items-center justify-center w-20 h-20"
-              onPress={() => router.push('/plan-settings')}
+              onPress={() => {}}
             >
-              <FontAwesome name="share" size={20} color="#fff" />
+              <Ionicons name="share-social-outline" size={24} color="#fff" />
             </Pressable>
           </View>
 
           <View className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly bg-[#ffffff16] rounded-lg">
             <Text className="font-thin text-white">Pool de Recompensas</Text>
             <Text className="mb-1 text-3xl font-bold text-white">
-              R$ 252,00
+              {formatMoney(252)}
             </Text>
             <View className="flex flex-row items-center w-full justify-evenly">
               <View className="flex flex-col items-center justify-center gap-1">
                 <Text className="text-xs font-thin text-white">
                   Total Multas
                 </Text>
-                <Text className="font-semibold text-white">R$ 280</Text>
+                <Text className="font-semibold text-white">
+                  {formatMoneyCompact(280)}
+                </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
                 <Text className="text-xs font-thin text-white">
-                  Taxa Admin (10%)
+                  Taxa Admin ({formatPercent(0.1)})
                 </Text>
-                <Text className="font-semibold text-white">R$ 28</Text>
+                <Text className="font-semibold text-white">
+                  {formatMoneyCompact(28)}
+                </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
                 <Text className="text-xs font-thin text-white">
                   Participantes
                 </Text>
-                <Text className="font-semibold text-white">8</Text>
+                <Text className="font-semibold text-white">
+                  {formatInteger(8)}
+                </Text>
               </View>
             </View>
           </View>
@@ -136,8 +144,10 @@ export default function PlanSettingsScreen() {
             </Pressable>
           </View>
 
-          { currentTab === 'Ranking' && <Ranking planId={'abc'} /> }
-          { currentTab === 'Check-ins' && <CheckinsWithReviewsList planId={'abc'} /> }
+          {currentTab === 'Ranking' && <Ranking planId={'abc'} />}
+          {currentTab === 'Check-ins' && (
+            <CheckinsWithReviewsList planId={'abc'} />
+          )}
         </View>
       </ScrollView>
     </View>

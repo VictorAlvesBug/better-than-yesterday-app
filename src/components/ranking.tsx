@@ -3,8 +3,7 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import RankingItemCard from './ranking-item-card';
 
-type RankingProps = 
-{
+type RankingProps = {
   planId: string;
 };
 
@@ -49,14 +48,33 @@ export default function Ranking({ planId }: RankingProps) {
     penalty: 40,
     streak: 8,
   });
+  rankingItems.push({
+    position: 256,
+    name: 'Zé da Rua Butia 245 1234',
+    checkinsCount: 20,
+    penalty: 123456789,
+    streak: 833,
+  });
 
   return (
     <>
-    {rankingItems.length === 0 && <View className="flex flex-row items-center justify-center gap-4">
-            {/* <FontAwesome name="ban" size={20} color="#6b7280" /> */}
-            <Text className="text-base text-gray-500">Check-ins insuficientes para ranking...</Text>
-          </View>}
-              { rankingItems.map(item => <RankingItemCard key={item.position} {...item} totalCount={totalCheckinsCount} />) }
+      {rankingItems.length === 0 && (
+        <View className="flex flex-row items-center justify-center gap-4">
+          {/* <FontAwesome name="ban" size={20} color="#6b7280" /> */}
+          <Text className="text-base text-gray-500">
+            Check-ins insuficientes para ranking...
+          </Text>
+        </View>
+      )}
+      <View className="flex flex-col w-full gap-2">
+        {rankingItems.map((item) => (
+          <RankingItemCard
+            key={item.position}
+            {...item}
+            totalCount={totalCheckinsCount}
+          />
+        ))}
+      </View>
     </>
-  )
+  );
 }

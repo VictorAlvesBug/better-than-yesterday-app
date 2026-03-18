@@ -10,10 +10,11 @@ import {
   Pressable,
   ScrollView,
   Text,
-  View
+  View,
 } from 'react-native';
 import CheckinCard from '../components/checkin-card';
 import SideDrawer from '../components/side-drawer';
+import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -55,8 +56,6 @@ type PlanParticipant = {
   joinedAt: string;
   status: 'active' | 'blocked';
 };
-
-
 
 export default function PlanTrackerScreen() {
   const [users, setUsers] = useState<User[]>([]);
@@ -154,9 +153,10 @@ export default function PlanTrackerScreen() {
     name: 'John Doe',
     date: '2026-03-14 09:15',
     title: 'Test',
-    photoUrl: 'https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg',
+    photoUrl:
+      'https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg',
     reviews: [],
-    status: 'Validated'
+    status: 'Validated',
   });
   readingCheckins.push({
     id: 'checkin2',
@@ -165,9 +165,10 @@ export default function PlanTrackerScreen() {
     name: 'Victor Bug',
     date: '2026-03-13 07:20',
     title: 'Hoje foi em jejum!',
-    photoUrl: 'https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all',
+    photoUrl:
+      'https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all',
     reviews: [],
-    status: 'Validated'
+    status: 'Validated',
   });
   readingCheckins.push({
     id: 'checkin3',
@@ -176,9 +177,10 @@ export default function PlanTrackerScreen() {
     name: 'Teste',
     date: '2026-02-11 12:10',
     title: 'Lorem ipsum dolor sit amet!',
-    photoUrl: 'https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg',
+    photoUrl:
+      'https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg',
     reviews: [],
-    status: 'Validated'
+    status: 'Validated',
   });
   readingCheckins.push({
     id: 'checkin4',
@@ -189,7 +191,7 @@ export default function PlanTrackerScreen() {
     title: 'Lorem ipsu44m dolor sit amet! 😋🔥',
     photoUrl: '',
     reviews: [],
-    status: 'Validated'
+    status: 'Validated',
   });
 
   if (loading) {
@@ -205,6 +207,16 @@ export default function PlanTrackerScreen() {
   }
 
   console.log(statusBarHeight);
+
+  const planInfoMock = {
+    streak: 7,
+    position: 3,
+    totalParticipants: 8,
+    checkinCount: 13,
+    totalCheckinCount: 21,
+    daysToFinish: 23,
+    restCount: 2,
+  };
 
   return (
     <View
@@ -267,7 +279,9 @@ export default function PlanTrackerScreen() {
                 <FontAwesome5 name="fire" size={18} color="#e48d0a" />
                 <Text className="text-gray-500">Sequência</Text>
               </View>
-              <Text className="text-3xl font-bold text-black">7</Text>
+              <Text className="text-3xl font-bold text-black">
+                {formatInteger(planInfoMock.streak)}
+              </Text>
               <Text className="text-xs font-semibold text-gray-500">
                 dias seguidos
               </Text>
@@ -277,9 +291,11 @@ export default function PlanTrackerScreen() {
                 <FontAwesome5 name="award" size={18} color="#7d23ce" />
                 <Text className="text-gray-500">Posição</Text>
               </View>
-              <Text className="text-3xl font-bold text-black">#3</Text>
+              <Text className="text-3xl font-bold text-black">
+                #{formatInteger(planInfoMock.position)}
+              </Text>
               <Text className="text-xs font-semibold text-gray-500">
-                de 8 pessoas
+                de {formatInteger(planInfoMock.totalParticipants)} pessoas
               </Text>
             </Card>
           </View>
@@ -288,7 +304,8 @@ export default function PlanTrackerScreen() {
             <View className="flex flex-row items-center justify-between w-full">
               <Text className="font-bold text-black text-md">Progresso</Text>
               <Text className="font-bold text-purple-700 text-md">
-                14/20 dias
+                {formatInteger(planInfoMock.checkinCount)}/
+                {formatInteger(planInfoMock.totalCheckinCount)} dias
               </Text>
             </View>
             <View className="w-full h-3 bg-gray-200 rounded-full">
@@ -296,14 +313,24 @@ export default function PlanTrackerScreen() {
                 colors={['#7c3aed', '#4f46e5']}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
-                style={{ flex: 1 }}
-                className="h-full rounded-full w-[70%]"
+                style={{
+                  flex: 1,
+                  height: '100%',
+                  borderRadius: '9999px',
+                  width: `${(100 * planInfoMock.checkinCount) / planInfoMock.totalCheckinCount}%`,
+                }}
               ></LinearGradient>
             </View>
             <View className="flex flex-row items-center justify-between w-full gap-2">
               <FontAwesome5 name="calendar" size={16} color="#6b7280" />
-              <Text className="flex-1 text-gray-500">Termina em 23 dias</Text>
-              <Text className="font-semibold text-purple-700">70%</Text>
+              <Text className="flex-1 text-gray-500">
+                {`Termina em ${formatInteger(planInfoMock.daysToFinish)} ${planInfoMock.daysToFinish === 1 ? 'dia' : 'dias'}`}
+              </Text>
+              <Text className="font-semibold text-purple-700">
+                {formatPercentCompact(
+                  planInfoMock.checkinCount / planInfoMock.totalCheckinCount,
+                )}
+              </Text>
             </View>
           </Card>
 
@@ -311,11 +338,13 @@ export default function PlanTrackerScreen() {
             <FontAwesome6 name="gift" size={20} color="#03a540" />
             <View className="flex flex-col items-start justify-center flex-1">
               <Text className="text-lg font-semibold text-[#03a540]">
-                2 folgas disponíveis
+                {formatInteger(planInfoMock.restCount)} folgas disponíveis
               </Text>
               <Text className="text-[#03a540]">Use com sabedoria!</Text>
             </View>
-            <Pressable className="bg-[#03a540] rounded-lg px-4 py-2"><Text className="font-semibold text-white">Usar</Text></Pressable>
+            <Pressable className="bg-[#03a540] rounded-lg px-4 py-2">
+              <Text className="font-semibold text-white">Usar</Text>
+            </Pressable>
           </View>
 
           {/* Lista dos últimos check-ins dos participantes */}
