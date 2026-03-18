@@ -166,7 +166,7 @@ export default function PlanSettingsScreen() {
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  className={`font-semibold text-lg ${
+                  className={`font-semibold block text-lg ${
                     currentTab === 'Check-ins' ? 'text-white' : 'text-gray-500'
                   }`}
                 >
@@ -176,10 +176,16 @@ export default function PlanSettingsScreen() {
             </Pressable>
           </View>
 
-          {currentTab === 'Ranking' && <Ranking planId={'abc'} />}
-          {currentTab === 'Check-ins' && (
+          <View
+            className={`flex flex-col items-center justify-center gap-4 w-full ${currentTab === 'Ranking' ? 'block' : 'hidden'}`}
+          >
+            <Ranking planId={'abc'} />
+          </View>
+          <View
+            className={`flex flex-col items-center justify-center gap-4  w-full ${currentTab === 'Check-ins' ? 'block' : 'hidden'}`}
+          >
             <CheckinsWithReviewsList planId={'abc'} />
-          )}
+          </View>
         </View>
       </ScrollView>
     </View>
