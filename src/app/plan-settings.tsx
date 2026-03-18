@@ -2,8 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  LayoutChangeEvent,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import BackButton from '../components/back-button';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import Ranking from '../components/ranking';
@@ -18,7 +25,28 @@ const statusBarHeight = Constants.statusBarHeight;
 
 export default function PlanSettingsScreen() {
   const router = useRouter();
-  const [currentTab, setCurrentTab] = useState('Ranking');
+  const [currentTab, setCurrentTab] = useState<'Ranking' | 'Check-ins'>(
+    'Ranking',
+  );
+
+  // ---- ANIMAÇÃO DAS ABAS ----
+  const translateX = useRef(new Animated.Value(0)).current;
+  const [tabsWidth, setTabsWidth] = useState(0);
+
+  // metade da largura do container das tabs
+  const tabWidth = tabsWidth / 2 || 0;
+
+  useEffect(() => {
+    Animated.spring(translateX, {
+      toValue: currentTab === 'Ranking' ? 0 : tabWidth,
+      useNativeDriver: true,
+    }).start();
+  }, [currentTab, tabWidth, translateX]);
+
+  const handleTabsLayout = (e: LayoutChangeEvent) => {
+    setTabsWidth(e.nativeEvent.layout.width);
+  };
+  // ----------------------------
 
   return (
     <View
@@ -85,62 +113,66 @@ export default function PlanSettingsScreen() {
         </LinearGradient>
 
         <View className="flex flex-col items-center justify-center gap-4 px-4 my-4">
-          <View className="flex flex-row items-center justify-center w-full bg-white shadow-md rounded-2xl h-14">
-            <Pressable
-              className={`h-full flex-1 overflow-hidden`}
-              onPress={() => setCurrentTab('Ranking')}
-            >
-              <LinearGradient
-                colors={
-                  currentTab === 'Ranking'
-                    ? ['#7c3aed', '#4f46e5']
-                    : ['transparent', 'transparent']
-                }
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
+          {/* CONTAINER DAS TABS + FUNDO ANIMADO */}
+          <View
+            className="flex flex-row items-center justify-center w-full overflow-hidden bg-white shadow-md rounded-2xl h-14"
+            onLayout={handleTabsLayout}
+          >
+            {/* Pill animado de fundo */}
+            {tabWidth > 0 && (
+              <Animated.View
                 style={{
-                  flex: 1,
-                  margin: 4,
-                  borderRadius: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: tabWidth,
+                  transform: [{ translateX }],
                 }}
               >
+                <LinearGradient
+                  colors={['#7c3aed', '#4f46e5']}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={{
+                    flex: 1,
+                    margin: 4,
+                    borderRadius: 12,
+                  }}
+                />
+              </Animated.View>
+            )}
+
+            {/* Aba Ranking */}
+            <Pressable
+              className="flex-1 h-full"
+              onPress={() => setCurrentTab('Ranking')}
+            >
+              <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  className={`font-semibold text-lg ${currentTab === 'Ranking' ? 'text-white' : 'text-gray-500'}`}
+                  className={`font-semibold text-lg ${
+                    currentTab === 'Ranking' ? 'text-white' : 'text-gray-500'
+                  }`}
                 >
                   Ranking
                 </Text>
-              </LinearGradient>
+              </View>
             </Pressable>
+
+            {/* Aba Check-ins */}
             <Pressable
-              className={`h-full flex-1 overflow-hidden`}
+              className="flex-1 h-full"
               onPress={() => setCurrentTab('Check-ins')}
             >
-              <LinearGradient
-                colors={
-                  currentTab === 'Check-ins'
-                    ? ['#7c3aed', '#4f46e5']
-                    : ['transparent', 'transparent']
-                }
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={{
-                  flex: 1,
-                  margin: 4,
-                  borderRadius: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                }}
-              >
+              <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  className={`font-semibold text-lg ${currentTab === 'Check-ins' ? 'text-white' : 'text-gray-500'}`}
+                  className={`font-semibold text-lg ${
+                    currentTab === 'Check-ins' ? 'text-white' : 'text-gray-500'
+                  }`}
                 >
                   Check-ins
                 </Text>
-              </LinearGradient>
+              </View>
             </Pressable>
           </View>
 
