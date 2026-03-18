@@ -57,7 +57,7 @@ export default function SearchableSelect({
 
       {/* Campo “fechado” */}
       <Pressable
-        className="flex-row items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg"
+        className="flex flex-row items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg"
         onPress={() => setOpen(true)}
       >
         <Text
@@ -154,7 +154,14 @@ export default function SearchableSelect({
                     Nenhum resultado encontrado
                   </Text>)
                   : (<Pressable
-                    onPress={() => createOption(search)}
+                    onPress={
+                      () => {
+                      createOption(search)
+                      onChange(search);
+                      setOpen(false);
+                      setSearch('');
+                    }
+                    }
                     className="py-4 m-2 text-sm font-semibold text-center text-purple-700 bg-purple-100 border border-purple-700 rounded-2xl">
                     Criar &quot;{search}&quot;
                   </Pressable>)

@@ -9,6 +9,7 @@ import {
   View
 } from 'react-native';
 import BackButton from '../components/back-button';
+import Input from '../components/input';
 import SearchableSelect, { type Option } from '../components/searchable-select';
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -17,6 +18,7 @@ export default function CreatePlanScreen() {
   const router = useRouter();
 
   const [habitId, setHabitId] = useState<string | null>()
+  const [description, setDescription] = useState<string | null>(null);
 
   const [habitItemList, setHabitItemList] = useState<Option[]>([
     {
@@ -67,15 +69,17 @@ export default function CreatePlanScreen() {
       value: "12",
       label: "12"
     }
-  ]); 
+  ]);
 
-  function createHabit (name: string){
+  function createHabit(name: string) {
     const newHabit = {
       value: name,
       label: name
     }
     setHabitItemList((prev) => [...prev, newHabit])
   }
+
+
 
   return (
     <View
@@ -106,17 +110,24 @@ export default function CreatePlanScreen() {
         </LinearGradient>
 
         <View className="flex flex-col items-start justify-center gap-6 p-4">
-          <Card className="flex flex-col items-start justify-center flex-1 w-full gap-3">
-            <View className="flex flex-col items-start justify-between w-full gap-1">
-              <SearchableSelect
-                label="Selecione o Hábito"
-                placeholder="Escolha um hábito..."
-                value={habitId}
-                options={habitItemList}
-                onChange={setHabitId}
-                createOption={createHabit}
-              />
-            </View>
+          <Card className="flex flex-col items-start justify-center w-full gap-4">
+            <SearchableSelect
+              label="Selecione o Hábito"
+              placeholder="Escolha um hábito..."
+              value={habitId}
+              options={habitItemList}
+              onChange={setHabitId}
+              createOption={createHabit}
+            />
+          </Card>
+
+          <Card className="flex flex-col items-start justify-center w-full gap-3">
+            <Input
+              label="Descrição (opcional)"
+              placeholder="Ex: Treinar pelo menos 45 minutos..."
+              value={description}
+              onChange={setDescription}
+            />
           </Card>
 
         </View>
