@@ -109,14 +109,16 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             </View>
             <Text className="font-semibold text-gray-700">Início</Text>
           </View>
-          <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
+          <Pressable
+            onPress={() => router.push('/manage-plans')}
+             className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-4">
               <Ionicons name="add-circle-outline" size={20} color="#374151" />
             </View>
             <Text className="font-semibold text-gray-700">
               Gerenciar Planos
             </Text>
-          </View>
+          </Pressable>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-4">
               <Ionicons name="settings-outline" size={20} color="#374151" />
