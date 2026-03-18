@@ -1,4 +1,4 @@
-import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -70,7 +70,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             className="flex flex-row items-center justify-center w-10 h-10"
             onPress={onClose}
           >
-            <FontAwesome name="times" size={22} color="#ffffff" />
+            <Ionicons name="close" size={26} color="#ffffff" />
           </Pressable>
         </LinearGradient>
         <View className="flex flex-col">
@@ -104,48 +104,44 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           </View>
           <View className="w-[calc(100%-2rem)] h-[1px] bg-gray-300 mx-auto my-6"></View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome
-              name="home"
-              size={18}
-              color="#374151"
-              className="w-4 text-center"
-            />
+            <View className="flex flex-row items-center justify-center w-4">
+              <Ionicons name="home-outline" size={20} color="#374151" />
+            </View>
             <Text className="font-semibold text-gray-700">Início</Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome
-              name="plus"
-              size={18}
-              color="#374151"
-              className="w-4 text-center"
-            />
+            <View className="flex flex-row items-center justify-center w-4">
+              <Ionicons name="add-circle-outline" size={20} color="#374151" />
+            </View>
             <Text className="font-semibold text-gray-700">
               Gerenciar Planos
             </Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome
-              name="gear"
-              size={18}
-              color="#374151"
-              className="w-4 text-center"
-            />
-            <Text className="font-semibold text-gray-700">Configurações</Text>
+            <View className="flex flex-row items-center justify-center w-4">
+              <Ionicons name="settings-outline" size={20} color="#374151" />
+            </View>
+            <Text className="my-auto font-semibold text-gray-700">
+              Configurações
+            </Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <FontAwesome
-              name="info"
-              size={18}
-              color="#374151"
-              className="w-4 text-center"
-            />
+            <View className="flex flex-row items-center justify-center w-4">
+              <Ionicons
+                name="information-circle-outline"
+                size={20}
+                color="#374151"
+              />
+            </View>
             <Text className="font-semibold text-gray-700">Sobre nós</Text>
           </View>
           <Pressable
             onPress={() => router.push('/login')}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
           >
-            <FontAwesome name="sign-out" size={18} color="#b91c1c" />
+            <View className="flex flex-row items-center justify-center w-4">
+              <Ionicons name="log-out-outline" size={20} color="#b91c1c" />
+            </View>
             <Text className="font-semibold text-red-700">Sair</Text>
           </Pressable>
         </View>

@@ -1,6 +1,6 @@
 import Card from '@/src/components/card';
 import { Checkin } from '@/types/checkin.type';
-import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -71,47 +71,6 @@ export default function PlanTrackerScreen() {
 
   const router = useRouter();
 
-  /*useEffect(() => {
-    async function loadData() {
-      try {
-        const [usersRes, habitsRes, plansRes, participantsRes, checkinsRes] =
-          await Promise.all([
-            fetch(`${API_BASE_URL}/users`),
-            fetch(`${API_BASE_URL}/habits`),
-            fetch(`${API_BASE_URL}/plans`),
-            fetch(`${API_BASE_URL}/planParticipants`),
-            fetch(`${API_BASE_URL}/checkins`),
-          ]);
-
-        const [
-          usersJson,
-          habitsJson,
-          plansJson,
-          participantsJson,
-          checkinsJson,
-        ] = await Promise.all([
-          usersRes.json(),
-          habitsRes.json(),
-          plansRes.json(),
-          participantsRes.json(),
-          checkinsRes.json(),
-        ]);
-
-        setUsers(usersJson);
-        setHabits(habitsJson);
-        setPlans(plansJson);
-        setPlanParticipants(participantsJson);
-        setCheckins(checkinsJson);
-      } catch (error) {
-        console.error('Erro ao buscar dados do json-server', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);*/
-
   const plan = useMemo(
     () => plans.find((p) => p.id === READING_PLAN_ID),
     [plans],
@@ -122,7 +81,6 @@ export default function PlanTrackerScreen() {
     [habits, plan],
   );
 
-  // participantes do plano de leitura
   const readingParticipants = useMemo(() => {
     return planParticipants
       .filter((pp) => pp.planId === READING_PLAN_ID && pp.status === 'active')
@@ -136,14 +94,6 @@ export default function PlanTrackerScreen() {
         };
       });
   }, [planParticipants, users]);
-
-  // checkins do plano de leitura, mais recentes primeiro
-  /*const readingCheckins = useMemo(() => {
-    return checkins
-      .filter((c) => c.planId === READING_PLAN_ID)
-      .sort((a, b) => (a.date < b.date ? 1 : -1))
-      .slice(0, 5); // últimos 5
-  }, [checkins]);*/
 
   const readingCheckins: Checkin[] = [];
   readingCheckins.push({
@@ -206,8 +156,6 @@ export default function PlanTrackerScreen() {
     );
   }
 
-  console.log(statusBarHeight);
-
   const planInfoMock = {
     streak: 7,
     position: 3,
@@ -246,7 +194,7 @@ export default function PlanTrackerScreen() {
               onPress={() => setIsDrawerOpen(true)}
               hitSlop={10}
             >
-              <FontAwesome name="bars" size={20} color="white" />
+              <Ionicons name="menu" size={24} color="white" />
             </Pressable>
 
             <View className="flex flex-col items-center justify-center">
@@ -259,7 +207,7 @@ export default function PlanTrackerScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
-              <FontAwesome6 name="user-group" size={20} color="#fff" />
+              <Ionicons name="people-outline" size={24} color="#fff" />
             </Pressable>
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
@@ -316,15 +264,20 @@ export default function PlanTrackerScreen() {
                 style={{
                   flex: 1,
                   height: '100%',
-                  borderRadius: '9999px',
-                  width: `${(100 * planInfoMock.checkinCount) / planInfoMock.totalCheckinCount}%`,
+                  borderRadius: 9999,
+                  width: `${
+                    (100 * planInfoMock.checkinCount) /
+                    planInfoMock.totalCheckinCount
+                  }%`,
                 }}
-              ></LinearGradient>
+              />
             </View>
             <View className="flex flex-row items-center justify-between w-full gap-2">
               <FontAwesome5 name="calendar" size={16} color="#6b7280" />
               <Text className="flex-1 text-gray-500">
-                {`Termina em ${formatInteger(planInfoMock.daysToFinish)} ${planInfoMock.daysToFinish === 1 ? 'dia' : 'dias'}`}
+                {`Termina em ${formatInteger(planInfoMock.daysToFinish)} ${
+                  planInfoMock.daysToFinish === 1 ? 'dia' : 'dias'
+                }`}
               </Text>
               <Text className="font-semibold text-purple-700">
                 {formatPercentCompact(
@@ -360,13 +313,12 @@ export default function PlanTrackerScreen() {
           </View>
 
           {readingCheckins.map((checkin) => {
-            // const user = users.find((u) => u.id === checkin.userId);
             return <CheckinCard key={checkin.id} {...checkin} />;
           })}
         </View>
       </ScrollView>
 
-      {/* Botão flutuante fixo (atalho para novo check-in, por exemplo) */}
+      {/* Botão flutuante fixo */}
       <Pressable className="absolute items-center justify-center w-16 h-16 bg-purple-700 rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
         <FontAwesome6 name="camera" size={24} color="white" />
       </Pressable>
