@@ -1,3 +1,4 @@
+import { TextSize } from '@/types/common.type';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -16,6 +17,7 @@ export type Option = {
 
 type SearchableSelectProps = {
   label?: string;
+    labelSize?: TextSize;
   placeholder?: string;
   value?: string | null;
   options: Option[];
@@ -25,6 +27,7 @@ type SearchableSelectProps = {
 
 export default function SearchableSelect({
   label,
+  labelSize = "text-base",
   placeholder = 'Selecione...',
   value,
   options,
@@ -50,7 +53,7 @@ export default function SearchableSelect({
   return (
     <View className="w-full">
       {label && (
-        <Text className="mb-1 text-xs font-semibold text-gray-500 uppercase">
+              <Text className={`mb-1 font-semibold text-gray-500 uppercase ${labelSize}`}>
           {label}
         </Text>
       )}

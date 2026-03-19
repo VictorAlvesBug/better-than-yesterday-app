@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import { formatDate } from '../utils/dateUtils';
+import { formatRelativeDate } from '../utils/dateUtils';
 import ProfilePhoto from './profile-photo';
 
 const unavailablePhotoUrl =
@@ -38,7 +38,7 @@ export default function CheckinCard({
             {name}
           </Text>
           <Text className="text-xs text-gray-500" numberOfLines={1}>
-            {formatDate(date)}
+            {formatRelativeDate(date)}
           </Text>
         </View>
       </View>

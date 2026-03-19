@@ -2,7 +2,7 @@ import { CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import { formatDate } from '../utils/dateUtils';
+import { formatRelativeDate } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
 import ProfilePhoto from './profile-photo';
 
@@ -45,7 +45,7 @@ export default function CheckinWithReviewsCard({
             {name}
           </Text>
           <Text className="text-xs text-gray-500" numberOfLines={1}>
-            {formatDate(date)}
+            {formatRelativeDate(date)}
           </Text>
         </View>
         {renderStatus(status)}

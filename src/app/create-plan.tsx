@@ -9,8 +9,11 @@ import {
   View
 } from 'react-native';
 import BackButton from '../components/back-button';
+import { DateInput } from '../components/date-input';
+import DateRangeSelect from '../components/date-range-select';
 import Input from '../components/input';
 import SearchableSelect, { type Option } from '../components/searchable-select';
+import { formatDate, getRelativeDate } from '../utils/dateUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -19,6 +22,8 @@ export default function CreatePlanScreen() {
 
   const [habitId, setHabitId] = useState<string | null>()
   const [description, setDescription] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string>(formatDate(getRelativeDate(+1)));
+  const [finishDate, setFinishDate] = useState<string>(formatDate(getRelativeDate(+365)));
 
   const [habitItemList, setHabitItemList] = useState<Option[]>([
     {
@@ -80,7 +85,6 @@ export default function CreatePlanScreen() {
   }
 
 
-
   return (
     <View
       className="flex-1 bg-slate-200"
@@ -109,7 +113,7 @@ export default function CreatePlanScreen() {
           </View>
         </LinearGradient>
 
-        <View className="flex flex-col items-start justify-center gap-6 p-4">
+        <View className="w-full px-4 gap-3 py-3">
           <Card className="flex flex-col items-start justify-center w-full gap-4">
             <SearchableSelect
               label="Selecione o Hábito"
@@ -124,9 +128,31 @@ export default function CreatePlanScreen() {
           <Card className="flex flex-col items-start justify-center w-full gap-3">
             <Input
               label="Descrição (opcional)"
-              placeholder="Ex: Treinar pelo menos 45 minutos..."
+              placeholder="Ex: Treinar ao menos 45 minutos..."
               value={description}
               onChange={setDescription}
+            />
+          </Card>
+
+          <Card className="flex flex-col items-start justify-center w-full gap-3">
+            <DateRangeSelect
+              label="Período do Plano"
+              startValueLabel="Data de Início"
+              startValue={startDate}
+              setStartValue={setStartDate}
+              minValue={formatDate(getRelativeDate(+1))}
+              finishValueLabel="Data de Término"
+              finishValue={finishDate}
+              setFinishValue={setFinishDate}
+            />
+          </Card>
+
+          <Card className="flex flex-row items-start justify-center w-full gap-3">
+            <DateInput 
+            label="Selecione uma data..."
+            value={startDate}
+            setValue={setStartDate}
+            minValue={formatDate(getRelativeDate(+1))}
             />
           </Card>
 

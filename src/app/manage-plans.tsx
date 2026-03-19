@@ -1,17 +1,13 @@
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleProp, Text, View, ViewStyle } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import BackButton from '../components/back-button';
+import { Button } from '../components/button';
 
 const statusBarHeight = Constants.statusBarHeight;
 
-type ManagePlansProps = {
-  className?: string;
-  style?: StyleProp<ViewStyle>;
-};
-
-export default function ManagePlansScreen({ className, style }: ManagePlansProps) {
+export default function ManagePlansScreen() {
   const router = useRouter();
 
   return (
@@ -42,43 +38,13 @@ export default function ManagePlansScreen({ className, style }: ManagePlansProps
         </LinearGradient>
 
         <View
-          style={style}
-          className={`w-full px-4 gap-3 py-3 ${className || ''}`}
+          className={`w-full px-4 gap-3 py-3`}
         >
 
-          <Pressable
-            className="items-center justify-center flex-1 p-4 bg-purple-200 border border-purple-700 rounded-2xl h-14"
-            onPress={() => router.push('/create-plan')}
-          >
-            <Text
-              className={`font-semibold text-lg text-purple-700`}
-            >
-              Criar Novo Plano
-            </Text>
-          </Pressable>
-
-          <Pressable
-            className="items-center justify-center flex-1 p-4 bg-purple-200 border border-purple-700 rounded-2xl h-14"
-            onPress={() => console.log('TODO: Abrir modal para colar link de convidado')}
-          >
-            <Text
-              className={`font-semibold text-lg text-purple-700`}
-            >
-              Tenho um Link de Convidado
-            </Text>
-          </Pressable>
-
-          <Pressable
-            className="items-center justify-center flex-1 p-4 bg-purple-200 border border-purple-700 rounded-2xl h-14"
-            onPress={() => console.log('TODO: /trending-plans')}
-          >
-            <Text
-              className={`font-semibold text-lg text-purple-700`}
-            >
-              Planos Populares
-            </Text>
-          </Pressable>
-          
+          <Button action={() => router.push('/create-plan')}>Criar Novo Plano</Button>
+          <Button action={() => console.log('TODO: Abrir modal para colar link de convidado')}>
+            Tenho um Link de Convidado</Button>
+          <Button action={() => console.log('TODO: /trending-plans')}>Planos Populares</Button>
         </View>
       </ScrollView>
     </View>
