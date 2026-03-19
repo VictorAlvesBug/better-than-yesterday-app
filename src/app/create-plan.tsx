@@ -9,9 +9,9 @@ import {
   View
 } from 'react-native';
 import BackButton from '../components/back-button';
-import { DateInput } from '../components/date-input';
 import DateRangeSelect from '../components/date-range-select';
 import Input from '../components/input';
+import NumberSelect from '../components/number-select';
 import SearchableSelect, { type Option } from '../components/searchable-select';
 import { formatDate, getRelativeDate } from '../utils/dateUtils';
 
@@ -24,6 +24,7 @@ export default function CreatePlanScreen() {
   const [description, setDescription] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(formatDate(getRelativeDate(+1)));
   const [finishDate, setFinishDate] = useState<string>(formatDate(getRelativeDate(+365)));
+  const [restsPerWeek, setRestsPerWeek] = useState<number>(2);
 
   const [habitItemList, setHabitItemList] = useState<Option[]>([
     {
@@ -148,11 +149,12 @@ export default function CreatePlanScreen() {
           </Card>
 
           <Card className="flex flex-row items-start justify-center w-full gap-3">
-            <DateInput 
-            label="Selecione uma data..."
-            value={startDate}
-            setValue={setStartDate}
-            minValue={formatDate(getRelativeDate(+1))}
+            <NumberSelect 
+            label="Folgas permitidas por semana"
+            value={restsPerWeek}
+            setValue={setRestsPerWeek}
+            minValue={0}
+            maxValue={6}
             />
           </Card>
 

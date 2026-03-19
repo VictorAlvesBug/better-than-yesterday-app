@@ -9,7 +9,7 @@ type ButtonProps = {
 export function Button({ action = () => { }, children, className }: ButtonProps) {
   return (
     <Pressable
-      className={`items-center justify-center bg-purple-200 border border-purple-700 rounded-2xl h-14 ${className || ''}`}
+      className={`items-center justify-center bg-purple-200 border border-purple-700 rounded-2xl h-14 ${className || ''} px-3`}
       onPress={action}
     >
       {typeof children === 'string' ? (

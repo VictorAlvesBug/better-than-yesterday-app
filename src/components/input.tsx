@@ -1,3 +1,4 @@
+import { TextSize } from '@/types/common.type';
 import React from 'react';
 import {
   Text,
@@ -7,6 +8,7 @@ import {
 
 type InputProps = {
   label?: string;
+  labelSize?: TextSize;
   placeholder?: string;
   value?: string | null;
   onChange: (value: string) => void;
@@ -14,6 +16,7 @@ type InputProps = {
 
 export default function Input({
   label,
+  labelSize = "text-base",
   placeholder = 'Selecione...',
   value,
   onChange,
@@ -21,7 +24,7 @@ export default function Input({
   return (
     <View className="w-full">
       {label && (
-        <Text className="mb-1 text-sm font-semibold text-gray-500 uppercase">
+                    <Text className={`mb-1 font-semibold text-gray-500 uppercase ${labelSize}`}>
           {label}
         </Text>
       )}
