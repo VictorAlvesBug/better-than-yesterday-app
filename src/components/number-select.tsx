@@ -1,4 +1,4 @@
-import { TextSize } from '@/types/common.type';
+import { getColor, TextSize } from '@/types/common.type';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -41,14 +41,14 @@ export default function NumberSelect({
         </Text>
       )}
       <View className="flex flex-row items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg">
-        <Button action={onDecrease}>
-          <Ionicons name="chevron-back-outline" size={20} />
+        <Button color={"secondary"} action={onDecrease}>
+          <Ionicons name="chevron-back-outline" size={20} color={getColor("secondary").base} />
         </Button>
-        <Text className="text-gray-800 outline-none text-lg">
+        <Text className="text-lg text-gray-800 outline-none">
           {value}
         </Text>
-        <Button action={onIncrease}>
-          <Ionicons name="chevron-forward-outline" size={20} />
+        <Button color={"secondary"} action={onIncrease}>
+          <Ionicons name="chevron-forward-outline" size={20} color={getColor("secondary").base} />
         </Button>
       </View>
     </View>

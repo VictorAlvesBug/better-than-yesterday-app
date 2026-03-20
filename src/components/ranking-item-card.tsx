@@ -31,7 +31,7 @@ export default function RankingItemCard({
   return (
     <View className="flex flex-col items-center justify-between w-full gap-1 px-5 py-3 bg-white shadow-md rounded-2xl">
       <View className="flex flex-row items-center justify-between w-full gap-1">
-        <View className="flex items-center justify-center w-10">
+        <View className="flex items-center justify-center w-12">
           {renderPosition(position)}
         </View>
 
@@ -92,8 +92,14 @@ function renderPosition(position: number) {
     case 3:
       return <FontAwesome6 name={iconName} size={iconSize} color="#d94f16" />;
     default:
+      const positionLength = position.toString().length;
+      const textSize = 
+        positionLength === 1 ? "text-2xl"
+        : positionLength === 2 ? "text-xl"
+        : positionLength === 3 ? "text-lg"
+        : "text-base"
       return (
-        <Text className="text-[#9ca2b4] text-2xl font-bold">
+        <Text className={`text-[#9ca2b4] ${textSize} font-bold`}>
           #{formatIntegerCompact(position)}
         </Text>
       );

@@ -104,34 +104,34 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           </View>
           <View className="w-[calc(100%-2rem)] h-[1px] bg-gray-300 mx-auto my-6"></View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <View className="flex flex-row items-center justify-center w-4">
-              <Ionicons name="home-outline" size={20} color="#374151" />
+            <View className="flex flex-row items-center justify-center w-5">
+              <Ionicons name="home-outline" size={16} color="#374151" />
             </View>
             <Text className="font-semibold text-gray-700">Início</Text>
           </View>
           <Pressable
             onPress={() => router.push('/manage-plans')}
              className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <View className="flex flex-row items-center justify-center w-4">
-              <Ionicons name="add-circle-outline" size={20} color="#374151" />
+            <View className="flex flex-row items-center justify-center w-5">
+              <Ionicons name="add-circle-outline" size={16} color="#374151" />
             </View>
             <Text className="font-semibold text-gray-700">
               Gerenciar Planos
             </Text>
           </Pressable>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <View className="flex flex-row items-center justify-center w-4">
-              <Ionicons name="settings-outline" size={20} color="#374151" />
+            <View className="flex flex-row items-center justify-center w-5">
+              <Ionicons name="settings-outline" size={16} color="#374151" />
             </View>
             <Text className="my-auto font-semibold text-gray-700">
               Configurações
             </Text>
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
-            <View className="flex flex-row items-center justify-center w-4">
+            <View className="flex flex-row items-center justify-center w-5">
               <Ionicons
                 name="information-circle-outline"
-                size={20}
+                size={16}
                 color="#374151"
               />
             </View>
@@ -141,8 +141,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             onPress={() => router.push('/login')}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
           >
-            <View className="flex flex-row items-center justify-center w-4">
-              <Ionicons name="log-out-outline" size={20} color="#b91c1c" />
+            <View className="flex flex-row items-center justify-center w-5">
+              <Ionicons name="log-out-outline" size={16} color="#b91c1c" />
             </View>
             <Text className="font-semibold text-red-700">Sair</Text>
           </Pressable>
