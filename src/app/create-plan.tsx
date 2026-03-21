@@ -1,5 +1,5 @@
 import Card from '@/src/components/card';
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
@@ -88,7 +88,7 @@ export default function CreatePlanScreen() {
   return (
     <View
       className="flex-1"
-      style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
+      style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
     >
       <ScrollView
         style={{ flex: 1 }}
@@ -113,7 +113,7 @@ export default function CreatePlanScreen() {
           </View>
         </LinearGradient>
 
-        <View className="w-full px-4 gap-3 py-3">
+        <View className="w-full gap-3 px-4 py-3">
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Selecione o Hábito</Label>
             <SearchableSelect

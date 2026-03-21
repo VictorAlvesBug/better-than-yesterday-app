@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@formatjs/intl-numberformat": "^9.3.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^7.2.0",
     "@fortawesome/react-native-fontawesome": "^0.3.2",

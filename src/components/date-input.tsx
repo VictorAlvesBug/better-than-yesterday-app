@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
@@ -34,9 +34,9 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
 
   return (
     <View className="flex-1">
-      <Pressable style={{borderColor: getColor("light-secondary")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
+      <Pressable style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
         onPress={openPicker}>
-        <TextInput style={{ color: getColor("dark-gray") }}
+        <TextInput
           className="flex-1 outline-none"
           value={value}
           editable={false}

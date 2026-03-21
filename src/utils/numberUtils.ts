@@ -1,4 +1,4 @@
-
+//import { IntlNumberFormat } from '@formatjs/intl-numberformat/polyfill';
 
 export function formatInteger(value: number) {
     return getIntegerFormatter({ value, showWholeNumber: false, useCompact: false })
@@ -11,13 +11,43 @@ export function formatIntegerCompact(value: number) {
 }
 
 export function formatMoney(value: number) {
-    return getMoneyFormatter({ value, showWholeNumber: true })
-        .format(value);
+    const formatter = new Intl.NumberFormat(
+        'pt-BR',
+        {
+            style: 'currency',
+            currency: 'BRL',
+            notation: 'standard',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+    return formatter.format(value);
 }
 
 export function formatMoneyCompact(value: number) {
-    return getMoneyFormatter({ value, showWholeNumber: false })
-        .format(value);
+    if (Math.abs(value) < 1000) {
+        const formatter = new Intl.NumberFormat(
+            'pt-BR',
+            {
+                style: 'currency',
+                currency: 'BRL',
+                notation: 'standard',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+
+        return formatter.format(value);
+    }
+
+    const formatter = new Intl.NumberFormat(
+        'en-US',
+        {
+            notation: 'compact',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+
+        return `R$${formatter.format(value)}`;
 }
 
 export function formatPercent(value: number) {
@@ -60,36 +90,6 @@ function getIntegerFormatter({ value, showWholeNumber, useCompact }: GetFormatte
             maximumFractionDigits: decimalPlaces
         });
 }
-
-function getMoneyFormatter({ value, showWholeNumber, useCompact }: GetFormatterOptions) {
-    const absoluteValue = Math.abs(value);
-    const decimalPlaces = showWholeNumber ? 2 : 0;
-    const notationDueToUseCompact = useCompact === undefined ? undefined : (useCompact ? 'compact' : 'standard');
-    const locateDueToUseCompact = useCompact === undefined ? undefined : (useCompact ? 'en-US' : 'pt-BR');
-
-    if (absoluteValue < 1000 || showWholeNumber) {
-        return new Intl.NumberFormat(
-            locateDueToUseCompact ?? 'pt-BR',
-            {
-                style: 'currency',
-                currency: 'BRL',
-                notation: notationDueToUseCompact ?? 'standard',
-                minimumFractionDigits: decimalPlaces,
-                maximumFractionDigits: decimalPlaces
-            });
-    }
-
-    return new Intl.NumberFormat(
-        locateDueToUseCompact ?? 'en-US',
-        {
-            style: 'currency',
-            currency: 'BRL',
-            notation: notationDueToUseCompact ?? 'compact',
-            minimumFractionDigits: decimalPlaces,
-            maximumFractionDigits: decimalPlaces
-        });
-}
-
 
 type GetPercentFormatterOptions = {
     value: number;

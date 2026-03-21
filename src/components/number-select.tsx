@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -30,15 +30,15 @@ export default function NumberSelect({
   }
 
   return (
-      <View style={{borderColor: getColor("light-secondary")}} className="w-full flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg">
-        <Button color='light-secondary' action={onDecrease}>
-          <Ionicons name="chevron-back-outline" size={20} color={getColor("secondary")} />
+      <View style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between w-full px-3 py-2 bg-white border rounded-lg">
+        <Button color='gray-d' type="outline" action={onDecrease}>
+          <Ionicons name="chevron-back-outline" size={20} color={getColor("gray-7")} />
         </Button>
-        <Text style={{color: getColor("dark-gray")}} className="text-lg outline-none">
+        <Text className="text-lg outline-none">
           {value}
         </Text>
-        <Button color='light-secondary' action={onIncrease}>
-          <Ionicons name="chevron-forward-outline" size={20} color={getColor("secondary")} />
+        <Button color='gray-d' type="outline" action={onIncrease}>
+          <Ionicons name="chevron-forward-outline" size={20} color={getColor("gray-7")} />
         </Button>
       </View>
   );

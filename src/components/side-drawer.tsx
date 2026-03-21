@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -76,7 +76,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
         </LinearGradient>
         <View className="flex flex-col">
           <View className="flex flex-col">
-            <Text style={{color: getColor("gray")}} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
+            <Text style={{color: getColor("gray-7")}} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
               Planos Ativos
             </Text>
             {activePlans.map((planName) => (
@@ -85,12 +85,12 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 className="flex flex-row items-center justify-start gap-3 px-8 py-4"
               >
                 <View style={{backgroundColor: getColor("lime")}} className="w-2 h-2 rounded-full"></View>
-                <Text style={{color: getColor("dark-gray")}} className="font-semibold">{planName}</Text>
+                <Text style={{color: getColor("gray-3")}} className="font-semibold">{planName}</Text>
               </View>
             ))}
           </View>
           <View className="flex flex-col">
-            <Text style={{color: getColor("gray")}} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
+            <Text style={{color: getColor("gray-7")}} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
               Planos Finalizados
             </Text>
             {finishedPlans.map((plan) => (
@@ -98,33 +98,33 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 key={plan.name}
                 className="flex flex-row items-center justify-between gap-3 px-8 py-4"
               >
-                <Text style={{color: getColor("dark-gray")}} className="font-semibold">{plan.name}</Text>
+                <Text style={{color: getColor("gray-3")}} className="font-semibold">{plan.name}</Text>
                 <TextBalanceForFinishedPlan balance={plan.balance} />
               </View>
             ))}
           </View>
-          <View style={{backgroundColor: getColor("light-gray"), width: "90%", height: 0.5}} className="mx-auto my-6"></View>
+          <View style={{backgroundColor: getColor("gray-9"), width: "90%", height: 0.5}} className="mx-auto my-6"></View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="home-outline" size={16} color={getColor("dark-gray")} />
+              <Ionicons name="home-outline" size={16} color={getColor("gray-3")} />
             </View>
-            <Text style={{color: getColor("dark-gray")}} className="font-semibold">Início</Text>
+            <Text style={{color: getColor("gray-3")}} className="font-semibold">Início</Text>
           </View>
           <Pressable
             onPress={() => {router.push('/manage-plans'); onClose();}}
              className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="add-circle-outline" size={16} color={getColor("dark-gray")} />
+              <Ionicons name="add-circle-outline" size={16} color={getColor("gray-3")} />
             </View>
-            <Text style={{color: getColor("dark-gray")}} className="font-semibold">
+            <Text style={{color: getColor("gray-3")}} className="font-semibold">
               Gerenciar Planos
             </Text>
           </Pressable>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="settings-outline" size={16} color={getColor("dark-gray")} />
+              <Ionicons name="settings-outline" size={16} color={getColor("gray-3")} />
             </View>
-            <Text style={{color: getColor("dark-gray")}} className="my-auto font-semibold">
+            <Text style={{color: getColor("gray-3")}} className="my-auto font-semibold">
               Configurações
             </Text>
           </View>
@@ -133,10 +133,10 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               <Ionicons
                 name="information-circle-outline"
                 size={16}
-                color={getColor("dark-gray")}
+                color={getColor("gray-3")}
               />
             </View>
-            <Text style={{color: getColor("dark-gray")}} className="font-semibold">Sobre nós</Text>
+            <Text style={{color: getColor("gray-3")}} className="font-semibold">Sobre nós</Text>
           </View>
           <Pressable
             onPress={() => router.push('/login')}

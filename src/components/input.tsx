@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import React from 'react';
 import {
   TextInput,
@@ -17,12 +17,11 @@ export default function Input({
   onChange,
 }: InputProps) {
   return (
-      <View style={{borderColor: getColor("light-secondary")}} className="w-full flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg">
+      <View style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between w-full px-3 py-2 bg-white border rounded-lg">
         <TextInput
-           style={{ color: getColor("dark-gray") }}
            className="flex-1 outline-none"
           placeholder={placeholder}
-          placeholderTextColor={getColor("light-gray")}
+          placeholderTextColor={getColor("gray-7")}
           value={value || ""}
           onChangeText={onChange}
           multiline={true}

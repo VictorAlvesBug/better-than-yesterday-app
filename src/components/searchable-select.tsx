@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { Button } from './button';
+import Label from './label';
 
 export type Option = {
   label: string;
@@ -53,16 +54,16 @@ export default function SearchableSelect({
     <View className="w-full">
       {/* Campo “fechado” */}
       <Pressable
-         style={{borderColor: getColor("light-secondary")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
+         style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
         onPress={() => setOpen(true)}
       >
         <Text
-           style={{color: getColor(selectedOption? "dark-gray" : "light-gray")}}
+           style={{color: getColor(selectedOption ? "black" : "gray-7")}}
           numberOfLines={1}
         >
           {selectedOption?.label ?? placeholder}
         </Text>
-        <Ionicons name="chevron-down" size={18} color={getColor("light-gray")} />
+        <Ionicons name="chevron-down" size={18} color={getColor("gray-7")} />
       </Pressable>
 
       {/* Modal de busca + lista */}
@@ -75,9 +76,7 @@ export default function SearchableSelect({
         <View className="justify-end flex-1 bg-black/40">
           <View className="max-h-[70%] bg-white rounded-t-2xl p-4">
             <View className="flex-row items-center justify-between mb-3">
-              <Text style={{ color: getColor("dark-gray") }} className="text-base font-semibold">
-                {label || 'Selecionar opção'}
-              </Text>
+              <Label>{label || 'Selecionar opção'}</Label>
               <Pressable
                 className="p-1"
                 onPress={() => {
@@ -85,23 +84,22 @@ export default function SearchableSelect({
                   setSearch('');
                 }}
               >
-                <Ionicons name="close" size={22} color={getColor("gray")} />
+                <Ionicons name="close" size={22} color={getColor("gray-7")} />
               </Pressable>
             </View>
 
-            <View style={{backgroundColor: getColor("light-dark")}} className="flex-row items-center px-3 py-2 mb-3 rounded-lg">
+            <View style={{borderColor: getColor("gray-d")}} className="flex-row items-center px-3 mb-3 border rounded-lg">
               <Ionicons
                 name="search"
-                size={18}
-                color={getColor("gray")}
+                size={16}
+                color={getColor("gray-7")}
                 style={{ marginRight: 8 }}
               />
               <TextInput
                 ref={inputRef}
-                 style={{color: getColor("dark-gray")}}
                 className="flex-1 outline-none"
                 placeholder="Buscar..."
-                placeholderTextColor={getColor("light-gray")}
+                placeholderTextColor={getColor("gray-7")}
                 value={search}
                 onChangeText={setSearch}
               />
@@ -112,7 +110,7 @@ export default function SearchableSelect({
               keyExtractor={(item) => item.value}
               keyboardShouldPersistTaps="handled"
               ItemSeparatorComponent={() => (
-                <View style={{backgroundColor: getColor("light-secondary")}} className="h-[1px]" />
+                <View style={{backgroundColor: getColor("gray-d")}} className="h-[1px]" />
               )}
               renderItem={({ item }) => {
                 const isSelected = item.value === value;
@@ -126,10 +124,10 @@ export default function SearchableSelect({
                     }}
                   >
                     <Text
-                      style={{ color: getColor(isSelected ? "violet" : "dark-gray") }}
+                      style={{ color: getColor(isSelected ? "violet" : "gray-3") }}
                       className={`text-base ${isSelected
-                        ? 'font-semibold'
-                        : ''
+                        ? 'font-bold'
+                        : 'black'
                         }`}
                     >
                       {item.label}
@@ -146,7 +144,7 @@ export default function SearchableSelect({
               }}
               ListEmptyComponent={
                 <>{createOption === undefined
-                  ? (<Text style={{color: getColor("gray")}} className="py-4 text-sm text-center">
+                  ? (<Text style={{color: getColor("gray-7")}} className="py-4 text-sm text-center">
                     Nenhum resultado encontrado
                   </Text>)
                   : (
@@ -157,7 +155,7 @@ export default function SearchableSelect({
                         setOpen(false);
                         setSearch('');
                       }
-                    } color={"secondary"}>{`Criar "${search}"`}</Button>
+                    }>{`Criar "${search}"`}</Button>
                   )
                 }</>
 

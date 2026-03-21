@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -14,7 +14,7 @@ export default function ManagePlansScreen() {
   return (
     <View
       className="flex-1"
-      style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
+      style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
     >
       <ScrollView
         style={{ flex: 1 }}

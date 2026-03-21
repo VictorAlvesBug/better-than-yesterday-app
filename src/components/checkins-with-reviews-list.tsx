@@ -1,5 +1,5 @@
 import { Checkin } from '@/types/checkin.type';
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import React from 'react';
 import { Text, View } from 'react-native';
 import CheckinWithReviewsCard from './checkin-with-reviews-card';
@@ -74,7 +74,7 @@ export default function CheckinsWithReviewsList({
   return (
     <View className="flex flex-col w-full gap-4">
       {checkins.length === 0 && (
-        <Text style={{color: getColor("gray")}} className="text-base">Nenhum Check-in aqui...</Text>
+        <Text style={{color: getColor("gray-4")}} className="text-base">Nenhum Check-in aqui...</Text>
       )}
       {checkins.map((checkin) => (
         <CheckinWithReviewsCard key={checkin.id} {...checkin} />

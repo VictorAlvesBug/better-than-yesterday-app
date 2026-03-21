@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { formatRelativeDate } from '../utils/dateUtils';
@@ -38,7 +38,7 @@ export default function CheckinCard({
           >
             {name}
           </Text>
-          <Text style={{color: getColor("gray")}} className="text-xs" numberOfLines={1}>
+          <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
             {formatRelativeDate(date)}
           </Text>
         </View>

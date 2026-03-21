@@ -1,4 +1,4 @@
-import { getColor } from '@/types/common.type';
+import { getColor } from '@/types/color.type';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
@@ -39,7 +39,7 @@ export default function RankingItemCard({
         <View className="flex flex-row items-center justify-start flex-1 px-4">
           <ProfilePhoto name={name} size="large" />
           <View className="flex flex-col items-start justify-center flex-1 gap-1 px-4 py-2">
-            <Text style={{color: getColor("dark-gray")}}
+            <Text
               className="w-full text-base font-semibold"
               numberOfLines={1}
               ellipsizeMode="tail"
@@ -48,10 +48,10 @@ export default function RankingItemCard({
             </Text>
             <View className="flex flex-row items-center justify-center gap-1">
               <FontAwesome5 name="check-circle" size={12} color={getColor("success")} />
-              <Text style={{color: getColor("gray")}} className="text-xs" numberOfLines={1}>
+              <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
                 {`${formatInteger(checkinsCount)}/${formatInteger(totalCount)}`}
               </Text>
-              <Text style={{color: getColor("gray")}} className="ml-3 text-xs" numberOfLines={1}>
+              <Text style={{color: getColor("gray-7")}} className="ml-3 text-xs" numberOfLines={1}>
                 {`Streak: ${formatInteger(streak)}`}
               </Text>
             </View>
@@ -59,12 +59,12 @@ export default function RankingItemCard({
         </View>
         <View className="flex flex-col items-end justify-center gap-1">
           {renderPenaltyStatus(penalty)}
-          <Text style={{color: getColor("gray")}} className="text-xs">
+          <Text style={{color: getColor("gray-7")}} className="text-xs">
             {formatPercent(checkinsPercent)}
           </Text>
         </View>
       </View>
-      <View style={{backgroundColor: getColor("light-dark"), borderRadius: 9999, height: 8, width: "100%"}}>
+      <View style={{backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 8, width: "100%"}}>
         <LinearGradient
           colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0.5, y: 0 }}
@@ -99,7 +99,7 @@ function renderPosition(position: number) {
             : positionLength === 3 ? "text-lg"
               : "text-base"
       return (
-        <Text style={{color: getColor("light-gray")}} className={`${textSize} font-bold`}>
+        <Text style={{color: getColor("gray-9")}} className={`${textSize} font-bold`}>
           #{formatIntegerCompact(position)}
         </Text>
       );
