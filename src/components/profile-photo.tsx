@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { getInitials } from '../utils/stringUtils';
@@ -13,19 +14,27 @@ export default function ProfilePhoto({
 }: ProfilePhotoProps) {
   return (
     <View
-      className={`flex items-center justify-center bg-purple-700 rounded-full ${getClassesForSize(size)}`}
+      style={{
+        backgroundColor: getColor("violet"),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "100%",
+        aspectRatio: 1,
+        width: getSize(size)
+      }} 
     >
-      <Text className="text-base text-white">{getInitials(name)}</Text>
+      <Text className="text-base text-white font-semibold">{getInitials(name)}</Text>
     </View>
   );
 }
 
-function getClassesForSize(size: ProfilePhotoProps['size']) {
+function getSize(size: ProfilePhotoProps['size']) {
   switch (size) {
     case 'large':
-      return 'w-12 h-12';
+      return 48;
     case 'small':
     default:
-      return 'w-10 h-10';
+      return 40;
   }
 }

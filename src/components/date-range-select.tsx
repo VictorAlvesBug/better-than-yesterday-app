@@ -1,13 +1,11 @@
-import { TextSize } from '@/types/common.type';
 import React from 'react';
 import {
-  Text,
   View
 } from 'react-native';
 import { DateInput } from './date-input';
+import Label from './label';
 
 type DateRangeSelectProps = {
-  label?: string;
   placeholder?: string;
   startValue: string;
   setStartValue: (value: string) => void;
@@ -17,12 +15,9 @@ type DateRangeSelectProps = {
   finishValueLabel?: string;
   minValue?: string;
   maxValue?: string;
-  labelSize?: TextSize;
 };
 
 export default function DateRangeSelect({
-  label,
-  labelSize = "text-base",
   startValueLabel,
   startValue,
   setStartValue,
@@ -34,28 +29,23 @@ export default function DateRangeSelect({
 }: DateRangeSelectProps) {
   return (
     <View className="w-full">
-      {label && (
-        <Text className={`mb-1 font-semibold text-gray-500 uppercase ${labelSize}`}>
-          {label}
-        </Text>
-      )}
       <View className="flex flex-row items-center justify-between py-2 bg-white rounded-lg gap-4">
-        <DateInput
-          label={startValueLabel}
-          labelSize='text-sm'
-          value={startValue}
-          setValue={setStartValue}
-          minValue={minValue}
-          maxValue={finishValue}
-        />
-        <DateInput
-          label={finishValueLabel}
-          labelSize='text-sm'
-          value={finishValue}
-          setValue={setFinishValue}
-          minValue={startValue}
-          maxValue={maxValue}
-        />
+        <View className=" flex-1 flex flex-col gap-1">
+          {startValueLabel && <Label size='text-sm'>{startValueLabel}</Label>}
+          <DateInput
+            value={startValue}
+            setValue={setStartValue}
+            minValue={minValue}
+            maxValue={finishValue}
+          /></View>
+        <View className=" flex-1 flex flex-col gap-1">
+          {finishValueLabel && <Label size='text-sm'>{finishValueLabel}</Label>}
+          <DateInput
+            value={finishValue}
+            setValue={setFinishValue}
+            minValue={startValue}
+            maxValue={maxValue}
+          /></View>
       </View>
     </View>
   );

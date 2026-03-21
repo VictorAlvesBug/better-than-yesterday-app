@@ -1,32 +1,32 @@
+import { getColor } from '@/types/common.type';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useRef } from 'react';
+import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { formatIntegerCompact, formatMoneyCompact } from '../utils/numberUtils';
 
 export default function LoginScreen() {
   const router = useRouter();
   //const { signIn } = useAuth();
-  const buttonRef = useRef(null);
 
   return (
     <LinearGradient
-      colors={['#9810fa', '#3a29ad']}
+      colors={[getColor("violet"), getColor("purple")]}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
       className="flex items-center justify-center flex-1"
     >
       <View className="flex items-center justify-center flex-1 w-[90%] max-w-[450px]">
-        <View className="flex items-center justify-center mb-8 bg-[#991ded] rounded-full w-28 h-28">
-          <FontAwesome6 name="trophy" size={60} color="#ffdf20" />
+        <View style={{backgroundColor: getColor("light-violet")}} className="flex items-center justify-center mb-8 rounded-full w-28 h-28">
+          <FontAwesome6 name="trophy" size={46} color={getColor("gold")} />
         </View>
         <Text className="px-8 mb-2 text-4xl font-bold text-white">BTY</Text>
         <Text className="px-8 mb-2 text-lg font-semibold text-white">
           Better Than Yesterday
         </Text>
         <View className="flex flex-row items-center justify-center gap-2 px-8 mb-12">
-          <Ionicons name="trending-up-outline" size={18} color="#7bf1a8" />
+          <Ionicons name="trending-up-outline" size={18} color={getColor("gold")} />
           <Text className="font-thin text-white">
             Construa hábitos. Ganhe recompensas.
           </Text>

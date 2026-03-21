@@ -1,4 +1,5 @@
 import { Checkin } from '@/types/checkin.type';
+import { getColor } from '@/types/common.type';
 import React from 'react';
 import { Text, View } from 'react-native';
 import CheckinWithReviewsCard from './checkin-with-reviews-card';
@@ -58,11 +59,22 @@ export default function CheckinsWithReviewsList({
       { status: 'Rejected' },
     ],
   });
+  checkins.push({
+    id: 'd',
+    planId: '',
+    userId: '',
+    name: 'Carla Silva',
+    date: '2026-03-14 15:20',
+    title: 'Teste',
+    photoUrl: '',
+    status: 'Pending',
+    reviews: []
+  });
 
   return (
     <View className="flex flex-col w-full gap-4">
       {checkins.length === 0 && (
-        <Text className="text-base text-gray-500">Nenhum Check-in aqui...</Text>
+        <Text style={{color: getColor("gray")}} className="text-base">Nenhum Check-in aqui...</Text>
       )}
       {checkins.map((checkin) => (
         <CheckinWithReviewsCard key={checkin.id} {...checkin} />

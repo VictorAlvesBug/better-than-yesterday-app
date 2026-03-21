@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import { FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -17,7 +18,7 @@ function TextBalanceForFinishedPlan({ balance }: TextBalanceProps) {
   const formattedBalance = `${signal}${formatMoney(Math.abs(balance))}`;
   return (
     <Text
-      className={`font-semibold ${isPositive ? 'text-green-500' : 'text-red-400'}`}
+      style={{color: getColor(isPositive ? "lime" : "danger")}} className={`font-semibold`}
     >
       {formattedBalance}
     </Text>
@@ -52,13 +53,13 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
         className={`flex flex-col w-[80%] bg-white transition-all duration-500 ${isOpen ? 'right-0' : 'right-[100%]'}`}
       >
         <LinearGradient
-          colors={['#8f10ed', '#5038f6']}
+                  colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
-          <View className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-full">
-            <FontAwesome6 name="trophy" size={24} color="#ffffff" />
+          <View style={{backgroundColor: getColor("light-violet")}} className="flex items-center justify-center w-12 h-12 rounded-full">
+            <FontAwesome6 name="trophy" size={20} color={getColor("gold")} />
           </View>
           <View className="flex flex-col items-start justify-center flex-1">
             <Text className="font-semibold text-white">João Silva</Text>
@@ -70,12 +71,12 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             className="flex flex-row items-center justify-center w-10 h-10"
             onPress={onClose}
           >
-            <Ionicons name="close" size={26} color="#ffffff" />
+            <Ionicons name="close" size={26} color="white" />
           </Pressable>
         </LinearGradient>
         <View className="flex flex-col">
           <View className="flex flex-col">
-            <Text className="px-6 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase">
+            <Text style={{color: getColor("gray")}} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
               Planos Ativos
             </Text>
             {activePlans.map((planName) => (
@@ -83,13 +84,13 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 key={planName}
                 className="flex flex-row items-center justify-start gap-3 px-8 py-4"
               >
-                <View className="w-2 h-2 bg-green-500 rounded-full"></View>
-                <Text className="font-semibold text-gray-700">{planName}</Text>
+                <View style={{backgroundColor: getColor("lime")}} className="w-2 h-2 rounded-full"></View>
+                <Text style={{color: getColor("dark-gray")}} className="font-semibold">{planName}</Text>
               </View>
             ))}
           </View>
           <View className="flex flex-col">
-            <Text className="px-6 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase">
+            <Text style={{color: getColor("gray")}} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
               Planos Finalizados
             </Text>
             {finishedPlans.map((plan) => (
@@ -97,33 +98,33 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                 key={plan.name}
                 className="flex flex-row items-center justify-between gap-3 px-8 py-4"
               >
-                <Text className="font-semibold text-gray-700">{plan.name}</Text>
+                <Text style={{color: getColor("dark-gray")}} className="font-semibold">{plan.name}</Text>
                 <TextBalanceForFinishedPlan balance={plan.balance} />
               </View>
             ))}
           </View>
-          <View className="w-[calc(100%-2rem)] h-[1px] bg-gray-300 mx-auto my-6"></View>
+          <View style={{backgroundColor: getColor("light-gray"), width: "90%", height: 0.5}} className="mx-auto my-6"></View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="home-outline" size={16} color="#374151" />
+              <Ionicons name="home-outline" size={16} color={getColor("dark-gray")} />
             </View>
-            <Text className="font-semibold text-gray-700">Início</Text>
+            <Text style={{color: getColor("dark-gray")}} className="font-semibold">Início</Text>
           </View>
           <Pressable
-            onPress={() => router.push('/manage-plans')}
+            onPress={() => {router.push('/manage-plans'); onClose();}}
              className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="add-circle-outline" size={16} color="#374151" />
+              <Ionicons name="add-circle-outline" size={16} color={getColor("dark-gray")} />
             </View>
-            <Text className="font-semibold text-gray-700">
+            <Text style={{color: getColor("dark-gray")}} className="font-semibold">
               Gerenciar Planos
             </Text>
           </Pressable>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="settings-outline" size={16} color="#374151" />
+              <Ionicons name="settings-outline" size={16} color={getColor("dark-gray")} />
             </View>
-            <Text className="my-auto font-semibold text-gray-700">
+            <Text style={{color: getColor("dark-gray")}} className="my-auto font-semibold">
               Configurações
             </Text>
           </View>
@@ -132,19 +133,19 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               <Ionicons
                 name="information-circle-outline"
                 size={16}
-                color="#374151"
+                color={getColor("dark-gray")}
               />
             </View>
-            <Text className="font-semibold text-gray-700">Sobre nós</Text>
+            <Text style={{color: getColor("dark-gray")}} className="font-semibold">Sobre nós</Text>
           </View>
           <Pressable
             onPress={() => router.push('/login')}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
           >
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="log-out-outline" size={16} color="#b91c1c" />
+              <Ionicons name="log-out-outline" size={16} color={getColor("danger")} />
             </View>
-            <Text className="font-semibold text-red-700">Sair</Text>
+            <Text style={{color: getColor("danger")}} className="font-semibold">Sair</Text>
           </Pressable>
         </View>
       </View>

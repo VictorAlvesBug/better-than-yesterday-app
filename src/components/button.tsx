@@ -1,35 +1,47 @@
-import { ColorKey, ColorSet, getColorSet } from '@/types/common.type';
+import { ColorName, getColor, getLightColor, TextSize } from '@/types/common.type';
 import { Pressable, Text } from 'react-native';
+import { twMerge } from 'tailwind-merge';
 
 type ButtonProps = {
   children: React.ReactNode | string;
   action?: () => void;
   className?: string;
-  color?: ColorKey | ColorSet;
+  color?: ColorName;
+  type?: 'default' | 'outline';
+  textSize?: TextSize;
 };
 
 
 
-export function Button({ action = () => { }, children, className, color = "accent" }: ButtonProps) {
-  const colorSet = getColorSet(color);
+export function Button({ action = () => { }, children, className, color = "silver", type = "default", textSize = "text-lg" }: ButtonProps) {
+  const colorSet = type === "default" 
+    ? {
+      text: getLightColor(color),
+      border: getColor(color),
+      background: getColor(color),
+    } : {
+      text: getColor(color),
+      border: getColor(color),
+      background: getLightColor(color),
+    }
 
   return (
     <Pressable
       style={{
-        backgroundColor: colorSet.backgroundLight,
-        borderColor: colorSet.borderBase,
+        backgroundColor: colorSet.background,
+        borderColor: colorSet.border,
       }}
       onPress={action}
-      className={`items-center justify-center border rounded-2xl h-14 ${className || ''} px-3`}
+      className={twMerge(`items-center justify-center border rounded-2xl h-14 px-3`, className)}
     >
       {typeof children === 'object' ? (
         children
       ) : (
-        <Text 
-        style={{
-          color: colorSet.textBase,
-        }}
-          className={`font-semibold text-lg`}>{children}</Text>
+        <Text
+          style={{
+            color: colorSet.text,
+          }}
+          className={`font-semibold ${textSize}`}>{children}</Text>
       )}
     </Pressable>
 

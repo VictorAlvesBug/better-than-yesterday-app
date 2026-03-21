@@ -10,78 +10,65 @@ export type TextSize =
   | "text-5xl"  // 48px
   | "text-6xl"; // 60px
 
-export type ColorPair = {
+type BasicColor = {
   base: string;
   light: string;
 }
 
-type Colors = {
-  [key: string]: ColorPair;
+type BasicColors = {
+  [key: string]: BasicColor;
 }
 
-const colors: Colors = {
-  accent: {
-    base: "#7e22ce",
-    light: "#e9d5ff"
-  },
-  primary: {
-    base: "#0d6efd",
-    light: "#cfe2ff"
-  },
-  secondary: {
-    base: "#6c757d",
-    light: "#e2e3e5"
-  },
-  success: {
-    base: "#198754",
-    light: "#d1e7dd"
-  },
-  info: {
-    base: "#0dcaf0",
-    light: "#cff4fc"
-  },
-  warning: {
-    base: "#ffc107",
-    light: "#fff3cd"
-  },
-  danger: {
-    base: "#dc3545",
-    light: "#f8d7da"
-  },
-  light: {
-    base: "#f8f9fa",
-    light: "#fefefe"
-  },
-  dark: {
-    base: "#212529",
-    light: "#e2e3e5"
-  },
+const basicColors = {
+  "accent": "#7e22ce",
+  "light-accent": "#e9d5ff",
+  "primary": "#0d6efd",
+  "light-primary": "#cfe2ff",
+  "secondary": "#6c757d",
+  "light-secondary": "#e2e3e5",
+  "success": "#198754",
+  "light-success": "#d1e7dd",
+  "info": "#0dcaf0",
+  "light-info": "#cff4fc",
+  "warning": "#ffc107",
+  "light-warning": "#fff3cd",
+  "danger": "#dc3545",
+  "light-danger": "#f8d7da",
+  "light": "#f8f9fa",
+  "light-light": "#fefefe",
+  "dark": "#212529",
+  "light-dark": "#e2e3e5",
 } as const;
 
-export type ColorKey = keyof typeof colors;
+const otherColors = {
+  violet: "#8f10ed",
+  "light-violet": "#a250fb",
+  purple: "#5038f6",
+  gold: "#ffd941",
+  silver: "#a6aab4",
+  bronze: "#c77c30",
+  black: "#000000",
+  white: "#ffffff",
+  gray: "#777777",
+  "dark-gray": "#333333",
+  "light-gray": "#aaaaaa",
+  lime: "#00cf51",
+  opaque: "#ffffff20"
+} as const;
 
-export type ColorSet = {
-  textBase: string;
-  textLight: string;
-  backgroundBase: string;
-  backgroundLight: string;
-  borderBase: string;
-  borderLight: string;
-}
+const colors = { ...basicColors, ...otherColors }
 
-export const getColorSet = (color: ColorKey | ColorSet): ColorSet => {
-  if (color && typeof color === 'object')
-    return color;
-  return {
-    textBase: colors[color].base,
-    textLight: colors[color].light,
-    backgroundBase: colors[color].base,
-    backgroundLight: colors[color].light,
-    borderBase: colors[color].base,
-    borderLight: colors[color].light,
-  } as ColorSet;
-}
+type Colors = typeof colors;
 
-export const getColor = (colorName: ColorKey): ColorPair => {
+export type ColorName = keyof Colors;
+
+export const getColor = (colorName: keyof Colors): string => {
   return colors[colorName];
+}
+
+export const getLightColor = (colorName: keyof Colors): string => {
+  const lightColorName = `light-${colorName}` as keyof typeof colors;
+  if (lightColorName in colors)
+    return colors[lightColorName]
+  return "white";//getColor(colorName);
 }

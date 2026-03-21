@@ -1,4 +1,5 @@
 import { CheckinReview, CheckinStatus } from '@/types/checkin.type';
+import { getColor } from '@/types/common.type';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
@@ -37,14 +38,14 @@ export default function CheckinWithReviewsCard({
       <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
         <ProfilePhoto name={name} />
         <View className="flex flex-col items-start justify-center flex-1 px-4 py-2">
-          <Text
-            className="w-full text-base font-medium text-gray-800"
+          <Text style={{ color: getColor("dark-gray") }}
+            className="w-full text-base font-medium"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {name}
           </Text>
-          <Text className="text-xs text-gray-500" numberOfLines={1}>
+          <Text style={{ color: getColor("gray") }} className="text-xs" numberOfLines={1}>
             {formatRelativeDate(date)}
           </Text>
         </View>
@@ -53,14 +54,9 @@ export default function CheckinWithReviewsCard({
 
       <Text className="px-6 text-md">{title}</Text>
 
-      {reviews.length > 0 && (
-        <>
-          {
-            <View className="w-[calc(100%-2rem)] h-[1px] bg-gray-300 mx-auto mt-3 mb-1"></View>
-          }
-          {renderReviews(reviews)}
-        </>
-      )}
+      {(reviews.length > 0 || status === 'Pending') && <View style={{ backgroundColor: getColor("light-gray"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}
+
+      {reviews.length > 0 && renderReviews(reviews)}
 
       {status === 'Pending' && renderReviewButtons()}
     </View>
@@ -68,23 +64,23 @@ export default function CheckinWithReviewsCard({
 }
 
 function renderStatus(status: CheckinStatus) {
-  const defaultClasses = 'px-3 py-1 font-semibold rounded-full';
+  const defaultClasses = 'px-3 py-1 font-semibold rounded-full text-sm';
 
   if (status === 'Pending')
     return (
-      <Text className={`bg-[#fff7c6] text-[#aa8c50] ${defaultClasses}`}>
+      <Text style={{ backgroundColor: getColor("light-warning"), color: getColor("warning") }} className={`${defaultClasses}`}>
         Pendente
       </Text>
     );
   if (status === 'Validated')
     return (
-      <Text className={`bg-[#d9ffea] text-[#4b795f] ${defaultClasses}`}>
+      <Text style={{ backgroundColor: getColor("light-success"), color: getColor("success") }} className={`${defaultClasses}`}>
         Validado
       </Text>
     );
   if (status === 'Rejected')
     return (
-      <Text className={`bg-[#fceff1] text-[#bd405c] ${defaultClasses}`}>
+      <Text style={{ backgroundColor: getColor("light-danger"), color: getColor("danger") }} className={`${defaultClasses}`}>
         Rejeitado
       </Text>
     );
@@ -107,16 +103,16 @@ function renderReviews(reviews: CheckinReview[]) {
     <View className="flex flex-row items-center justify-start w-full gap-4 px-6">
       {validationReviews.length > 0 && (
         <View className="flex flex-row items-center justify-center gap-2">
-          <FontAwesome5 name="check-circle" size={14} color="#619b7a" />
-          <Text className="text-[#619b7a] font-bold">
+          <FontAwesome5 name="check-circle" size={14} color={getColor("success")} />
+          <Text style={{ color: getColor("success") }} className="font-bold">
             {formatIntegerCompact(validationReviews.length)} {validationText}
           </Text>
         </View>
       )}
       {rejectionReviews.length > 0 && (
         <View className="flex flex-row items-center justify-center gap-2">
-          <FontAwesome6 name="flag" size={14} color="#bd405c" />
-          <Text className="text-[#bd405c] font-bold">
+          <FontAwesome6 name="flag" size={14} color={getColor("danger")} />
+          <Text style={{ color: getColor("danger") }} className="font-bold">
             {formatIntegerCompact(rejectionReviews.length)} {rejectionText}
           </Text>
         </View>
@@ -128,16 +124,16 @@ function renderReviews(reviews: CheckinReview[]) {
 function renderReviewButtons() {
   return (
     <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
-      <Pressable className="bg-[#d9ffea] py-2 rounded-xl flex-1">
+      <Pressable style={{ backgroundColor: getColor("light-success") }} className="py-2 rounded-xl flex-1">
         <View className="flex flex-row items-center justify-center w-full gap-2">
-          <FontAwesome5 name="check-circle" size={14} color="#619b7a" />
-          <Text className="text-[#619b7a] font-bold">Validar</Text>
+          <FontAwesome5 name="check-circle" size={14} color={getColor("success")} />
+          <Text style={{ color: getColor("success") }} className="font-bold">Validar</Text>
         </View>
       </Pressable>
-      <Pressable className="bg-[#fceff1] px-4 py-2 rounded-xl flex-1">
+      <Pressable style={{ backgroundColor: getColor("light-danger") }} className="px-4 py-2 rounded-xl flex-1">
         <View className="flex flex-row items-center justify-center w-full gap-2">
-          <FontAwesome6 name="flag" size={14} color="#bd405c" />
-          <Text className="text-[#bd405c] font-bold">Rejeitar</Text>
+          <FontAwesome6 name="flag" size={14} color={getColor("danger")} />
+          <Text style={{ color: getColor("danger") }} className="font-bold">Rejeitar</Text>
         </View>
       </Pressable>
     </View>

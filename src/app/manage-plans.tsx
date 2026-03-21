@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -12,8 +13,8 @@ export default function ManagePlansScreen() {
 
   return (
     <View
-      className="flex-1 bg-slate-200"
-      style={{ marginTop: statusBarHeight }}
+      className="flex-1"
+      style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
     >
       <ScrollView
         style={{ flex: 1 }}
@@ -22,7 +23,7 @@ export default function ManagePlansScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={['#8f10ed', '#5038f6']}
+          colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"

@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import { RankingItem } from '@/types/ranking.type';
 import React from 'react';
 import { Text, View } from 'react-native';
@@ -60,8 +61,7 @@ export default function Ranking({ planId }: RankingProps) {
     <>
       {rankingItems.length === 0 && (
         <View className="flex flex-row items-center justify-center gap-4">
-          {/* <FontAwesome name="ban" size={20} color="#6b7280" /> */}
-          <Text className="text-base text-gray-500">
+          <Text style={{color: getColor("gray")}} className="text-base">
             Check-ins insuficientes para ranking...
           </Text>
         </View>

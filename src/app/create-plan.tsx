@@ -1,7 +1,7 @@
 import Card from '@/src/components/card';
+import { getColor } from '@/types/common.type';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ScrollView,
@@ -11,6 +11,7 @@ import {
 import BackButton from '../components/back-button';
 import DateRangeSelect from '../components/date-range-select';
 import Input from '../components/input';
+import Label from '../components/label';
 import NumberSelect from '../components/number-select';
 import SearchableSelect, { type Option } from '../components/searchable-select';
 import { formatDate, getRelativeDate } from '../utils/dateUtils';
@@ -18,8 +19,6 @@ import { formatDate, getRelativeDate } from '../utils/dateUtils';
 const statusBarHeight = Constants.statusBarHeight;
 
 export default function CreatePlanScreen() {
-  const router = useRouter();
-
   const [habitId, setHabitId] = useState<string | null>()
   const [description, setDescription] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(formatDate(getRelativeDate(+1)));
@@ -88,8 +87,8 @@ export default function CreatePlanScreen() {
 
   return (
     <View
-      className="flex-1 bg-slate-200"
-      style={{ marginTop: statusBarHeight }}
+      className="flex-1"
+      style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
     >
       <ScrollView
         style={{ flex: 1 }}
@@ -98,7 +97,7 @@ export default function CreatePlanScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={['#8f10ed', '#5038f6']}
+          colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
@@ -115,7 +114,8 @@ export default function CreatePlanScreen() {
         </LinearGradient>
 
         <View className="w-full px-4 gap-3 py-3">
-          <Card className="flex flex-col items-start justify-center w-full gap-4">
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Selecione o Hábito</Label>
             <SearchableSelect
               label="Selecione o Hábito"
               placeholder="Escolha um hábito..."
@@ -126,18 +126,18 @@ export default function CreatePlanScreen() {
             />
           </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-3">
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Descrição (opcional)</Label>
             <Input
-              label="Descrição (opcional)"
               placeholder="Ex: Treinar ao menos 45 minutos..."
               value={description}
               onChange={setDescription}
             />
           </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-3">
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Período do Plano</Label>
             <DateRangeSelect
-              label="Período do Plano"
               startValueLabel="Data de Início"
               startValue={startDate}
               setStartValue={setStartDate}
@@ -148,13 +148,13 @@ export default function CreatePlanScreen() {
             />
           </Card>
 
-          <Card className="flex flex-row items-start justify-center w-full gap-3">
-            <NumberSelect 
-            label="Folgas permitidas por semana"
-            value={restsPerWeek}
-            setValue={setRestsPerWeek}
-            minValue={0}
-            maxValue={6}
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Folgas Permitidas por Semana</Label>
+            <NumberSelect
+              value={restsPerWeek}
+              setValue={setRestsPerWeek}
+              minValue={0}
+              maxValue={6}
             />
           </Card>
 

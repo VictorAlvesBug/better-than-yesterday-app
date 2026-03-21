@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { formatRelativeDate } from '../utils/dateUtils';
@@ -31,13 +32,13 @@ export default function CheckinCard({
         <ProfilePhoto name={name} />
         <View className="flex flex-col items-start justify-center flex-1 px-4 py-2">
           <Text
-            className="w-full text-base font-medium text-gray-800"
+            className="w-full text-base font-semibold"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {name}
           </Text>
-          <Text className="text-xs text-gray-500" numberOfLines={1}>
+          <Text style={{color: getColor("gray")}} className="text-xs" numberOfLines={1}>
             {formatRelativeDate(date)}
           </Text>
         </View>

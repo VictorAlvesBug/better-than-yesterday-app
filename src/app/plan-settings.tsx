@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -50,8 +51,8 @@ export default function PlanSettingsScreen() {
 
   return (
     <View
-      className="relative flex-1 bg-slate-200"
-      style={{ marginTop: statusBarHeight }}
+      className="relative flex-1"
+      style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
     >
       <ScrollView
         style={{ flex: 1 }}
@@ -60,7 +61,7 @@ export default function PlanSettingsScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={['#8f10ed', '#5038f6']}
+          colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
@@ -72,13 +73,13 @@ export default function PlanSettingsScreen() {
             </Text>
             <Pressable
               className="flex items-center justify-center w-20 h-20"
-              onPress={() => {}}
+              onPress={() => { }}
             >
               <Ionicons name="share-social-outline" size={24} color="#fff" />
             </Pressable>
           </View>
 
-          <View className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly bg-[#ffffff16] rounded-lg">
+          <View style={{backgroundColor: getColor("opaque")}} className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg">
             <Text className="font-thin text-white">Pool de Recompensas</Text>
             <Text className="mb-1 text-3xl font-bold text-white">
               {formatMoney(252)}
@@ -131,7 +132,7 @@ export default function PlanSettingsScreen() {
                 }}
               >
                 <LinearGradient
-                  colors={['#7c3aed', '#4f46e5']}
+                  colors={[getColor("violet"), getColor("purple")]}
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
                   style={{
@@ -150,9 +151,7 @@ export default function PlanSettingsScreen() {
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  className={`font-semibold text-lg ${
-                    currentTab === 'Ranking' ? 'text-white' : 'text-gray-500'
-                  }`}
+                  style={{color: getColor(currentTab === 'Ranking' ? "white" : "gray")}} className={`font-semibold text-lg`}
                 >
                   Ranking
                 </Text>
@@ -166,9 +165,7 @@ export default function PlanSettingsScreen() {
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  className={`font-semibold block text-lg ${
-                    currentTab === 'Check-ins' ? 'text-white' : 'text-gray-500'
-                  }`}
+                  style={{color: getColor(currentTab === 'Check-ins' ? "white" : "gray")}} className={`font-semibold block text-lg`}
                 >
                   Check-ins
                 </Text>

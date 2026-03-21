@@ -1,21 +1,19 @@
-import { TextSize } from '@/types/common.type';
+import { getColor } from '@/types/common.type';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, TextInput, View } from 'react-native';
 import { formatDate, rawDate } from '../utils/dateUtils';
 
 type DateInputProps = {
-  label?: string;
-  labelSize?: TextSize;
   value: string;
   setValue: (value: string) => void;
   minValue?: string;
   maxValue?: string;
 };
 
-export function DateInput({ label, value, setValue, minValue, maxValue, labelSize = "text-base" }: DateInputProps) {
+export function DateInput({ value, setValue, minValue, maxValue }: DateInputProps) {
   const [date, setDate] = useState<Date>(rawDate(value));
   const [show, setShow] = useState(false);
 
@@ -36,16 +34,10 @@ export function DateInput({ label, value, setValue, minValue, maxValue, labelSiz
 
   return (
     <View className="flex-1">
-      {label && (
-        <Text className={`mb-1 font-semibold text-gray-500 uppercase ${labelSize}`}>
-          {label}
-        </Text>
-      )}
-      <Pressable className="flex flex-row items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg"
+      <Pressable style={{borderColor: getColor("light-secondary")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
         onPress={openPicker}>
-        <TextInput
-          className="flex-1 text-gray-800 outline-none"
-          placeholderTextColor="#9ca3af"
+        <TextInput style={{ color: getColor("dark-gray") }}
+          className="flex-1 outline-none"
           value={value}
           editable={false}
           onPress={() => setShow(true)}

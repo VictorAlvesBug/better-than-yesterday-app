@@ -1,4 +1,4 @@
-import { getColor, TextSize } from '@/types/common.type';
+import { getColor } from '@/types/common.type';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -8,8 +8,6 @@ import {
 import { Button } from './button';
 
 type NumberSelectProps = {
-  label?: string;
-  labelSize?: TextSize;
   value: number;
   setValue: (value: number) => void;
   minValue?: number;
@@ -17,8 +15,6 @@ type NumberSelectProps = {
 };
 
 export default function NumberSelect({
-  label,
-  labelSize = "text-base",
   value,
   setValue,
   minValue,
@@ -34,23 +30,16 @@ export default function NumberSelect({
   }
 
   return (
-    <View className="w-full">
-      {label && (
-        <Text className={`mb-1 font-semibold text-gray-500 uppercase ${labelSize}`}>
-          {label}
-        </Text>
-      )}
-      <View className="flex flex-row items-center justify-between px-3 py-2 bg-white border border-gray-300 rounded-lg">
-        <Button color={"secondary"} action={onDecrease}>
-          <Ionicons name="chevron-back-outline" size={20} color={getColor("secondary").base} />
+      <View style={{borderColor: getColor("light-secondary")}} className="w-full flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg">
+        <Button color='light-secondary' action={onDecrease}>
+          <Ionicons name="chevron-back-outline" size={20} color={getColor("secondary")} />
         </Button>
-        <Text className="text-lg text-gray-800 outline-none">
+        <Text style={{color: getColor("dark-gray")}} className="text-lg outline-none">
           {value}
         </Text>
-        <Button color={"secondary"} action={onIncrease}>
-          <Ionicons name="chevron-forward-outline" size={20} color={getColor("secondary").base} />
+        <Button color='light-secondary' action={onIncrease}>
+          <Ionicons name="chevron-forward-outline" size={20} color={getColor("secondary")} />
         </Button>
       </View>
-    </View>
   );
 }

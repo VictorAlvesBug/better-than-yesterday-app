@@ -1,3 +1,4 @@
+import { getColor } from '@/types/common.type';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
@@ -38,19 +39,19 @@ export default function RankingItemCard({
         <View className="flex flex-row items-center justify-start flex-1 px-4">
           <ProfilePhoto name={name} size="large" />
           <View className="flex flex-col items-start justify-center flex-1 gap-1 px-4 py-2">
-            <Text
-              className="w-full text-base font-medium text-gray-800"
+            <Text style={{color: getColor("dark-gray")}}
+              className="w-full text-base font-semibold"
               numberOfLines={1}
               ellipsizeMode="tail"
             >
               {name}
             </Text>
             <View className="flex flex-row items-center justify-center gap-1">
-              <FontAwesome5 name="check-circle" size={14} color="#539d6a" />
-              <Text className="text-xs text-gray-500" numberOfLines={1}>
+              <FontAwesome5 name="check-circle" size={12} color={getColor("success")} />
+              <Text style={{color: getColor("gray")}} className="text-xs" numberOfLines={1}>
                 {`${formatInteger(checkinsCount)}/${formatInteger(totalCount)}`}
               </Text>
-              <Text className="ml-3 text-xs text-gray-500" numberOfLines={1}>
+              <Text style={{color: getColor("gray")}} className="ml-3 text-xs" numberOfLines={1}>
                 {`Streak: ${formatInteger(streak)}`}
               </Text>
             </View>
@@ -58,23 +59,22 @@ export default function RankingItemCard({
         </View>
         <View className="flex flex-col items-end justify-center gap-1">
           {renderPenaltyStatus(penalty)}
-          <Text className="text-xs text-gray-500">
+          <Text style={{color: getColor("gray")}} className="text-xs">
             {formatPercent(checkinsPercent)}
           </Text>
         </View>
       </View>
-      <View className="w-full h-2 bg-gray-200 rounded-full">
+      <View style={{backgroundColor: getColor("light-dark"), borderRadius: 9999, height: 8, width: "100%"}}>
         <LinearGradient
-          colors={['#7c3aed', '#4f46e5']}
+          colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
           style={{
             flex: 1,
             height: '100%',
-            borderRadius: '9999px',
+            borderRadius: 9999,
             width: `${checkinsPercent * 100}%`,
           }}
-          className="h-full rounded-full w-[70%]"
         ></LinearGradient>
       </View>
     </View>
@@ -86,20 +86,20 @@ function renderPosition(position: number) {
   const iconSize = 32;
   switch (position) {
     case 1:
-      return <FontAwesome6 name={iconName} size={iconSize} color="#dbaf36" />;
+      return <FontAwesome6 name={iconName} size={iconSize} color={getColor("gold")} />;
     case 2:
-      return <FontAwesome6 name={iconName} size={iconSize} color="#a6aab4" />;
+      return <FontAwesome6 name={iconName} size={iconSize} color={getColor("silver")} />;
     case 3:
-      return <FontAwesome6 name={iconName} size={iconSize} color="#d94f16" />;
+      return <FontAwesome6 name={iconName} size={iconSize} color={getColor("bronze")} />;
     default:
       const positionLength = position.toString().length;
-      const textSize = 
+      const textSize =
         positionLength === 1 ? "text-2xl"
-        : positionLength === 2 ? "text-xl"
-        : positionLength === 3 ? "text-lg"
-        : "text-base"
+          : positionLength === 2 ? "text-xl"
+            : positionLength === 3 ? "text-lg"
+              : "text-base"
       return (
-        <Text className={`text-[#9ca2b4] ${textSize} font-bold`}>
+        <Text style={{color: getColor("light-gray")}} className={`${textSize} font-bold`}>
           #{formatIntegerCompact(position)}
         </Text>
       );
@@ -111,13 +111,18 @@ function renderPenaltyStatus(penalty: number) {
     <View className="flex flex-row items-center justify-center gap-1">
       {penalty <= 0 ? (
         <>
-          <FontAwesome5 name="check-circle" size={16} color="#539d6a" />
-          <Text className="text-sm text-[#539d6a] font-bold">Perfeito!</Text>
+          <FontAwesome5 name="check-circle" size={12} color={getColor("success")} />
+          <Text style={{
+            color: getColor("success")
+          }}
+            className="text-sm font-bold">Perfeito!</Text>
         </>
       ) : (
         <>
-          <FontAwesome6 name="arrow-trend-down" size={14} color="#e24a55" />
-          <Text className="text-sm font-bold text-[#e24a55]">
+          <FontAwesome6 name="arrow-trend-down" size={14} color={getColor("danger")} />
+          <Text style={{
+           color: getColor("danger")
+          }} className="text-sm font-bold">
             {formatMoneyCompact(penalty)}
           </Text>
         </>

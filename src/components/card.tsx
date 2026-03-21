@@ -1,5 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
+import { twMerge } from 'tailwind-merge';
 
 type CardProps = {
   children: React.ReactNode;
@@ -8,7 +9,7 @@ type CardProps = {
 
 export default function Card({ children, className }: CardProps) {
   return (
-    <View className={`p-4 bg-white rounded-2xl shadow-md ${className || ''}`}>
+    <View className={twMerge(`p-4 bg-white rounded-2xl shadow-md`, className)}>
       {children}
     </View>
   );

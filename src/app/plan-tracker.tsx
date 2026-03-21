@@ -1,5 +1,6 @@
 import Card from '@/src/components/card';
 import { Checkin } from '@/types/checkin.type';
+import { getColor } from '@/types/common.type';
 import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +13,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { Button } from '../components/button';
 import CheckinCard from '../components/checkin-card';
 import SideDrawer from '../components/side-drawer';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
@@ -147,11 +149,11 @@ export default function PlanTrackerScreen() {
   if (loading) {
     return (
       <View
-        className="items-center justify-center flex-1 bg-slate-200"
-        style={{ marginTop: statusBarHeight }}
+        className="items-center justify-center flex-1"
+        style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
       >
-        <ActivityIndicator size="large" color="#0f766e" />
-        <Text className="mt-2 text-sm text-slate-600">Carregando plano...</Text>
+        <ActivityIndicator size="large" color={getColor("gray")} />
+        <Text style={{color: getColor("gray")}} className="mt-2 text-sm">Carregando plano...</Text>
       </View>
     );
   }
@@ -168,8 +170,8 @@ export default function PlanTrackerScreen() {
 
   return (
     <View
-      className="relative flex-1 bg-slate-200"
-      style={{ marginTop: statusBarHeight }}
+      className="relative flex-1"
+      style={{ marginTop: statusBarHeight, backgroundColor: getColor("light-dark") }}
     >
       <SideDrawer
         isOpen={isDrawerOpen}
@@ -183,7 +185,7 @@ export default function PlanTrackerScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={['#8f10ed', '#5038f6']}
+          colors={[getColor("violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
@@ -207,7 +209,7 @@ export default function PlanTrackerScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
-              <Ionicons name="people-outline" size={24} color="#fff" />
+              <Ionicons name="people-outline" size={24} color="white" />
             </Pressable>
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
@@ -220,29 +222,29 @@ export default function PlanTrackerScreen() {
           </View>
         </LinearGradient>
 
-        <View className="flex flex-col items-start justify-center gap-6 px-4 -mt-4">
+        <View className="flex flex-col items-start justify-center gap-6 px-4 -mt-6">
           <View className="flex flex-row items-center justify-between flex-1 w-full gap-4 mb-6">
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-2">
-                <FontAwesome5 name="fire" size={18} color="#e48d0a" />
-                <Text className="text-gray-500">Sequência</Text>
+                <FontAwesome5 name="fire" size={16} color={getColor("warning")} />
+                <Text style={{color: getColor("gray")}} className="">Sequência</Text>
               </View>
               <Text className="text-3xl font-bold text-black">
                 {formatInteger(planInfoMock.streak)}
               </Text>
-              <Text className="text-xs font-semibold text-gray-500">
+              <Text style={{color: getColor("gray")}} className="text-xs font-semibold ">
                 dias seguidos
               </Text>
             </Card>
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-2">
-                <FontAwesome5 name="award" size={18} color="#7d23ce" />
-                <Text className="text-gray-500">Posição</Text>
+                <FontAwesome5 name="award" size={16} color={getColor("violet")} />
+                <Text style={{color: getColor("gray")}} className="">Posição</Text>
               </View>
               <Text className="text-3xl font-bold text-black">
                 #{formatInteger(planInfoMock.position)}
               </Text>
-              <Text className="text-xs font-semibold text-gray-500">
+              <Text style={{color: getColor("gray")}} className="text-xs font-semibold ">
                 de {formatInteger(planInfoMock.totalParticipants)} pessoas
               </Text>
             </Card>
@@ -251,35 +253,33 @@ export default function PlanTrackerScreen() {
           <Card className="flex flex-col items-start justify-center flex-1 w-full gap-3">
             <View className="flex flex-row items-center justify-between w-full">
               <Text className="font-bold text-black text-md">Progresso</Text>
-              <Text className="font-bold text-purple-700 text-md">
+              <Text style={{color: getColor("violet")}} className="font-bold text-md">
                 {formatInteger(planInfoMock.checkinCount)}/
                 {formatInteger(planInfoMock.totalCheckinCount)} dias
               </Text>
             </View>
-            <View className="w-full h-3 bg-gray-200 rounded-full">
+            <View style={{backgroundColor: getColor("light-dark"), borderRadius: 9999, height: 10, width: "100%"}}>
               <LinearGradient
-                colors={['#7c3aed', '#4f46e5']}
+                colors={[getColor("violet"), getColor("purple")]}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
                 style={{
                   flex: 1,
                   height: '100%',
                   borderRadius: 9999,
-                  width: `${
-                    (100 * planInfoMock.checkinCount) /
+                  width: `${(100 * planInfoMock.checkinCount) /
                     planInfoMock.totalCheckinCount
-                  }%`,
+                    }%`,
                 }}
               />
             </View>
             <View className="flex flex-row items-center justify-between w-full gap-2">
-              <FontAwesome5 name="calendar" size={16} color="#6b7280" />
-              <Text className="flex-1 text-gray-500">
-                {`Termina em ${formatInteger(planInfoMock.daysToFinish)} ${
-                  planInfoMock.daysToFinish === 1 ? 'dia' : 'dias'
-                }`}
+              <FontAwesome5 name="calendar" size={16} color={getColor("gray")} />
+              <Text style={{color: getColor("gray")}} className="flex-1 ">
+                {`Termina em ${formatInteger(planInfoMock.daysToFinish)} ${planInfoMock.daysToFinish === 1 ? 'dia' : 'dias'
+                  }`}
               </Text>
-              <Text className="font-semibold text-purple-700">
+              <Text style={{color: getColor("violet")}} className="font-semibold">
                 {formatPercentCompact(
                   planInfoMock.checkinCount / planInfoMock.totalCheckinCount,
                 )}
@@ -287,26 +287,27 @@ export default function PlanTrackerScreen() {
             </View>
           </Card>
 
-          <View className="flex flex-row items-center justify-center flex-1 w-full gap-4 px-4 border border-green-300 shadow-md bg-green-50 rounded-xl">
-            <FontAwesome6 name="gift" size={20} color="#03a540" />
+          <View style={{backgroundColor: getColor("light-success"), borderColor: getColor("success")}} className="flex flex-row items-center justify-center flex-1 w-full gap-4 px-4 py-2 border shadow-md rounded-xl">
+            <FontAwesome6 name="gift" size={20} color={getColor("success")} />
             <View className="flex flex-col items-start justify-center flex-1">
-              <Text className="text-lg font-semibold text-[#03a540]">
+              <Text style={{color: getColor("success")}} className="text-lg font-semibold">
                 {formatInteger(planInfoMock.restCount)} folgas disponíveis
               </Text>
-              <Text className="text-[#03a540]">Use com sabedoria!</Text>
+              <Text style={{color: getColor("success")}}>Use com sabedoria!</Text>
             </View>
-            <Pressable className="bg-[#03a540] rounded-lg px-4 py-2">
+            <Pressable style={{backgroundColor: getColor("success")}} className="rounded-lg px-4 py-2">
               <Text className="font-semibold text-white">Usar</Text>
             </Pressable>
+            <Button  color="success" textSize='text-base' className="px-4 py-1">Usar</Button>
           </View>
 
           {/* Lista dos últimos check-ins dos participantes */}
           <View className="mt-2 -mb-5">
-            <Text className="mb-3 text-lg font-bold text-gray-700 fond-bold">
+            <Text style={{color: getColor("dark-gray")}} className="mb-3 text-lg font-bold">
               Check-ins Recentes
             </Text>
             {readingCheckins.length === 0 && (
-              <Text className="text-xs text-gray-500">
+              <Text style={{color: getColor("gray")}} className="text-xs ">
                 Faça seu primeiro check-in hoje para aparecer aqui!
               </Text>
             )}
@@ -319,8 +320,15 @@ export default function PlanTrackerScreen() {
       </ScrollView>
 
       {/* Botão flutuante fixo */}
-      <Pressable className="absolute items-center justify-center w-16 h-16 bg-purple-700 rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
+      <Pressable style={{backgroundColor: getColor('violet')}} className="absolute items-center justify-center w-16 h-16 rounded-full shadow-xl bottom-4 right-4 active:opacity-80  overflow-hidden">
+        <LinearGradient
+          colors={[getColor("violet"), getColor("purple")]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          className="flex flex-col items-center justify-center w-full h-full"
+        >
         <FontAwesome6 name="camera" size={24} color="white" />
+        </LinearGradient>
       </Pressable>
     </View>
   );
