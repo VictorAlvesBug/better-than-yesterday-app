@@ -10,11 +10,13 @@ import {
   View,
 } from 'react-native';
 import { Button } from './button';
+import Input from './input';
 import Label from './label';
 
 export type Option = {
   label: string;
   value: string;
+  justAdded?: boolean;
 };
 
 type SearchableSelectProps = {
@@ -46,6 +48,11 @@ export default function SearchableSelect({
     return options.filter((o) => o.label.toLowerCase().includes(s));
   }, [options, search]);
 
+  const onClose = () => {
+    setOpen(false);
+    setSearch('');
+  }
+
   useEffect(() => {
     inputRef.current?.focus();
   }, [open]);
@@ -54,16 +61,15 @@ export default function SearchableSelect({
     <View className="w-full">
       {/* Campo “fechado” */}
       <Pressable
-         style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
+        className="relative"
         onPress={() => setOpen(true)}
       >
-        <Text
-           style={{color: getColor(selectedOption ? "black" : "gray-7")}}
-          numberOfLines={1}
-        >
-          {selectedOption?.label ?? placeholder}
-        </Text>
-        <Ionicons name="chevron-down" size={18} color={getColor("gray-7")} />
+        <Input
+          value={selectedOption?.label}
+          onChange={() => { }}
+          placeholder={selectedOption?.label ?? placeholder}
+          className='pointer-events-none' />
+        <Ionicons name="chevron-down" size={18} color={getColor("gray-7")} className='absolute right-0 m-3' />
       </Pressable>
 
       {/* Modal de busca + lista */}
@@ -71,38 +77,45 @@ export default function SearchableSelect({
         visible={open}
         animationType="slide"
         transparent
-        onRequestClose={() => setOpen(false)}
+        onRequestClose={onClose}
       >
-        <View className="justify-end flex-1 bg-black/40">
-          <View className="max-h-[70%] bg-white rounded-t-2xl p-4">
+        <Pressable
+          onPress={(event) => {
+            if (event.target === event.currentTarget) {
+              onClose();
+            }
+          }}
+          className="justify-end flex-1 bg-black/40">
+          <Pressable
+            onPress={() => { }}
+            android_disableSound={false}
+            className={`max-h-[70%] bg-white ro unded-t-2xl p-4`}>
             <View className="flex-row items-center justify-between mb-3">
               <Label>{label || 'Selecionar opção'}</Label>
               <Pressable
                 className="p-1"
                 onPress={() => {
-                  setOpen(false);
-                  setSearch('');
+                  onClose();
                 }}
               >
                 <Ionicons name="close" size={22} color={getColor("gray-7")} />
               </Pressable>
             </View>
 
-            <View style={{borderColor: getColor("gray-d")}} className="flex-row items-center px-3 mb-3 border rounded-lg">
+            <View className="relative flex-row items-center mb-3">
               <Ionicons
                 name="search"
                 size={16}
                 color={getColor("gray-7")}
                 style={{ marginRight: 8 }}
+                className='absolute left-0 m-3'
               />
-              <TextInput
+              <Input
                 ref={inputRef}
                 className="flex-1 outline-none"
                 placeholder="Buscar..."
-                placeholderTextColor={getColor("gray-7")}
                 value={search}
-                onChangeText={setSearch}
-              />
+                onChange={setSearch} />
             </View>
 
             <FlatList
@@ -110,28 +123,33 @@ export default function SearchableSelect({
               keyExtractor={(item) => item.value}
               keyboardShouldPersistTaps="handled"
               ItemSeparatorComponent={() => (
-                <View style={{backgroundColor: getColor("gray-d")}} className="h-[1px]" />
+                <View style={{ backgroundColor: getColor("gray-d") }} className="h-[1px]" />
               )}
               renderItem={({ item }) => {
                 const isSelected = item.value === value;
                 return (
                   <Pressable
-                    className="flex-row items-center justify-between px-2 py-3"
+                    className="flex-row items-center justify-between gap-3 px-2 py-3"
                     onPress={() => {
                       onChange(item.value);
-                      setOpen(false);
-                      setSearch('');
+                      onClose();
                     }}
                   >
                     <Text
                       style={{ color: getColor(isSelected ? "violet" : "gray-3") }}
-                      className={`text-base ${isSelected
+                      className={`text-base flex-1 ${isSelected
                         ? 'font-bold'
                         : 'black'
                         }`}
                     >
                       {item.label}
                     </Text>
+                    {item.justAdded && (
+                      <Text
+                        style={{color: getColor("gray-7"), borderColor: getColor('gray-7')}}
+                        className='text-xs'
+                      >Recém-adicionado</Text>
+                    )}
                     {isSelected && (
                       <Ionicons
                         name="checkmark"
@@ -144,7 +162,7 @@ export default function SearchableSelect({
               }}
               ListEmptyComponent={
                 <>{createOption === undefined
-                  ? (<Text style={{color: getColor("gray-7")}} className="py-4 text-sm text-center">
+                  ? (<Text style={{ color: getColor("gray-7") }} className="py-4 text-sm text-center">
                     Nenhum resultado encontrado
                   </Text>)
                   : (
@@ -152,8 +170,7 @@ export default function SearchableSelect({
                       () => {
                         createOption(search);
                         onChange(search);
-                        setOpen(false);
-                        setSearch('');
+                        onClose();
                       }
                     }>{`Criar "${search}"`}</Button>
                   )
@@ -161,8 +178,8 @@ export default function SearchableSelect({
 
               }
             />
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     </View>
   );

@@ -30,15 +30,15 @@ export default function NumberSelect({
   }
 
   return (
-      <View style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between w-full px-3 py-2 bg-white border rounded-lg">
-        <Button color='gray-d' type="outline" action={onDecrease}>
-          <Ionicons name="chevron-back-outline" size={20} color={getColor("gray-7")} />
+      <View style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between w-full px-1 py-1 bg-white border rounded-lg">
+        <Button color='gray-d' type="outline" action={onDecrease} className='w-8 h-10 p-0'>
+          <Ionicons name="chevron-back-outline" size={16} color={getColor("gray-7")} />
         </Button>
         <Text className="text-lg outline-none">
           {value}
         </Text>
-        <Button color='gray-d' type="outline" action={onIncrease}>
-          <Ionicons name="chevron-forward-outline" size={20} color={getColor("gray-7")} />
+        <Button color='gray-d' type="outline" action={onIncrease} className='w-8 h-10 p-0'>
+          <Ionicons name="chevron-forward-outline" size={16} color={getColor("gray-7")} />
         </Button>
       </View>
   );

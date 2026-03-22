@@ -1,10 +1,12 @@
 import { getColor } from '@/types/color.type';
+import { FontAwesome5 } from '@expo/vector-icons';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { Platform, Pressable, TextInput, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 import { formatDate, rawDate } from '../utils/dateUtils';
+import Input from './input';
 
 type DateInputProps = {
   value: string;
@@ -34,14 +36,17 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
 
   return (
     <View className="flex-1">
-      <Pressable style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between px-3 py-2 bg-white border rounded-lg"
-        onPress={openPicker}>
-        <TextInput
-          className="flex-1 outline-none"
+      <Pressable
+        className="relative"
+        onPress={openPicker}
+      >
+        <Input
+          className="flex-1 outline-none pointer-events-none"
           value={value}
-          editable={false}
-          onPress={() => setShow(true)}
-        />
+          onChange={() => {}}
+          // onPress={() => setShow(true)}
+          />
+        <FontAwesome5 name="calendar" size={16} color={getColor("gray-7")} className='absolute right-0 m-3' />
       </Pressable>
 
       {show && (

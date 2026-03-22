@@ -21,13 +21,13 @@ export default function LoginScreen() {
         <View style={{backgroundColor: getColor("light-violet")}} className="flex items-center justify-center mb-8 rounded-full w-28 h-28">
           <FontAwesome6 name="trophy" size={46} color={getColor("gold")} />
         </View>
-        <Text className="px-8 mb-2 text-4xl font-bold text-white">BTY</Text>
+        <Text className="px-8 mb-2 text-5xl font-extrabold text-white">BTY</Text>
         <Text className="px-8 mb-2 text-lg font-semibold text-white">
           Better Than Yesterday
         </Text>
         <View className="flex flex-row items-center justify-center gap-2 px-8 mb-12">
           <Ionicons name="trending-up-outline" size={18} color={getColor("gold")} />
-          <Text className="font-thin text-white">
+          <Text className="text-sm font-thin text-white">
             Construa hábitos. Ganhe recompensas.
           </Text>
         </View>

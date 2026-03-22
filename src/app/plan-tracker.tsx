@@ -13,8 +13,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { Button } from '../components/button';
 import CheckinCard from '../components/checkin-card';
+import DaysOffCard from '../components/days-off-card';
 import SideDrawer from '../components/side-drawer';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 
@@ -47,7 +47,7 @@ type Plan = {
   endsAt: string;
   status: 'active' | 'inactive';
   type: 'public' | 'private';
-  restsPerWeek: number;
+  daysOffPerWeek: number;
   createdAt: string;
 };
 
@@ -159,13 +159,16 @@ export default function PlanTrackerScreen() {
   }
 
   const planInfoMock = {
+    planId: '123',
+    userId: '456',
     streak: 7,
     position: 3,
     totalParticipants: 8,
     checkinCount: 13,
     totalCheckinCount: 21,
     daysToFinish: 23,
-    restCount: 2,
+    daysOffAvailable: 1,
+    daysOffPerWeek: 2
   };
 
   return (
@@ -200,7 +203,7 @@ export default function PlanTrackerScreen() {
             </Pressable>
 
             <View className="flex flex-col items-center justify-center">
-              <Text style={{color: getColor("white")}} className="text-xl font-bold text-center ">
+              <Text style={{ color: getColor("white") }} className="text-xl font-bold text-center ">
                 BTY
               </Text>
             </View>
@@ -213,11 +216,11 @@ export default function PlanTrackerScreen() {
             </Pressable>
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
-            <Text style={{color: getColor("white")}} className="text-2xl font-bold ">
+            <Text style={{ color: getColor("white") }} className="text-2xl font-bold ">
               {habit?.name ?? 'Treino 5x na semana'}
             </Text>
-            <Text style={{color: getColor("white")}} className=" text-md">
-              {habit?.name ?? '5x por semana'}
+            <Text style={{ color: getColor("white") }} className=" text-md">
+              {`${(7 - planInfoMock.daysOffPerWeek)}x por semana`}
             </Text>
           </View>
         </LinearGradient>
@@ -286,18 +289,7 @@ export default function PlanTrackerScreen() {
               </Text>
             </View>
           </Card>
-
-          <View style={{ backgroundColor: getColor("light-success"), borderColor: getColor("success") }} className="flex flex-row items-center justify-center flex-1 w-full gap-4 px-4 py-2 border shadow-md rounded-xl">
-            <FontAwesome6 name="gift" size={20} color={getColor("success")} />
-            <View className="flex flex-col items-start justify-center flex-1">
-              <Text style={{ color: getColor("success") }} className="text-base font-semibold">
-                {formatInteger(planInfoMock.restCount)} folgas disponíveis
-              </Text>
-              <Text style={{ color: getColor("success") }} className="text-sm">Use com sabedoria!</Text>
-            </View>
-            <Button color="success" textSize='text-base' className="h-auto px-4 py-2 rounded-xl">Usar</Button>
-          </View>
-
+          <DaysOffCard daysOffAvailable={planInfoMock.daysOffAvailable} onUseDayOff={() => {}} />
           {/* Lista dos últimos check-ins dos participantes */}
           <View className="mt-2 -mb-5">
             <Text style={{ color: getColor("black") }} className="mb-3 text-lg font-extrabold">

@@ -23,7 +23,7 @@ export default function CreatePlanScreen() {
   const [description, setDescription] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(formatDate(getRelativeDate(+1)));
   const [finishDate, setFinishDate] = useState<string>(formatDate(getRelativeDate(+365)));
-  const [restsPerWeek, setRestsPerWeek] = useState<number>(2);
+  const [daysOffPerWeek, setDaysOffPerWeek] = useState<number>(2);
 
   const [habitItemList, setHabitItemList] = useState<Option[]>([
     {
@@ -37,42 +37,6 @@ export default function CreatePlanScreen() {
     {
       value: "3",
       label: "3"
-    },
-    {
-      value: "4",
-      label: "4"
-    },
-    {
-      value: "5",
-      label: "5"
-    },
-    {
-      value: "6",
-      label: "6"
-    },
-    {
-      value: "7",
-      label: "7"
-    },
-    {
-      value: "8",
-      label: "8"
-    },
-    {
-      value: "9",
-      label: "9"
-    },
-    {
-      value: "10",
-      label: "10"
-    },
-    {
-      value: "11",
-      label: "11"
-    },
-    {
-      value: "12",
-      label: "12"
     }
   ]);
 
@@ -81,7 +45,7 @@ export default function CreatePlanScreen() {
       value: name,
       label: name
     }
-    setHabitItemList((prev) => [...prev, newHabit])
+    setHabitItemList((prev) => [...prev, { ...newHabit, justAdded: true }])
   }
 
 
@@ -121,7 +85,10 @@ export default function CreatePlanScreen() {
               placeholder="Escolha um hábito..."
               value={habitId}
               options={habitItemList}
-              onChange={setHabitId}
+              onChange={(newSelectedId) => {
+                setHabitId(newSelectedId);
+                setHabitItemList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.value === newSelectedId)))
+              }}
               createOption={createHabit}
             />
           </Card>
@@ -151,8 +118,8 @@ export default function CreatePlanScreen() {
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Folgas Permitidas por Semana</Label>
             <NumberSelect
-              value={restsPerWeek}
-              setValue={setRestsPerWeek}
+              value={daysOffPerWeek}
+              setValue={setDaysOffPerWeek}
               minValue={0}
               maxValue={6}
             />

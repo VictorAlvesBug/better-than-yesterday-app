@@ -46,7 +46,7 @@
       "endsAt": "2026-12-31",
       "status": "active",
       "type": "public",
-      "restsPerWeek": 1,
+      "daysOffPerWeek": 1,
       "createdAt": "2024-06-01"
     },
     {
@@ -57,7 +57,7 @@
       "endsAt": "2026-12-31",
       "status": "active",
       "type": "public",
-      "restsPerWeek": 2,
+      "daysOffPerWeek": 2,
       "createdAt": "2024-06-01"
     }
   ],
