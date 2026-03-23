@@ -61,15 +61,16 @@ export default function SearchableSelect({
     <View className="w-full">
       {/* Campo “fechado” */}
       <Pressable
-        className="relative"
         onPress={() => setOpen(true)}
       >
         <Input
           value={selectedOption?.label}
           onChange={() => { }}
           placeholder={selectedOption?.label ?? placeholder}
-          className='pointer-events-none' />
-        <Ionicons name="chevron-down" size={18} color={getColor("gray-7")} className='absolute right-0 m-3' />
+          className='pointer-events-none'
+          icon='chevron-down'
+          iconPosition='right'
+        />
       </Pressable>
 
       {/* Modal de busca + lista */}
@@ -102,20 +103,15 @@ export default function SearchableSelect({
               </Pressable>
             </View>
 
-            <View className="relative flex-row items-center mb-3">
-              <Ionicons
-                name="search"
-                size={16}
-                color={getColor("gray-7")}
-                style={{ marginRight: 8 }}
-                className='absolute left-0 m-3'
-              />
+            <View className="flex-row items-center mb-3">
               <Input
                 ref={inputRef}
-                className="flex-1 outline-none"
+                className="outline-none flex-1test"
                 placeholder="Buscar..."
                 value={search}
-                onChange={setSearch} />
+                onChange={setSearch}
+                icon="search"
+                iconPosition="left" />
             </View>
 
             <FlatList

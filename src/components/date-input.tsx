@@ -1,5 +1,3 @@
-import { getColor } from '@/types/color.type';
-import { FontAwesome5 } from '@expo/vector-icons';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
@@ -37,16 +35,15 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
   return (
     <View className="flex-1">
       <Pressable
-        className="relative"
         onPress={openPicker}
       >
         <Input
           className="flex-1 outline-none pointer-events-none"
           value={value}
           onChange={() => {}}
-          // onPress={() => setShow(true)}
+          icon='calendar-clear-outline'
+          iconPosition='right'
           />
-        <FontAwesome5 name="calendar" size={16} color={getColor("gray-7")} className='absolute right-0 m-3' />
       </Pressable>
 
       {show && (

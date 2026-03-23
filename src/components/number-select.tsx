@@ -20,25 +20,29 @@ export default function NumberSelect({
   minValue,
   maxValue,
 }: NumberSelectProps) {
+  const canDecrease = () => minValue === undefined || value > minValue;
+  const canIncrease = () => maxValue === undefined || value < maxValue;
+
   const onDecrease = () => {
-    if (minValue === undefined || value > minValue)
+    if (canDecrease())
       setValue(value - 1);
   }
+
   const onIncrease = () => {
-    if (maxValue === undefined || value < maxValue)
+    if (canIncrease())
       setValue(value + 1);
   }
 
   return (
-      <View style={{borderColor: getColor("gray-d")}} className="flex flex-row items-center justify-between w-full px-1 py-1 bg-white border rounded-lg">
-        <Button color='gray-d' type="outline" action={onDecrease} className='w-8 h-10 p-0'>
-          <Ionicons name="chevron-back-outline" size={16} color={getColor("gray-7")} />
+      <View className="flex flex-row items-center justify-start w-full gap-6 px-1 py-1">
+        <Button color='gray-d' action={onDecrease} className='w-8 h-8 p-0' disabled={!canDecrease()}>
+          <Ionicons name="remove-outline" size={20} color={getColor("gray-7")} />
         </Button>
         <Text className="text-lg outline-none">
           {value}
         </Text>
-        <Button color='gray-d' type="outline" action={onIncrease} className='w-8 h-10 p-0'>
-          <Ionicons name="chevron-forward-outline" size={16} color={getColor("gray-7")} />
+        <Button color='gray-d' action={onIncrease} className='w-8 h-8 p-0' disabled={!canIncrease()}>
+          <Ionicons name="add-outline" size={20} color={getColor("gray-7")} />
         </Button>
       </View>
   );

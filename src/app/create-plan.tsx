@@ -1,5 +1,6 @@
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
+import { PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
@@ -9,12 +10,15 @@ import {
   View
 } from 'react-native';
 import BackButton from '../components/back-button';
+import { Button } from '../components/button';
 import DateRangeSelect from '../components/date-range-select';
 import Input from '../components/input';
 import Label from '../components/label';
 import NumberSelect from '../components/number-select';
+import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
 import SearchableSelect, { type Option } from '../components/searchable-select';
 import { formatDate, getRelativeDate } from '../utils/dateUtils';
+import { formatMoney } from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -24,21 +28,21 @@ export default function CreatePlanScreen() {
   const [startDate, setStartDate] = useState<string>(formatDate(getRelativeDate(+1)));
   const [finishDate, setFinishDate] = useState<string>(formatDate(getRelativeDate(+365)));
   const [daysOffPerWeek, setDaysOffPerWeek] = useState<number>(2);
+  const [penaltyValue, setPenaltyValue] = useState<number>(10);
 
-  const [habitItemList, setHabitItemList] = useState<Option[]>([
-    {
-      value: "1",
-      label: "1"
-    },
-    {
-      value: "2",
-      label: "2"
-    },
-    {
-      value: "3",
-      label: "3"
-    }
-  ]);
+  const auxList1 = ["Lorem", "ipsun", "dolor", "sit", "amet", "fulano", "ciclano", "beltrano"];
+
+  const [habitItemList, setHabitItemList] = useState<Option[]>(auxList1.map(item => ({
+    value: item,
+    label: item
+  })));
+
+
+  const auxList2 = [1, 5, 10, 20, 50, 100];
+
+  const [penaltyValueList,] = useState<Option[]>(auxList2.map(item => ({
+    value: item.toString(), label: formatMoney(item)
+  })));
 
   function createHabit(name: string) {
     const newHabit = {
@@ -48,6 +52,20 @@ export default function CreatePlanScreen() {
     setHabitItemList((prev) => [...prev, { ...newHabit, justAdded: true }])
   }
 
+  const [planType, setPlanType] = useState<PlanType>('private');
+
+  const radioButtonOptions: RadioButtonOption[] = [{
+    value: 'private',
+    icon: 'lock-closed-outline',
+    title: 'Privado',
+    complement: 'Apenas para amigos e família'
+  },
+  {
+    value: 'public',
+    icon: 'globe-outline',
+    title: 'Público',
+    complement: 'Qualquer pessoa pode participar'
+  }]
 
   return (
     <View
@@ -77,9 +95,9 @@ export default function CreatePlanScreen() {
           </View>
         </LinearGradient>
 
-        <View className="w-full gap-3 px-4 py-3">
+        <View className="w-full gap-6 px-4 py-3">
           <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Selecione o Hábito</Label>
+            <Label>Hábito</Label>
             <SearchableSelect
               label="Selecione o Hábito"
               placeholder="Escolha um hábito..."
@@ -125,6 +143,32 @@ export default function CreatePlanScreen() {
             />
           </Card>
 
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Multa por Descumprimento</Label>
+            <SearchableSelect
+              label="Selecione o Valor"
+              value={penaltyValue.toString()}
+              options={penaltyValueList}
+              onChange={(newSelectedId) => {
+                setPenaltyValue(Number.parseInt(newSelectedId));
+              }}
+            />
+          </Card>
+
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Tipo de Plano</Label>
+            <RadioButtonSelect selectedValue={planType} onChange={value => setPlanType(value as PlanType)} options={radioButtonOptions} />
+          </Card>
+
+          <Button className='p-0 overflow-hidden'>
+            <LinearGradient
+              colors={[getColor("violet"), getColor("purple")]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              className="flex flex-col items-center justify-center w-full h-full">
+              <Text style={{color: getColor('white')}} className='text-lg font-bold'>Criar Plano</Text>
+            </LinearGradient>
+          </Button>
         </View>
       </ScrollView>
     </View>

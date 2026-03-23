@@ -30,6 +30,7 @@ type ButtonProps = {
   action?: () => void;
   className?: string;
   textSize?: TextSize;
+  disabled?: boolean;
 } & (WithColorNameProps
   | WithColorNameSetProps);
 
@@ -39,7 +40,7 @@ const defaultColor: ColorNameSet = {
   background: "gray-e",
 };
 
-export function Button({ action = () => { }, children, className, color = defaultColor, type = "default", textSize = "text-lg" }: ButtonProps) {
+export function Button({ action = () => { }, children, className, color = defaultColor, type = "default", textSize = "text-lg", disabled }: ButtonProps) {
   const colorSet: ColorSet =
     typeof color === 'string'
       ? (type === "default"
@@ -65,7 +66,11 @@ export function Button({ action = () => { }, children, className, color = defaul
         borderColor: colorSet.border,
       }}
       onPress={action}
-      className={twMerge(`items-center justify-center border rounded-2xl px-3 h-14`, className)}
+      className={twMerge(
+        `items-center justify-center border rounded-2xl px-3 h-14`, 
+        disabled && "pointer-events-none opacity-40", 
+        className
+      )}
     >
       {typeof children === 'object' ? (
         children

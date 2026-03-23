@@ -48,6 +48,9 @@ const colors = {
   opaque: "#ffffff20",
   accent: "#7e22ce",
   "light-accent": "#e9d5ff",
+
+  // Transparent
+  transparent: "#00000000"
 } as const;
 
 type Colors = typeof colors;
