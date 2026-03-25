@@ -33,7 +33,7 @@ export default function LoginScreen() {
         </View>
         <Pressable
           className="w-full mb-6"
-          onPress={() => router.push('/plan-tracker')}
+          onPress={() => router.replace('/login-additional-information')}
         >
           <View className="flex flex-row items-center justify-center gap-3 py-4 bg-white rounded-xl">
             <Image

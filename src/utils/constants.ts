@@ -49,3 +49,5 @@ export const REFRESH_COOKIE_OPTIONS = {
   path: "/api/auth/refresh", // Restrict to refresh endpoint only
   maxAge: REFRESH_TOKEN_MAX_AGE,
 };
+
+export const API_URL = "http://192.168.15.9:3000";

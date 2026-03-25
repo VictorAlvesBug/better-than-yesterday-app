@@ -1,11 +1,12 @@
 import Card from '@/src/components/card';
 import { Checkin } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
+import { PlanWithHabit } from '@/types/plan.type';
 import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -17,11 +18,13 @@ import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
 import SideDrawer from '../components/side-drawer';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
+import createAsyncStorageRepository from './api/repositories/asyncStorageRepository';
+import createPlanRepository from './api/repositories/planRepository';
 
 const statusBarHeight = Constants.statusBarHeight;
 
 // ajuste aqui para o IP/porta do seu json-server
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://192.168.15.9:3000';
 
 // IDs fixos para o plano de leitura (poderia vir via rota/params)
 const READING_PLAN_ID = '65352d6fb37d421799f9f5fb17a42c04';
@@ -60,9 +63,13 @@ type PlanParticipant = {
 };
 
 export default function PlanTrackerScreen() {
+  const asyncStorageRepository = createAsyncStorageRepository();
+  const planRepository = createPlanRepository();
+
+  const [plan, setPlan] = useState<PlanWithHabit | null>(null);
+
   const [users, setUsers] = useState<User[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
-  const [plans, setPlans] = useState<Plan[]>([]);
   const [planParticipants, setPlanParticipants] = useState<PlanParticipant[]>(
     [],
   );
@@ -72,11 +79,6 @@ export default function PlanTrackerScreen() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const router = useRouter();
-
-  const plan = useMemo(
-    () => plans.find((p) => p.id === READING_PLAN_ID),
-    [plans],
-  );
 
   const habit = useMemo(
     () => habits.find((h) => h.id === plan?.habitId),
@@ -146,6 +148,24 @@ export default function PlanTrackerScreen() {
     status: 'Validated',
   });
 
+  useEffect(() => {
+    const fetchPlan = async () => {
+      const planId = await asyncStorageRepository.get<string>('planId');
+
+      if (!planId)
+        throw new Error('PlanId not found...');
+
+      const plan = await planRepository.getById(planId);
+
+      if (!plan)
+        throw new Error('Plan not found...');
+
+      setPlan(plan);
+    };
+
+    fetchPlan();
+  }, []);
+
   if (loading) {
     return (
       <View
@@ -158,6 +178,9 @@ export default function PlanTrackerScreen() {
     );
   }
 
+  if (!plan)
+    return null;
+
   const planInfoMock = {
     planId: '123',
     userId: '456',
@@ -168,7 +191,7 @@ export default function PlanTrackerScreen() {
     totalCheckinCount: 21,
     daysToFinish: 23,
     daysOffAvailable: 1,
-    daysOffPerWeek: 2
+    ...plan
   };
 
   return (

@@ -3,7 +3,7 @@ import { getColor } from '@/types/color.type';
 import { PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   Text,
@@ -19,6 +19,7 @@ import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button
 import SearchableSelect, { type Option } from '../components/searchable-select';
 import { formatDate, getRelativeDate } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
+import createHabitRepository from './api/repositories/habitRepository';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -30,13 +31,9 @@ export default function CreatePlanScreen() {
   const [daysOffPerWeek, setDaysOffPerWeek] = useState<number>(2);
   const [penaltyValue, setPenaltyValue] = useState<number>(10);
 
-  const auxList1 = ["Lorem", "ipsun", "dolor", "sit", "amet", "fulano", "ciclano", "beltrano"];
+  const [habitList, setHabitList] = useState<Option[]>([]);
 
-  const [habitItemList, setHabitItemList] = useState<Option[]>(auxList1.map(item => ({
-    value: item,
-    label: item
-  })));
-
+  const habitRepository = createHabitRepository();
 
   const auxList2 = [1, 5, 10, 20, 50, 100];
 
@@ -49,7 +46,7 @@ export default function CreatePlanScreen() {
       value: name,
       label: name
     }
-    setHabitItemList((prev) => [...prev, { ...newHabit, justAdded: true }])
+    setHabitList((prev) => [...prev, { ...newHabit, justAdded: true }])
   }
 
   const [planType, setPlanType] = useState<PlanType>('private');
@@ -66,6 +63,19 @@ export default function CreatePlanScreen() {
     title: 'Público',
     complement: 'Qualquer pessoa pode participar'
   }]
+
+  useEffect(() => {
+    const fetchHabits = async () => {
+      const habits = await habitRepository.listAll();
+
+      setHabitList(habits.map(habit => ({
+        value: habit.id,
+        label: habit.name
+      })));
+    };
+
+    fetchHabits();
+  }, [habitRepository, setHabitList]);
 
   return (
     <View
@@ -102,10 +112,10 @@ export default function CreatePlanScreen() {
               label="Selecione o Hábito"
               placeholder="Escolha um hábito..."
               value={habitId}
-              options={habitItemList}
+              options={habitList}
               onChange={(newSelectedId) => {
                 setHabitId(newSelectedId);
-                setHabitItemList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.value === newSelectedId)))
+                setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.value === newSelectedId)))
               }}
               createOption={createHabit}
             />
@@ -166,7 +176,7 @@ export default function CreatePlanScreen() {
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
               className="flex flex-col items-center justify-center w-full h-full">
-              <Text style={{color: getColor('white')}} className='text-lg font-bold'>Criar Plano</Text>
+              <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Criar Plano</Text>
             </LinearGradient>
           </Button>
         </View>

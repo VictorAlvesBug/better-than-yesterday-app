@@ -1,21 +1,28 @@
 import { getColor } from '@/types/color.type';
+import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ScrollView, Text, View } from 'react-native';
-import BackButton from '../components/back-button';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Button } from '../components/button';
+import SideDrawer from '../components/side-drawer';
 
+import { useState } from 'react';
 const statusBarHeight = Constants.statusBarHeight;
 
 export default function ManagePlansScreen() {
   const router = useRouter();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
     <View
-      className="flex-1"
+      className="relative flex-1"
       style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
     >
+      <SideDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      />
       <ScrollView
         style={{ flex: 1 }}
         className="flex-1"
@@ -29,7 +36,14 @@ export default function ManagePlansScreen() {
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-start w-full">
-            <BackButton />
+            <Pressable
+              className="flex items-center justify-center w-20 h-20"
+              onPress={() => setIsDrawerOpen(true)}
+              hitSlop={10}
+            >
+              <Ionicons name="menu" size={24} color={getColor("white")} />
+            </Pressable>
+
             <View className="flex flex-col items-center justify-center">
               <Text className="text-xl font-bold text-center text-white">
                 Gerenciar Planos

@@ -4,24 +4,40 @@
       "id": "ad50726d466b4f59937f210c5344188d",
       "nickname": "Vitão",
       "email": "victoralvesbug@gmail.com",
+      "name": "Victor Alves Bugueno",
+      "photo": "123",
+      "phoneNumber": "11999999999",
+      "pixKey": "11999999999",
       "createdAt": "2024-06-01"
     },
     {
       "id": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
       "nickname": "Fátima",
       "email": "butia245@gmail.com",
+      "name": "Maria de Fátima Alves Bugueno",
+      "photo": "321",
+      "phoneNumber": "11888888888",
+      "pixKey": "11888888888",
       "createdAt": "2024-06-01"
     },
     {
       "id": "2216fe3e553145c5b12b29358a15c771",
       "nickname": "Thiago",
       "email": "thiago.245.thiago@gmail.com",
+      "name": "Thiago Alves Bugueno",
+      "photo": "222",
+      "phoneNumber": "11999999999",
+      "pixKey": "11999999999",
       "createdAt": "2024-06-01"
     },
     {
       "id": "af25bfe959114e77a8f002b1a554b542",
       "nickname": "John Doe Son",
       "email": "john.doe@email.com",
+      "name": "John Doe Son",
+      "photo": "555",
+      "phoneNumber": "11777777777",
+      "pixKey": "11777777777",
       "createdAt": "2020-01-10"
     }
   ],
@@ -44,7 +60,7 @@
       "description": "Ler 10 páginas por dia em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
-      "status": "active",
+      "status": "Running",
       "type": "public",
       "daysOffPerWeek": 1,
       "createdAt": "2024-06-01"
@@ -55,7 +71,7 @@
       "description": "Treinar 5 vezes por semana em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
-      "status": "active",
+      "status": "Finished",
       "type": "public",
       "daysOffPerWeek": 2,
       "createdAt": "2024-06-01"
