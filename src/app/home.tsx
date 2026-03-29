@@ -49,7 +49,7 @@ export default function HomeScreen() {
 
         fetchUser();
     }, [authUser, isSignedIn, planRepository, userRepository]);
-
+    
     switch (redirectionScreen) {
         case 'login':
             return <LoginScreen />;

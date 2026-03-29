@@ -26,7 +26,6 @@ export default function createPlanRepository() {
         },
         listByUserId: async (userId: string) => {
             const planParticipants = (await axios.get<PlanParticipant[]>(`${API_URL}/planParticipants?userId=${userId}`)).data;
-            console.log({ planParticipants });
             const plansTasks = planParticipants
                 .map(async planParticipant => {
                     return (await axios.get<Plan>(`${API_URL}/plans/${planParticipant.planId}`)).data;
@@ -34,7 +33,6 @@ export default function createPlanRepository() {
 
             const plans = (await Promise.all(plansTasks))
                 .filter(plan => Boolean(plan)) as Plan[];
-            console.log({ plans });
             const planWithHabitTasks = plans
                 .map(async plan => {
                     const habit = await habitRepository.getById(plan.habitId);
