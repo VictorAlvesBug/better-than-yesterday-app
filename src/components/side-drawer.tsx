@@ -1,12 +1,13 @@
 import { getColor } from '@/types/color.type';
 import { PlanWithHabit } from '@/types/plan.type';
 import { User } from '@/types/user.type';
-import { FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
-import createAsyncStorageRepository from '../app/api/repositories/asyncStorageRepository';
+import { Image, Pressable, Text, View } from 'react-native';
+import Memory from '../app/api/repositories/memory';
 import createPlanRepository from '../app/api/repositories/planRepository';
 import createUserRepository from '../app/api/repositories/userRepository';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
@@ -39,7 +40,6 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const router = useRouter();
   const userRepository = createUserRepository();
   const planRepository = createPlanRepository();
-  const asyncStorageRepository = createAsyncStorageRepository();
 
   const [user, setUser] = useState<User | null>(null);
   const [plans, setPlans] = useState<PlanWithHabit[]>([]);
@@ -47,15 +47,37 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const activePlans = plans.filter(plan => plan.status === "Running");
   const finishedPlans = plans.filter(plan => plan.status === "Finished");
 
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      router.replace('/login');
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     const fetchUser = async () => {
-      const dbUser = await userRepository.getById('ad50726d466b4f59937f210c5344188d');
-      console.log({ dbUser });
-      setUser(dbUser)
+      const userId = await Memory.get('userId');
+
+      if (!userId){
+        router.replace('/login');
+        return;
+      }
+      
+      const user = await userRepository.getById(userId);
+
+      if (!user){
+        router.replace('/login');
+        return;
+      }
+
+      setUser(user)
     };
 
     fetchUser();
-  }, [userRepository]);
+  }, [router, userRepository]);
 
   useEffect(() => {
     if (!user)
@@ -69,6 +91,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
     fetchPlans();
   }, [planRepository, user]);
 
+  if (!user)
+    return;
+
   return (
     <View
       className={`absolute z-30 flex flex-row w-full h-full ${isOpen ? '' : 'hidden'}`}
@@ -77,16 +102,18 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
         className={`flex flex-col w-[80%] bg-white transition-all duration-500 ${isOpen ? 'right-0' : 'right-[100%]'}`}
       >
         <LinearGradient
-          colors={[getColor("violet"), getColor("purple")]}
+          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
-          <View style={{ backgroundColor: getColor("light-violet") }} className="flex items-center justify-center w-12 h-12 rounded-full">
-            <FontAwesome6 name="trophy" size={20} color={getColor("gold")} />
-          </View>
+          <Image
+                    source={require("../../assets/images/logo.png")}
+                    resizeMode="cover"
+                    className="w-12 h-12 rounded-full"
+                  />
           <View className="flex flex-col items-start justify-center flex-1">
-            <Text className="font-semibold text-white">{user?.name || "Juninho"}</Text>
+            <Text className="font-semibold text-white">{user.name}</Text>
             <Text className="font-thin text-white">
               Ranking: #{formatInteger(42)}
             </Text>
@@ -111,7 +138,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                     key={plan.id}
                     className="flex flex-row items-center justify-start gap-3 px-8 py-4"
                     onPress={async () => {
-                      await asyncStorageRepository.set('planId', plan.id);
+                      await Memory.set('planId', plan.id);
                       router.push('/plan-tracker');
                       onClose();
                     }}
@@ -173,7 +200,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             <Text style={{ color: getColor("gray-3") }} className="font-semibold">Sobre nós</Text>
           </View>
           <Pressable
-            onPress={() => router.replace('/login')}
+            // onPress={() => router.replace('/login')}
+            onPress={signOut}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
           >
             <View className="flex flex-row items-center justify-center w-5">

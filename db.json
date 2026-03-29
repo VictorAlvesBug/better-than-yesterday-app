@@ -1,16 +1,6 @@
 {
   "users": [
     {
-      "id": "ad50726d466b4f59937f210c5344188d",
-      "nickname": "Vitão",
-      "email": "victoralvesbug@gmail.com",
-      "name": "Victor Alves Bugueno",
-      "photo": "123",
-      "phoneNumber": "11999999999",
-      "pixKey": "11999999999",
-      "createdAt": "2024-06-01"
-    },
-    {
       "id": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
       "nickname": "Fátima",
       "email": "butia245@gmail.com",
@@ -39,6 +29,44 @@
       "phoneNumber": "11777777777",
       "pixKey": "11777777777",
       "createdAt": "2020-01-10"
+    },
+    {
+      "id": "ee0d",
+      "nickname": "Teste cadastro via Insomnia",
+      "email": "a@b.com",
+      "name": "Testando cadastro via Insomnia",
+      "photo": "222",
+      "phoneNumber": "11999999999",
+      "pixKey": "11999999999",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "e06a",
+      "nickname": "Teste cadastro via Insomnia2",
+      "email": "a@b.com",
+      "name": "Testando cadastro via Insomnia2",
+      "photo": "222",
+      "phoneNumber": "11999999999",
+      "pixKey": "11999999999"
+    },
+    {
+      "id": "12345",
+      "nickname": "Teste cadastro via Insomnia3",
+      "email": "a@b.com",
+      "name": "Testando cadastro via Insomnia3",
+      "photo": "222",
+      "phoneNumber": "11999999999",
+      "pixKey": "11999999999",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "117634549697561341128",
+      "email": "engenhariatrinity@gmail.com",
+      "name": "Equipe Trinity",
+      "nickname": "Equipe Trinity",
+      "photo": "https://lh3.googleusercontent.com/a/ACg8ocIEvAI1dkX-N8JAmurbW5t6pDZwC2aAzQCTGU376n_dAKT7glA",
+      "phoneNumber": "11987654321",
+      "pixKey": "engenhariatrinity@gmail.com"
     }
   ],
   "habits": [

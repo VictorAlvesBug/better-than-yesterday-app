@@ -89,7 +89,7 @@ export default function CreatePlanScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={[getColor("violet"), getColor("purple")]}
+          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
@@ -172,7 +172,7 @@ export default function CreatePlanScreen() {
 
           <Button className='p-0 overflow-hidden'>
             <LinearGradient
-              colors={[getColor("violet"), getColor("purple")]}
+              colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}
               className="flex flex-col items-center justify-center w-full h-full">

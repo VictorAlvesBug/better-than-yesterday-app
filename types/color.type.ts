@@ -38,10 +38,11 @@ const colors = {
   black: "#000000",
 
   // Custom Colors
-  violet: "#8f10ed",
+  violet: "#9810fa",
   "light-violet": "#a250fb",
   purple: "#5038f6",
-  gold: "#ffd941",
+  "purple-violet": "#8100d9",
+  gold: "#ffd43b",
   silver: "#a6aab4",
   bronze: "#c77c30",
   lime: "#00cf51",

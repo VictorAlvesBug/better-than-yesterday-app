@@ -1,5 +1,34 @@
 //import { IntlNumberFormat } from '@formatjs/intl-numberformat/polyfill';
 
+export function formatPhoneNumber(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+
+  const ddd = digits.slice(0, 2);
+  const rest = digits.slice(2);
+
+  const firstPartLength = rest.length > 8 ? 5 : 4;
+  const first = rest.slice(0, firstPartLength);
+  const last = rest.slice(firstPartLength);
+
+  let result = '';
+
+  if (ddd) {
+    result += `(${ddd}`;
+    if (ddd.length === 2 && rest.length) result += ') ';
+  }
+
+  if (first) {
+    result += first;
+    if (last) result += '-';
+  }
+
+  if (last) {
+    result += last;
+  }
+
+  return result;
+}
+
 export function formatInteger(value: number) {
     return getIntegerFormatter({ value, showWholeNumber: false, useCompact: false })
         .format(value);

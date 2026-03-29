@@ -16,5 +16,21 @@ export default function createUserRepository(){
 
             return response.data;
         },
+        getByEmail: async (email: string) => {
+            const response = await axios.get<User[]>(`${API_URL}/users?email=${email}`);
+            
+            if (response.status !== 200)
+                throw new Error(`HTTP: ${response}`);
+
+            return response.data.length > 0 ? response.data[0] : null;
+        },
+        save: async (user: User) => {
+            const response = await axios.post(`${API_URL}/users`, user);
+            
+            if (response.status !== 201)
+                throw new Error(`HTTP: ${response}`);
+
+            return JSON.stringify(response.data); // TODO: Ajustar
+        }
     }
 }

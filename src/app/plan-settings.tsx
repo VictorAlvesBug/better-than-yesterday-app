@@ -4,21 +4,21 @@ import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Animated,
-  LayoutChangeEvent,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
+    Animated,
+    LayoutChangeEvent,
+    Pressable,
+    ScrollView,
+    Text,
+    View,
 } from 'react-native';
 import BackButton from '../components/back-button';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import Ranking from '../components/ranking';
 import {
-  formatInteger,
-  formatMoney,
-  formatMoneyCompact,
-  formatPercent,
+    formatInteger,
+    formatMoney,
+    formatMoneyCompact,
+    formatPercent,
 } from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -59,7 +59,7 @@ export default function PlanSettingsScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={[getColor("violet"), getColor("purple")]}
+          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
@@ -130,7 +130,7 @@ export default function PlanSettingsScreen() {
                 }}
               >
                 <LinearGradient
-                  colors={[getColor("violet"), getColor("purple")]}
+                  colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
                   style={{

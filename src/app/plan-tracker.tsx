@@ -18,13 +18,10 @@ import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
 import SideDrawer from '../components/side-drawer';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
-import createAsyncStorageRepository from './api/repositories/asyncStorageRepository';
+import Memory from './api/repositories/memory';
 import createPlanRepository from './api/repositories/planRepository';
 
 const statusBarHeight = Constants.statusBarHeight;
-
-// ajuste aqui para o IP/porta do seu json-server
-const API_BASE_URL = 'http://192.168.15.9:3000';
 
 // IDs fixos para o plano de leitura (poderia vir via rota/params)
 const READING_PLAN_ID = '65352d6fb37d421799f9f5fb17a42c04';
@@ -63,7 +60,6 @@ type PlanParticipant = {
 };
 
 export default function PlanTrackerScreen() {
-  const asyncStorageRepository = createAsyncStorageRepository();
   const planRepository = createPlanRepository();
 
   const [plan, setPlan] = useState<PlanWithHabit | null>(null);
@@ -150,21 +146,26 @@ export default function PlanTrackerScreen() {
 
   useEffect(() => {
     const fetchPlan = async () => {
-      const planId = await asyncStorageRepository.get<string>('planId');
+      const planId = await Memory.get('planId');
 
-      if (!planId)
-        throw new Error('PlanId not found...');
+      if (!planId){
+        router.replace('/manage-plans');
+        return;
+      }
 
       const plan = await planRepository.getById(planId);
 
-      if (!plan)
-        throw new Error('Plan not found...');
+      if (!plan){
+        await Memory.remove('planId');
+        router.replace('/manage-plans');
+        return;
+      }
 
       setPlan(plan);
     };
 
     fetchPlan();
-  }, []);
+  }, [planRepository, router]);
 
   if (loading) {
     return (
@@ -211,7 +212,7 @@ export default function PlanTrackerScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <LinearGradient
-          colors={[getColor("violet"), getColor("purple")]}
+          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full"
@@ -240,7 +241,7 @@ export default function PlanTrackerScreen() {
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
             <Text style={{ color: getColor("white") }} className="text-2xl font-bold ">
-              {habit?.name ?? 'Treino 5x na semana'}
+              {planInfoMock.description ?? planInfoMock.habitName}
             </Text>
             <Text style={{ color: getColor("white") }} className=" text-md">
               {`${(7 - planInfoMock.daysOffPerWeek)}x por semana`}
@@ -286,7 +287,7 @@ export default function PlanTrackerScreen() {
             </View>
             <View style={{ backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 10, width: "100%" }}>
               <LinearGradient
-                colors={[getColor("violet"), getColor("purple")]}
+                colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
                 start={{ x: 0.5, y: 0 }}
                 end={{ x: 0.5, y: 1 }}
                 style={{
@@ -334,7 +335,7 @@ export default function PlanTrackerScreen() {
       {/* Botão flutuante fixo */}
       <Pressable style={{ backgroundColor: getColor('violet') }} className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
         <LinearGradient
-          colors={[getColor("violet"), getColor("purple")]}
+          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           className="flex flex-col items-center justify-center w-full h-full"

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "better-than-yesterday-app",
+    "name": "Better Than Yesterday",
     "slug": "better-than-yesterday-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -44,11 +44,19 @@
         }
       ],
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-web-browser",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "feb9e99e-69cf-450d-aecc-85e9bd45a51b"
+      }
     }
   }
 }
