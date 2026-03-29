@@ -2,7 +2,6 @@ import { getColor } from '@/types/color.type';
 import { PlanWithHabit } from '@/types/plan.type';
 import { User } from '@/types/user.type';
 import { Ionicons } from '@expo/vector-icons';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -10,6 +9,7 @@ import { Image, Pressable, Text, View } from 'react-native';
 import Memory from '../app/api/repositories/memory';
 import createPlanRepository from '../app/api/repositories/planRepository';
 import createUserRepository from '../app/api/repositories/userRepository';
+import { useAuth } from '../context/auth';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
 
 type TextBalanceProps = {
@@ -37,6 +37,7 @@ type SideDrawerProps = {
 };
 
 export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
+  const { signOut } = useAuth();
   const router = useRouter();
   const userRepository = createUserRepository();
   const planRepository = createPlanRepository();
@@ -47,28 +48,14 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const activePlans = plans.filter(plan => plan.status === "Running");
   const finishedPlans = plans.filter(plan => plan.status === "Finished");
 
-  const signOut = async () => {
-    try {
-      await GoogleSignin.signOut();
-      router.replace('/login');
-    }
-    catch (error) {
-      console.error(error);
-    }
-  }
 
   useEffect(() => {
     const fetchUser = async () => {
       const userId = await Memory.get('userId');
 
-      if (!userId){
-        router.replace('/login');
-        return;
-      }
+      const user = await userRepository.getById(userId || '');
       
-      const user = await userRepository.getById(userId);
-
-      if (!user){
+      if (!userId || !user){
         router.replace('/login');
         return;
       }
@@ -108,7 +95,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
           <Image
-                    source={require("../../assets/images/logo.png")}
+                    source={{ uri: user.photo }}
                     resizeMode="cover"
                     className="w-12 h-12 rounded-full"
                   />
@@ -200,7 +187,6 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             <Text style={{ color: getColor("gray-3") }} className="font-semibold">Sobre nós</Text>
           </View>
           <Pressable
-            // onPress={() => router.replace('/login')}
             onPress={signOut}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
           >

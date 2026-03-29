@@ -1,18 +1,19 @@
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { PlanType } from '@/types/plan.type';
-import Constants from 'expo-constants';
+import { CreatePlan, DaysOffPerWeek, PlanType } from '@/types/plan.type';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ScrollView,
   Text,
   View
 } from 'react-native';
 import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import DateRangeSelect from '../components/date-range-select';
+import GradientHeader from '../components/gradient-header';
 import Input from '../components/input';
+import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import NumberSelect from '../components/number-select';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
@@ -20,20 +21,24 @@ import SearchableSelect, { type Option } from '../components/searchable-select';
 import { formatDate, getRelativeDate } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import createHabitRepository from './api/repositories/habitRepository';
-
-const statusBarHeight = Constants.statusBarHeight;
+import Memory from './api/repositories/memory';
+import createPlanRepository from './api/repositories/planRepository';
 
 export default function CreatePlanScreen() {
-  const [habitId, setHabitId] = useState<string | null>()
-  const [description, setDescription] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string>(formatDate(getRelativeDate(+1)));
-  const [finishDate, setFinishDate] = useState<string>(formatDate(getRelativeDate(+365)));
-  const [daysOffPerWeek, setDaysOffPerWeek] = useState<number>(2);
-  const [penaltyValue, setPenaltyValue] = useState<number>(10);
+  const [plan, setPlan] = useState<CreatePlan>({
+    habitId: '',
+    startsAt: formatDate(getRelativeDate(+1)),
+    endsAt: formatDate(getRelativeDate(+365)),
+    daysOffPerWeek: 2,
+    penaltyValue: 10,
+    type: 'private',
+    createdAt: formatDate(new Date()),
+  });
 
   const [habitList, setHabitList] = useState<Option[]>([]);
 
   const habitRepository = createHabitRepository();
+  const planRepository = createPlanRepository();
 
   const auxList2 = [1, 5, 10, 20, 50, 100];
 
@@ -48,8 +53,6 @@ export default function CreatePlanScreen() {
     }
     setHabitList((prev) => [...prev, { ...newHabit, justAdded: true }])
   }
-
-  const [planType, setPlanType] = useState<PlanType>('private');
 
   const radioButtonOptions: RadioButtonOption[] = [{
     value: 'private',
@@ -77,44 +80,49 @@ export default function CreatePlanScreen() {
     fetchHabits();
   }, [habitRepository, setHabitList]);
 
+  const createPlan = async () => {
+    const habit = habitList.find(h => h.value === plan.habitId);
+
+    if (!habit) {
+      console.log('Selecione um hábito para criar o plano.');
+      return;
+    }
+
+    habit.justAdded && await habitRepository.save({
+      name: habit.label,
+    });
+
+    const planSaved = await planRepository.save(plan);
+
+    await Memory.set('planId', planSaved.id);
+    router.push('/plan-tracker');
+    console.log('Plano criado com sucesso:', planSaved);
+
+    await planRepository.join(planSaved.id, await Memory.get('userId') || '');
+  };
+
   return (
-    <View
-      className="flex-1"
-      style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
-    >
-      <ScrollView
-        style={{ flex: 1 }}
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
-      >
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          className="flex flex-col items-center justify-center w-full"
+    <>
+      <GradientHeader>
+        <BackButton />
+        <Text className="text-xl font-bold text-center text-white">
+          Criar Plano
+        </Text>
+      </GradientHeader>
+      <KeyboardableView>
+        <View
+          className="flex-1 w-full gap-6 px-4 py-3"
+          style={{ backgroundColor: getColor("gray-e") }}
         >
-          <View className="flex flex-row items-center justify-start w-full">
-            <BackButton />
-
-            <View className="flex flex-col items-center justify-center">
-              <Text className="text-xl font-bold text-center text-white">
-                Criar Plano
-              </Text>
-            </View>
-          </View>
-        </LinearGradient>
-
-        <View className="w-full gap-6 px-4 py-3">
           <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Hábito</Label>
+            <Label>Hábitos</Label>
             <SearchableSelect
               label="Selecione o Hábito"
               placeholder="Escolha um hábito..."
-              value={habitId}
+              value={plan.habitId}
               options={habitList}
               onChange={(newSelectedId) => {
-                setHabitId(newSelectedId);
+                setPlan({ ...plan, habitId: newSelectedId });
                 setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.value === newSelectedId)))
               }}
               createOption={createHabit}
@@ -125,8 +133,8 @@ export default function CreatePlanScreen() {
             <Label>Descrição (opcional)</Label>
             <Input
               placeholder="Ex: Treinar ao menos 45 minutos..."
-              value={description}
-              onChange={setDescription}
+              value={plan.description}
+              onChange={(value) => setPlan({ ...plan, description: value })}
             />
           </Card>
 
@@ -134,20 +142,20 @@ export default function CreatePlanScreen() {
             <Label>Período do Plano</Label>
             <DateRangeSelect
               startValueLabel="Data de Início"
-              startValue={startDate}
-              setStartValue={setStartDate}
+              startValue={plan.startsAt}
+              setStartValue={startsAt => setPlan(prev => ({ ...prev, startsAt: startsAt }))}
               minValue={formatDate(getRelativeDate(+1))}
               finishValueLabel="Data de Término"
-              finishValue={finishDate}
-              setFinishValue={setFinishDate}
+              finishValue={plan.endsAt}
+              setFinishValue={endsAt => setPlan(prev => ({ ...prev, endsAt: endsAt }))}
             />
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Folgas Permitidas por Semana</Label>
             <NumberSelect
-              value={daysOffPerWeek}
-              setValue={setDaysOffPerWeek}
+              value={plan.daysOffPerWeek}
+              setValue={daysOffPerWeek => setPlan(prev => ({ ...prev, daysOffPerWeek: daysOffPerWeek as DaysOffPerWeek }))}
               minValue={0}
               maxValue={6}
             />
@@ -157,20 +165,23 @@ export default function CreatePlanScreen() {
             <Label>Multa por Descumprimento</Label>
             <SearchableSelect
               label="Selecione o Valor"
-              value={penaltyValue.toString()}
+              value={plan.penaltyValue.toString()}
               options={penaltyValueList}
               onChange={(newSelectedId) => {
-                setPenaltyValue(Number.parseInt(newSelectedId));
+                setPlan(prev => ({ ...prev, penaltyValue: Number.parseInt(newSelectedId) }));
               }}
             />
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Tipo de Plano</Label>
-            <RadioButtonSelect selectedValue={planType} onChange={value => setPlanType(value as PlanType)} options={radioButtonOptions} />
+            <RadioButtonSelect
+              selectedValue={plan.type}
+              onChange={value => setPlan(prev => ({ ...prev, type: value as PlanType }))}
+              options={radioButtonOptions} />
           </Card>
 
-          <Button className='p-0 overflow-hidden'>
+          <Button className='p-0 overflow-hidden' action={createPlan}>
             <LinearGradient
               colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
               start={{ x: 0, y: 0.5 }}
@@ -180,7 +191,7 @@ export default function CreatePlanScreen() {
             </LinearGradient>
           </Button>
         </View>
-      </ScrollView>
-    </View>
+      </KeyboardableView>
+    </>
   );
 }

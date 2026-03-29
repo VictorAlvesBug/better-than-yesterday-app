@@ -33,12 +33,13 @@ type InputProps = {
   onChange?: (value: string) => void;
   className?: string;
   ref?: RefObject<TextInput | null>;
-  disabled?: boolean;
+  typeable?: boolean;
+  grayBackground?: boolean;
   inputType?: InputType;
 } & WithIconProps;
 
 export default function Input({
-  placeholder = 'Selecione...',
+  placeholder = '',
   value,
   onChange = () => {},
   className,
@@ -49,14 +50,15 @@ export default function Input({
   iconSize = 18,
   iconAction = () => {},
   inputType = 'default',
-  disabled = false,
+  typeable = true,
+  grayBackground = false,
 }: InputProps) {
   return (
     <View
       style={{
         borderColor: getColor("gray-d"),
-        backgroundColor: getColor(disabled ? "gray-d" : "white"), 
-        pointerEvents: disabled ? 'none' : 'auto'
+        backgroundColor: getColor(grayBackground ? "gray-d" : "white"), 
+        pointerEvents: typeable ? 'auto' : 'none'
       }}
       className={
         twMerge(
@@ -65,11 +67,7 @@ export default function Input({
           className
         )
       }>
-      {disabled ? <TextInput
-        className="flex-1 outline-none"
-        value={value || ""}
-      /> :
-        <TextInput
+      <TextInput
           ref={ref}
           className="flex-1 outline-none"
           placeholder={placeholder}
@@ -79,7 +77,6 @@ export default function Input({
           onChangeText={onChange}
           {...getKeyboardTypeProps(inputType, onChange)}
         />
-      }
       {
         icon && <Ionicons onPress={iconAction} name={icon} size={iconSize} color={getColor(iconColor)} />
       }

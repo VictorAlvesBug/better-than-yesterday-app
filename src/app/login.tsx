@@ -1,57 +1,13 @@
 import { getColor } from '@/types/color.type';
 import { Ionicons } from '@expo/vector-icons';
-import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from "@react-native-google-signin/google-signin";
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import { useAuth } from '../context/auth';
 import { formatIntegerCompact, formatMoneyCompact } from '../utils/numberUtils';
-import Memory from './api/repositories/memory';
 
 export default function LoginScreen() {
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const router = useRouter();
-  //const { signIn } = useAuth();
-
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsSubmitting(true);
-      
-      await GoogleSignin.hasPlayServices();
-      const response = await GoogleSignin.signIn();
-      if (isSuccessResponse(response)){
-        const { idToken, user } = response.data;
-        idToken && Memory.set("google_idToken", idToken);
-        Memory.set("google_user", user);
-        router.replace('/login-additional-information')
-      }
-      else{
-        console.log("Login com Google foi cancelado")
-      }
-
-      setIsSubmitting(false);
-    } catch (error) {
-      if (isErrorWithCode(error)){
-        switch (error.code){
-          case statusCodes.IN_PROGRESS:
-        console.log("Login com Google está em progresso");
-        break;
-
-        case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-          console.log("Play Services não está disponível");
-          break;
-          
-          default:
-            console.log(error.code);
-        }
-      }
-      else {
-        console.log("Ops, ocorreu um erro");
-      }
-
-      setIsSubmitting(false);
-    }
-  };
+  const { isLoading, signIn } = useAuth();
 
   return (
     <LinearGradient
@@ -78,9 +34,8 @@ export default function LoginScreen() {
         </View>
         <Pressable
           className="w-full mb-6"
-          // onPress={() => router.replace('/login-additional-information')}
-          onPress={handleGoogleSignIn}
-          disabled={isSubmitting}
+          onPress={signIn}
+          disabled={isLoading}
         >
           <View className="flex flex-row items-center justify-center gap-3 py-4 bg-white rounded-xl">
             <Image

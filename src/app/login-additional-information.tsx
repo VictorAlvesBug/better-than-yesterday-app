@@ -1,6 +1,6 @@
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { AuthUser, User } from '@/types/user.type';
+import { User } from '@/types/user.type';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -16,6 +16,7 @@ import GradientHeader from '../components/gradient-header';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
+import { useAuth } from '../context/auth';
 import Memory from './api/repositories/memory';
 import createPlanRepository from './api/repositories/planRepository';
 import createUserRepository from './api/repositories/userRepository';
@@ -23,30 +24,18 @@ import createUserRepository from './api/repositories/userRepository';
 
 
 export default function LoginAdditionalInformationScreen() {
-  //const { user: authUser } = useAuth();
+  const { isSignedIn, signOut, authUser } = useAuth();
   const router = useRouter();
   const userRepository = createUserRepository();
   const planRepository = createPlanRepository();
 
   const [user, setUser] = useState<User | null>(null);
 
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
-
   useEffect(() => {
-    const fetchAuthUser = async () => {
-      //Memory.get<string>("google.idToken", idToken || "");
-      setAuthUser(await Memory.get("google_user"));
-    };
-
-    fetchAuthUser();
-  }, [])
-
-  useEffect(() => {
+    if (!isSignedIn || !authUser)
+      return;
 
     const fetchUser = async () => {
-      if (!authUser)
-        return;
-
       const dbUser = await userRepository.getByEmail(authUser.email);
 
       if (!dbUser) {
@@ -62,23 +51,10 @@ export default function LoginAdditionalInformationScreen() {
 
         return;
       }
-
-      await Memory.set('userId', dbUser.id);
-
-      const plans = await planRepository.listByUserId(dbUser.id);
-      const lastAccessedPlanId = await Memory.get('planId');
-
-      if (lastAccessedPlanId && plans.some(plan => plan.id === lastAccessedPlanId)) {
-        router.replace('./plan-tracker');
-        return;
-      }
-
-      await Memory.remove('planId');
-      router.replace('./manage-plans');
     };
 
     fetchUser();
-  }, [authUser, planRepository, router, userRepository]);
+  }, [authUser, isSignedIn, planRepository, router, userRepository]);
 
   if (!authUser || !user)
     return null;
@@ -99,54 +75,49 @@ export default function LoginAdditionalInformationScreen() {
 
   return (
     <>
-      <GradientHeader>
-        <View className="flex flex-row items-center justify-between w-full">
-          <View className="flex flex-col items-center justify-center pl-8">
-            <Text className="text-xl font-bold text-center text-white">
+      <GradientHeader className="justify-between">
+            <Text className="pl-8 text-xl font-bold text-center text-white">
               Seja bem-vindo!
             </Text>
-          </View>
 
           <Pressable
             className="flex items-center justify-center w-20 h-20"
-            onPress={() => router.replace('/login')}
+            onPress={() => {
+              signOut();
+            }}
           >
             <Ionicons name="log-out-outline" size={24} color="#fff" />
           </Pressable>
-        </View>
       </GradientHeader>
 
       <KeyboardableView>
         <View
-          className="flex-1"
           style={{
             flex: 1,
             backgroundColor: getColor("gray-e"),
           }}
+          className="flex-1 w-full gap-6 px-4 py-3"
         >
-
-
-          <View className="w-full gap-6 px-4 py-3">
             <Card className="flex flex-row items-center justify-center w-full gap-3">
-            <View className="flex flex-col items-start justify-center gap-1 w-fit">
-              <Image
-                source={{
-                  uri: user.photo,
-                }}
-                style={{ width: 80, height: 80, borderRadius: 9999 }}
-              />
-            </View>
+              <View className="flex flex-col items-start justify-center gap-1 w-fit">
+                <Image
+                  source={{
+                    uri: user.photo,
+                  }}
+                  style={{ width: 80, height: 80, borderRadius: 9999 }}
+                />
+              </View>
 
-            <View className="flex flex-col items-start justify-center flex-1 gap-1">
-              <Label>Nome</Label>
-              <Input
-                inputType='nickname'
-                value={user.name}
-                onChange={(value) => {
-                  onChangeHandler('name', value);
-                }}
-              />
-            </View>
+              <View className="flex flex-col items-start justify-center flex-1 gap-1">
+                <Label>Nome</Label>
+                <Input
+                  inputType='nickname'
+                  value={user.name}
+                  onChange={(value) => {
+                    onChangeHandler('name', value);
+                  }}
+                />
+              </View>
             </Card>
 
             <Card className="flex flex-col items-start justify-center w-full gap-1">
@@ -154,7 +125,8 @@ export default function LoginAdditionalInformationScreen() {
               <Input
                 inputType='email'
                 value={user.email}
-                disabled
+                typeable={false}
+                grayBackground
               />
             </Card>
 
@@ -192,7 +164,6 @@ export default function LoginAdditionalInformationScreen() {
               </LinearGradient>
             </Button>
           </View>
-        </View>
       </KeyboardableView>
     </>
   );

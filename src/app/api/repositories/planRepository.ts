@@ -1,6 +1,6 @@
 
 import { API_URL } from '@/src/utils/constants';
-import { Plan, PlanParticipant, PlanWithHabit } from '@/types/plan.type';
+import { CreatePlan, Plan, PlanParticipant, PlanWithHabit } from '@/types/plan.type';
 import axios from 'axios';
 import createHabitRepository from './habitRepository';
 
@@ -48,5 +48,19 @@ export default function createPlanRepository() {
             return (await Promise.all(planWithHabitTasks))
                 .filter(planWithHabit => Boolean(planWithHabit)) as PlanWithHabit[];
         },
+        save: async (createPlan: CreatePlan) => {
+            const plan = {...createPlan, id: JSON.stringify(createPlan), status: 'NotStarted', createdAt: new Date().toISOString()}
+            const response = await axios.post<Plan>(`${API_URL}/plans`, plan);
+            return plan;
+        },
+        join: async (planId: string, userId: string) => {
+            const response = await axios.post<PlanParticipant>(`${API_URL}/planParticipants`, {
+                planId,
+                userId,
+                joinedAt: new Date().toISOString(),
+                status: 'active'
+            });
+            return response.data;
+        }
     }
 }

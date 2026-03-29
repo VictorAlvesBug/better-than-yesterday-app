@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Keyboard, KeyboardEvent } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { twMerge } from 'tailwind-merge';
 
 type KeyboardableViewProps = {
     children: React.ReactNode;
+    className?: string;
 }
 
-export default function KeyboardableView({ children }: KeyboardableViewProps) {
+export default function KeyboardableView({ children, className }: KeyboardableViewProps) {
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     //const [keyboardWidth, setKeyboardWidth] = useState(0);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -33,11 +35,11 @@ export default function KeyboardableView({ children }: KeyboardableViewProps) {
         }
     }, []);
 
-    const contentPaddingBottom = isKeyboardOpen ? keyboardHeight - 220 : 15;
+    const contentPaddingBottom = isKeyboardOpen ? keyboardHeight - 290 : 15;
 
     return (
         <KeyboardAwareScrollView
-            className="flex-1"
+            className={twMerge("flex-1", className)}
             style={{
                 flex: 1
             }}

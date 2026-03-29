@@ -1,72 +1,13 @@
 {
   "users": [
     {
-      "id": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
-      "nickname": "Fátima",
-      "email": "butia245@gmail.com",
-      "name": "Maria de Fátima Alves Bugueno",
-      "photo": "321",
-      "phoneNumber": "11888888888",
-      "pixKey": "11888888888",
-      "createdAt": "2024-06-01"
-    },
-    {
-      "id": "2216fe3e553145c5b12b29358a15c771",
-      "nickname": "Thiago",
-      "email": "thiago.245.thiago@gmail.com",
-      "name": "Thiago Alves Bugueno",
-      "photo": "222",
-      "phoneNumber": "11999999999",
-      "pixKey": "11999999999",
-      "createdAt": "2024-06-01"
-    },
-    {
-      "id": "af25bfe959114e77a8f002b1a554b542",
-      "nickname": "John Doe Son",
-      "email": "john.doe@email.com",
-      "name": "John Doe Son",
-      "photo": "555",
-      "phoneNumber": "11777777777",
-      "pixKey": "11777777777",
-      "createdAt": "2020-01-10"
-    },
-    {
-      "id": "ee0d",
-      "nickname": "Teste cadastro via Insomnia",
-      "email": "a@b.com",
-      "name": "Testando cadastro via Insomnia",
-      "photo": "222",
-      "phoneNumber": "11999999999",
-      "pixKey": "11999999999",
-      "createdAt": "2024-06-01"
-    },
-    {
-      "id": "e06a",
-      "nickname": "Teste cadastro via Insomnia2",
-      "email": "a@b.com",
-      "name": "Testando cadastro via Insomnia2",
-      "photo": "222",
-      "phoneNumber": "11999999999",
-      "pixKey": "11999999999"
-    },
-    {
-      "id": "12345",
-      "nickname": "Teste cadastro via Insomnia3",
-      "email": "a@b.com",
-      "name": "Testando cadastro via Insomnia3",
-      "photo": "222",
-      "phoneNumber": "11999999999",
-      "pixKey": "11999999999",
-      "createdAt": "2024-06-01"
-    },
-    {
-      "id": "117634549697561341128",
-      "email": "engenhariatrinity@gmail.com",
-      "name": "Equipe Trinity",
-      "nickname": "Equipe Trinity",
-      "photo": "https://lh3.googleusercontent.com/a/ACg8ocIEvAI1dkX-N8JAmurbW5t6pDZwC2aAzQCTGU376n_dAKT7glA",
-      "phoneNumber": "11987654321",
-      "pixKey": "engenhariatrinity@gmail.com"
+      "id": "103214552318957733491",
+      "email": "victoralvesbug@gmail.com",
+      "name": "Vitão",
+      "nickname": "Victor Alves",
+      "photo": "https://lh3.googleusercontent.com/a/ACg8ocJEyTQXTDWLXcS49Y4lHHuuyG3KiNJYIID6ve3l7azTFg7czA7MKA",
+      "phoneNumber": "(11) 97562-3736",
+      "pixKey": "victoralvesbug@gmail.com"
     }
   ],
   "habits": [
@@ -78,6 +19,51 @@
     {
       "id": "75f460343d0946938e987f64b3be9d2d",
       "name": "Exercícios",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "2",
+      "name": "Meditação",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "3",
+      "name": "Beber água",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "4",
+      "name": "Sono cedo",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "5",
+      "name": "Estudo",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "6",
+      "name": "Alongamento",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "7",
+      "name": "Jantar leve",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "8",
+      "name": "Diário / journaling",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "9",
+      "name": "Tempo offline",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "10",
+      "name": "Planejar o dia seguinte",
       "createdAt": "2024-06-01"
     }
   ],
@@ -103,6 +89,29 @@
       "type": "public",
       "daysOffPerWeek": 2,
       "createdAt": "2024-06-01"
+    },
+    {
+      "id": "{\"habitId\":\"3\",\"startsAt\":\"30/03/2026\",\"endsAt\":\"29/03/2027\",\"daysOffPerWeek\":2,\"penaltyValue\":10,\"type\":\"public\",\"createdAt\":\"29/03/2026\"}",
+      "habitId": "3",
+      "startsAt": "30/03/2026",
+      "endsAt": "29/03/2027",
+      "daysOffPerWeek": 2,
+      "penaltyValue": 10,
+      "type": "public",
+      "createdAt": "2026-03-29T03:54:52.404Z",
+      "status": "NotStarted"
+    },
+    {
+      "id": "{\"habitId\":\"4\",\"startsAt\":\"30/03/2026\",\"endsAt\":\"29/03/2027\",\"daysOffPerWeek\":2,\"penaltyValue\":10,\"type\":\"public\",\"createdAt\":\"29/03/2026\",\"description\":\"Lol\"}",
+      "habitId": "4",
+      "startsAt": "30/03/2026",
+      "endsAt": "29/03/2027",
+      "daysOffPerWeek": 2,
+      "penaltyValue": 10,
+      "type": "public",
+      "createdAt": "2026-03-29T03:57:54.378Z",
+      "description": "Lol",
+      "status": "NotStarted"
     }
   ],
   "planParticipants": [

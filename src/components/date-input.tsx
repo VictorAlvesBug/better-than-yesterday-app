@@ -43,6 +43,7 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
           onChange={() => {}}
           icon='calendar-clear-outline'
           iconPosition='right'
+          typeable={false}
           />
       </Pressable>
 

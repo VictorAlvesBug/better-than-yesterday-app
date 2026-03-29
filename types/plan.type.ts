@@ -9,14 +9,17 @@ export type DaysOffPerWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type Plan = {
     id: string;
     habitId: string;
-    description: string;
+    description?: string;
     startsAt: string;
     endsAt: string;
     status: PlanStatus;
     type: PlanType;
     daysOffPerWeek: DaysOffPerWeek;
+    penaltyValue: number;
     createdAt: string;
 }
+
+export type CreatePlan = Omit<Plan, 'id' | 'status'/* | 'createdAt'*/>;
 
 export type PlanWithHabit = Plan & {
     habitName: string;
