@@ -50,7 +50,7 @@ export default function PlanSettingsScreen() {
   return (
     <View
       className="relative flex-1"
-      style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
+      style={{ backgroundColor: getColor("gray-e") }}
     >
       <ScrollView
         style={{ flex: 1 }}
@@ -59,11 +59,15 @@ export default function PlanSettingsScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <GradientView
+          style={{
+            paddingTop: Constants.statusBarHeight,
+          }}
           className="flex flex-col items-center justify-center w-full"
         >
+
           <View className="flex flex-row items-center justify-center w-full">
             <BackButton />
-            <Text style={{color: getColor("white")}} className="flex-1 text-lg font-bold text-left">
+            <Text style={{ color: getColor("white") }} className="flex-1 text-lg font-bold text-left">
               Treino 5x na semana
             </Text>
             <Pressable
@@ -74,33 +78,33 @@ export default function PlanSettingsScreen() {
             </Pressable>
           </View>
 
-          <View style={{backgroundColor: getColor("opaque")}} className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg">
-            <Text style={{color: getColor("white")}} className="font-thin">Pool de Recompensas</Text>
-            <Text style={{color: getColor("white")}} className="mb-1 text-3xl font-bold">
+          <View style={{ backgroundColor: getColor("opaque") }} className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg">
+            <Text style={{ color: getColor("white") }} className="font-thin">Pool de Recompensas</Text>
+            <Text style={{ color: getColor("white") }} className="mb-1 text-3xl font-bold">
               {formatMoney(252)}
             </Text>
             <View className="flex flex-row items-center w-full justify-evenly">
               <View className="flex flex-col items-center justify-center gap-1">
-                <Text style={{color: getColor("white")}} className="text-xs font-thin">
+                <Text style={{ color: getColor("white") }} className="text-xs font-thin">
                   Total Multas
                 </Text>
-                <Text style={{color: getColor("white")}} className="font-semibold">
+                <Text style={{ color: getColor("white") }} className="font-semibold">
                   {formatMoneyCompact(280)}
                 </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
-                <Text style={{color: getColor("white")}} className="text-xs font-thin">
+                <Text style={{ color: getColor("white") }} className="text-xs font-thin">
                   Taxa Admin ({formatPercent(0.1)})
                 </Text>
-                <Text style={{color: getColor("white")}} className="font-semibold">
+                <Text style={{ color: getColor("white") }} className="font-semibold">
                   {formatMoneyCompact(28)}
                 </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
-                <Text style={{color: getColor("white")}} className="text-xs font-thin">
+                <Text style={{ color: getColor("white") }} className="text-xs font-thin">
                   Participantes
                 </Text>
-                <Text style={{color: getColor("white")}} className="font-semibold">
+                <Text style={{ color: getColor("white") }} className="font-semibold">
                   {formatInteger(8)}
                 </Text>
               </View>
@@ -126,13 +130,13 @@ export default function PlanSettingsScreen() {
                   transform: [{ translateX }],
                 }}
               >
-                <GradientView 
+                <GradientView
                   style={{
                     flex: 1,
                     margin: 4,
                     borderRadius: 12,
                   }}
-                  />
+                />
               </Animated.View>
             )}
 
@@ -143,7 +147,7 @@ export default function PlanSettingsScreen() {
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  style={{color: getColor(currentTab === 'Ranking' ? "white" : "gray-7")}} className={`font-semibold text-lg`}
+                  style={{ color: getColor(currentTab === 'Ranking' ? "white" : "gray-7") }} className={`font-semibold text-lg`}
                 >
                   Ranking
                 </Text>
@@ -157,7 +161,7 @@ export default function PlanSettingsScreen() {
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  style={{color: getColor(currentTab === 'Check-ins' ? "white" : "gray-7")}} className={`font-semibold block text-lg`}
+                  style={{ color: getColor(currentTab === 'Check-ins' ? "white" : "gray-7") }} className={`font-semibold block text-lg`}
                 >
                   Check-ins
                 </Text>

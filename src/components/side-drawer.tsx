@@ -2,7 +2,7 @@ import { getColor } from '@/types/color.type';
 import { PlanWithHabit } from '@/types/plan.type';
 import { User } from '@/types/user.type';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
@@ -11,6 +11,7 @@ import createPlanRepository from '../app/api/repositories/planRepository';
 import createUserRepository from '../app/api/repositories/userRepository';
 import { useAuth } from '../context/auth';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
+import GradientView from './gradient-view';
 
 type TextBalanceProps = {
   balance: number;
@@ -83,15 +84,15 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
   return (
     <View
+        style={{
+          paddingTop: Constants.statusBarHeight,
+        }}
       className={`absolute z-30 flex flex-row w-full h-full ${isOpen ? '' : 'hidden'}`}
     >
       <View
         className={`flex flex-col w-[80%] bg-white transition-all duration-500 ${isOpen ? 'right-0' : 'right-[100%]'}`}
       >
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+        <GradientView
         className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
           <Image
@@ -111,7 +112,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           >
             <Ionicons name="close" size={26} color="white" />
           </Pressable>
-        </LinearGradient>
+        </GradientView>
         <View className="flex flex-col">
           {
             activePlans.length > 0

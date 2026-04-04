@@ -1,13 +1,13 @@
 import { getColor } from '@/types/color.type';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Button } from '../components/button';
 import SideDrawer from '../components/side-drawer';
 
 import { useState } from 'react';
+import GradientView from '../components/gradient-view';
 const statusBarHeight = Constants.statusBarHeight;
 
 export default function ManagePlansScreen() {
@@ -17,7 +17,7 @@ export default function ManagePlansScreen() {
   return (
     <View
       className="relative flex-1"
-      style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
+      style={{ marginTop: 0, backgroundColor: getColor("gray-e") }}
     >
       <SideDrawer
         isOpen={isDrawerOpen}
@@ -29,10 +29,10 @@ export default function ManagePlansScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+        <GradientView
+        style={{
+          paddingTop: Constants.statusBarHeight,
+        }}
         className="flex flex-col items-center justify-center w-full"
       >
         <View className="flex flex-row items-center justify-start w-full">
@@ -50,7 +50,7 @@ export default function ManagePlansScreen() {
             </Text>
           </View>
         </View>
-        </LinearGradient>
+        </GradientView>
 
         <View
           className={`w-full px-4 gap-3 py-3`}

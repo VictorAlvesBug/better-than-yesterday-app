@@ -198,7 +198,7 @@ export default function PlanTrackerScreen() {
   return (
     <View
       className="relative flex-1"
-      style={{ marginTop: statusBarHeight, backgroundColor: getColor("gray-e") }}
+      style={{ backgroundColor: getColor("gray-e") }}
     >
       <SideDrawer
         isOpen={isDrawerOpen}
@@ -212,6 +212,9 @@ export default function PlanTrackerScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <GradientView
+        style={{
+          paddingTop: Constants.statusBarHeight,
+        }}
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-between w-full">
