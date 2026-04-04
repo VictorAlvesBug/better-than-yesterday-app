@@ -16,3 +16,21 @@ export type User = {
     phoneNumber: string;
     pixKey: string;
 }
+
+export type CreateUser = {
+    email: string;
+    name: string;
+    photo: string;
+    nickname: string;
+    phoneNumber: string;
+    pixKey: string;
+}
+
+export type UpdateUser = {
+    id: string;
+    name: string;
+    photo: string;
+    nickname: string;
+    phoneNumber: string;
+    pixKey: string;
+}

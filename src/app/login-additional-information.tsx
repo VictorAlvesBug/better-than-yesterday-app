@@ -2,7 +2,7 @@ import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { User } from '@/types/user.type';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -12,7 +12,7 @@ import {
   View
 } from 'react-native';
 import { Button } from '../components/button';
-import GradientHeader from '../components/gradient-header';
+import GradientView from '../components/gradient-view';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
@@ -75,20 +75,24 @@ export default function LoginAdditionalInformationScreen() {
 
   return (
     <>
-      <GradientHeader className="justify-between">
-            <Text className="pl-8 text-xl font-bold text-center text-white">
-              Seja bem-vindo!
-            </Text>
+      <GradientView
+        style={{
+          paddingTop: Constants.statusBarHeight,
+        }}
+        className="flex flex-row items-center justify-between w-full">
+        <Text className="pl-8 text-xl font-bold text-center text-white">
+          Seja bem-vindo!
+        </Text>
 
-          <Pressable
-            className="flex items-center justify-center w-20 h-20"
-            onPress={() => {
-              signOut();
-            }}
-          >
-            <Ionicons name="log-out-outline" size={24} color="#fff" />
-          </Pressable>
-      </GradientHeader>
+        <Pressable
+          className="flex items-center justify-center w-20 h-20"
+          onPress={() => {
+            signOut();
+          }}
+        >
+          <Ionicons name="log-out-outline" size={24} color="#fff" />
+        </Pressable>
+      </GradientView>
 
       <KeyboardableView>
         <View
@@ -98,72 +102,69 @@ export default function LoginAdditionalInformationScreen() {
           }}
           className="flex-1 w-full gap-6 px-4 py-3"
         >
-            <Card className="flex flex-row items-center justify-center w-full gap-3">
-              <View className="flex flex-col items-start justify-center gap-1 w-fit">
-                <Image
-                  source={{
-                    uri: user.photo,
-                  }}
-                  style={{ width: 80, height: 80, borderRadius: 9999 }}
-                />
-              </View>
-
-              <View className="flex flex-col items-start justify-center flex-1 gap-1">
-                <Label>Nome</Label>
-                <Input
-                  inputType='nickname'
-                  value={user.name}
-                  onChange={(value) => {
-                    onChangeHandler('name', value);
-                  }}
-                />
-              </View>
-            </Card>
-
-            <Card className="flex flex-col items-start justify-center w-full gap-1">
-              <Label>E-mail</Label>
-              <Input
-                inputType='email'
-                value={user.email}
-                typeable={false}
-                grayBackground
+          <Card className="flex flex-row items-center justify-center w-full gap-3">
+            <View className="flex flex-col items-start justify-center gap-1 w-fit">
+              <Image
+                source={{
+                  uri: user.photo,
+                }}
+                style={{ width: 80, height: 80, borderRadius: 9999 }}
               />
-            </Card>
+            </View>
 
-            <Card className="flex flex-col items-start justify-center w-full gap-1">
-              <Label>Celular</Label>
+            <View className="flex flex-col items-start justify-center flex-1 gap-1">
+              <Label>Nome</Label>
               <Input
-                inputType='phone-number'
-                value={user.phoneNumber}
+                inputType='nickname'
+                value={user.name}
                 onChange={(value) => {
-                  onChangeHandler('phoneNumber', value);
+                  onChangeHandler('name', value);
                 }}
               />
-            </Card>
+            </View>
+          </Card>
 
-            <Card className="flex flex-col items-start justify-center w-full gap-1">
-              <Label>Chave Pix</Label>
-              <Input
-                inputType='pix-key'
-                value={user.pixKey}
-                onChange={(value) => {
-                  onChangeHandler('pixKey', value);
-                }}
-              />
-            </Card>
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>E-mail</Label>
+            <Input
+              inputType='email'
+              value={user.email}
+              typeable={false}
+              grayBackground
+            />
+          </Card>
 
-            <Button
-              className='p-0 overflow-hidden'
-              action={createUser}>
-              <LinearGradient
-                colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                className="flex flex-col items-center justify-center w-full h-full">
-                <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Salvar</Text>
-              </LinearGradient>
-            </Button>
-          </View>
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Celular</Label>
+            <Input
+              inputType='phone-number'
+              value={user.phoneNumber}
+              onChange={(value) => {
+                onChangeHandler('phoneNumber', value);
+              }}
+            />
+          </Card>
+
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Chave Pix</Label>
+            <Input
+              inputType='pix-key'
+              value={user.pixKey}
+              onChange={(value) => {
+                onChangeHandler('pixKey', value);
+              }}
+            />
+          </Card>
+
+          <Button
+            className='p-0 overflow-hidden'
+            action={createUser}>
+            <GradientView
+              className="flex flex-col items-center justify-center w-full h-full">
+              <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Salvar</Text>
+            </GradientView>
+          </Button>
+        </View>
       </KeyboardableView>
     </>
   );

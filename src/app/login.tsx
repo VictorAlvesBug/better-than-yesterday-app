@@ -1,8 +1,8 @@
 import { getColor } from '@/types/color.type';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import GradientView from '../components/gradient-view';
 import { useAuth } from '../context/auth';
 import { formatIntegerCompact, formatMoneyCompact } from '../utils/numberUtils';
 
@@ -10,10 +10,8 @@ export default function LoginScreen() {
   const { isLoading, signIn } = useAuth();
 
   return (
-    <LinearGradient
-      colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+    <GradientView
+      gradientFlowDirection="top-to-bottom"
       className="flex items-center justify-center flex-1"
     >
       <View className="flex items-center justify-center flex-1 w-[90%] max-w-[450px]">
@@ -74,6 +72,6 @@ export default function LoginScreen() {
           </View>
         </View>
       </View>
-    </LinearGradient>
+    </GradientView>
   );
 }

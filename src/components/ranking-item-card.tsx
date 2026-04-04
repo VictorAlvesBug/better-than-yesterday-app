@@ -1,14 +1,14 @@
 import { getColor } from '@/types/color.type';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Text, View } from 'react-native';
 import {
-    formatInteger,
-    formatIntegerCompact,
-    formatMoneyCompact,
-    formatPercent,
+  formatInteger,
+  formatIntegerCompact,
+  formatMoneyCompact,
+  formatPercent,
 } from '../utils/numberUtils';
+import GradientView from './gradient-view';
 import ProfilePhoto from './profile-photo';
 
 type RankingItemCardProps = {
@@ -65,17 +65,13 @@ export default function RankingItemCard({
         </View>
       </View>
       <View style={{backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 8, width: "100%"}}>
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
+        <GradientView
           style={{
             flex: 1,
             height: '100%',
             borderRadius: 9999,
             width: `${checkinsPercent * 100}%`,
-          }}
-        ></LinearGradient>
+          }} />
       </View>
     </View>
   );

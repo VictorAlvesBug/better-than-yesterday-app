@@ -1,7 +1,7 @@
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { CreatePlan, DaysOffPerWeek, PlanType } from '@/types/plan.type';
-import { LinearGradient } from 'expo-linear-gradient';
+import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -11,7 +11,7 @@ import {
 import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import DateRangeSelect from '../components/date-range-select';
-import GradientHeader from '../components/gradient-header';
+import GradientView from '../components/gradient-view';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
@@ -103,12 +103,16 @@ export default function CreatePlanScreen() {
 
   return (
     <>
-      <GradientHeader>
+      <GradientView 
+        style={{
+          paddingTop: Constants.statusBarHeight,
+        }}
+        className="flex flex-row items-center justify-start w-full">
         <BackButton />
         <Text className="text-xl font-bold text-center text-white">
           Criar Plano
         </Text>
-      </GradientHeader>
+      </GradientView>
       <KeyboardableView>
         <View
           className="flex-1 w-full gap-6 px-4 py-3"
@@ -182,13 +186,9 @@ export default function CreatePlanScreen() {
           </Card>
 
           <Button className='p-0 overflow-hidden' action={createPlan}>
-            <LinearGradient
-              colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              className="flex flex-col items-center justify-center w-full h-full">
+            <GradientView className="flex flex-col items-center justify-center w-full h-full">
               <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Criar Plano</Text>
-            </LinearGradient>
+            </GradientView>
           </Button>
         </View>
       </KeyboardableView>

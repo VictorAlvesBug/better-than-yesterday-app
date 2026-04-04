@@ -1,24 +1,24 @@
 import { getColor } from '@/types/color.type';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    Animated,
-    LayoutChangeEvent,
-    Pressable,
-    ScrollView,
-    Text,
-    View,
+  Animated,
+  LayoutChangeEvent,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
 import BackButton from '../components/back-button';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
+import GradientView from '../components/gradient-view';
 import Ranking from '../components/ranking';
 import {
-    formatInteger,
-    formatMoney,
-    formatMoneyCompact,
-    formatPercent,
+  formatInteger,
+  formatMoney,
+  formatMoneyCompact,
+  formatPercent,
 } from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -58,10 +58,7 @@ export default function PlanSettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+        <GradientView
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-center w-full">
@@ -109,7 +106,7 @@ export default function PlanSettingsScreen() {
               </View>
             </View>
           </View>
-        </LinearGradient>
+        </GradientView>
 
         <View className="flex flex-col items-center justify-center gap-4 px-4 my-4">
           {/* CONTAINER DAS TABS + FUNDO ANIMADO */}
@@ -129,16 +126,13 @@ export default function PlanSettingsScreen() {
                   transform: [{ translateX }],
                 }}
               >
-                <LinearGradient
-                  colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 1, y: 0.5 }}
+                <GradientView 
                   style={{
                     flex: 1,
                     margin: 4,
                     borderRadius: 12,
                   }}
-                />
+                  />
               </Animated.View>
             )}
 

@@ -4,7 +4,6 @@ import { getColor } from '@/types/color.type';
 import { PlanWithHabit } from '@/types/plan.type';
 import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -16,6 +15,7 @@ import {
 } from 'react-native';
 import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
+import GradientView from '../components/gradient-view';
 import SideDrawer from '../components/side-drawer';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 import Memory from './api/repositories/memory';
@@ -211,10 +211,7 @@ export default function PlanTrackerScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+        <GradientView
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-between w-full">
@@ -247,7 +244,7 @@ export default function PlanTrackerScreen() {
               {`${(7 - planInfoMock.daysOffPerWeek)}x por semana`}
             </Text>
           </View>
-        </LinearGradient>
+        </GradientView>
 
         <View className="flex flex-col items-start justify-center gap-5 px-4 -mt-6">
           <View className="flex flex-row items-center justify-between flex-1 w-full gap-4">
@@ -286,10 +283,7 @@ export default function PlanTrackerScreen() {
               </Text>
             </View>
             <View style={{ backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 10, width: "100%" }}>
-              <LinearGradient
-                colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
+              <GradientView
                 style={{
                   flex: 1,
                   height: '100%',
@@ -334,14 +328,11 @@ export default function PlanTrackerScreen() {
 
       {/* Botão flutuante fixo */}
       <Pressable style={{ backgroundColor: getColor('violet') }} className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
-        <LinearGradient
-          colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+        <GradientView
           className="flex flex-col items-center justify-center w-full h-full"
         >
           <FontAwesome6 name="camera" size={24} color={getColor("white")} />
-        </LinearGradient>
+        </GradientView>
       </Pressable>
     </View>
   );

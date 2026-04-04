@@ -92,7 +92,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
-          className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
+        className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
           <Image
                     source={{ uri: user.photo }}

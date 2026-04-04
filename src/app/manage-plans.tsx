@@ -33,23 +33,23 @@ export default function ManagePlansScreen() {
           colors={[getColor("violet"), getColor("purple-violet"), getColor("purple")]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
-          className="flex flex-col items-center justify-center w-full"
-        >
-          <View className="flex flex-row items-center justify-start w-full">
-            <Pressable
-              className="flex items-center justify-center w-20 h-20"
-              onPress={() => setIsDrawerOpen(true)}
-              hitSlop={10}
-            >
-              <Ionicons name="menu" size={24} color={getColor("white")} />
-            </Pressable>
+        className="flex flex-col items-center justify-center w-full"
+      >
+        <View className="flex flex-row items-center justify-start w-full">
+          <Pressable
+            className="flex items-center justify-center w-20 h-20"
+            onPress={() => setIsDrawerOpen(true)}
+            hitSlop={10}
+          >
+            <Ionicons name="menu" size={24} color={getColor("white")} />
+          </Pressable>
 
-            <View className="flex flex-col items-center justify-center">
-              <Text className="text-xl font-bold text-center text-white">
-                Gerenciar Planos
-              </Text>
-            </View>
+          <View className="flex flex-col items-center justify-center">
+            <Text className="text-xl font-bold text-center text-white">
+              Gerenciar Planos
+            </Text>
           </View>
+        </View>
         </LinearGradient>
 
         <View
