@@ -3,7 +3,7 @@ import { getColor } from '@/types/color.type';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import { formatRelativeDate } from '../utils/dateUtils';
+import { DateTime, formatRelativeDateTime } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
 import ProfilePhoto from './profile-photo';
 
@@ -12,7 +12,7 @@ const unavailablePhotoUrl =
 
 type CheckinWithReviewsCardProps = {
   name: string;
-  date: string;
+  dateTime: DateTime;
   title: string;
   photoUrl: string;
   status: CheckinStatus;
@@ -21,7 +21,7 @@ type CheckinWithReviewsCardProps = {
 
 export default function CheckinWithReviewsCard({
   name,
-  date,
+  dateTime,
   title,
   photoUrl,
   status,
@@ -45,7 +45,7 @@ export default function CheckinWithReviewsCard({
             {name}
           </Text>
           <Text style={{ color: getColor("gray-7") }} className="text-xs" numberOfLines={1}>
-            {formatRelativeDate(date)}
+            {formatRelativeDateTime(dateTime)}
           </Text>
         </View>
         {renderStatus(status)}

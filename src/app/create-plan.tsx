@@ -1,5 +1,6 @@
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
+import { Habit } from '@/types/habit.type';
 import { CreatePlan, DaysOffPerWeek, PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
@@ -17,8 +18,8 @@ import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import NumberSelect from '../components/number-select';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
-import SearchableSelect, { type Option } from '../components/searchable-select';
-import { formatDate, getRelativeDate } from '../utils/dateUtils';
+import SearchableSelect from '../components/searchable-select';
+import { DateOnly, getDateOnlyWithOffset, getDateTime } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import createHabitRepository from './api/repositories/habitRepository';
 import Memory from './api/repositories/memory';
@@ -27,31 +28,46 @@ import createPlanRepository from './api/repositories/planRepository';
 export default function CreatePlanScreen() {
   const [plan, setPlan] = useState<CreatePlan>({
     habitId: '',
-    startsAt: formatDate(getRelativeDate(+1)),
-    endsAt: formatDate(getRelativeDate(+365)),
+    startsAt: getDateOnlyWithOffset(+1),
+    endsAt: getDateOnlyWithOffset(+365),
     daysOffPerWeek: 2,
     penaltyValue: 10,
     type: 'private',
-    createdAt: formatDate(new Date()),
+    createdAt: getDateTime(new Date()),
   });
 
-  const [habitList, setHabitList] = useState<Option[]>([]);
+  const toughnessMap = {
+    0: 'Quase impossível',
+    1: 'Muito difícil',
+    2: 'Difícil',
+    3: 'Média',
+    4: 'Média',
+    5: 'Fácil',
+    6: 'Muito fácil',
+  }
+
+  type HabitWithJustAdded = Habit & { justAdded?: boolean };
+
+  const [habitList, setHabitList] = useState<HabitWithJustAdded[]>([]);
 
   const habitRepository = createHabitRepository();
   const planRepository = createPlanRepository();
 
   const auxList2 = [1, 5, 10, 20, 50, 100];
 
-  const [penaltyValueList,] = useState<Option[]>(auxList2.map(item => ({
-    value: item.toString(), label: formatMoney(item)
-  })));
+  type PenaltyValue = {
+    id: string;
+    label: string;
+  }
 
-  function createHabit(name: string) {
-    const newHabit = {
-      value: name,
-      label: name
-    }
-    setHabitList((prev) => [...prev, { ...newHabit, justAdded: true }])
+  const penaltyValueList = auxList2.map(item => ({
+    id: item.toString(), label: formatMoney(item)
+  }));
+
+  function createHabit(habitName: string) {
+    const justAddedHabit = { id: habitName, name: habitName, justAdded: true };
+    setHabitList((prev) => [...prev, justAddedHabit])
+    return justAddedHabit;
   }
 
   const radioButtonOptions: RadioButtonOption[] = [{
@@ -71,17 +87,14 @@ export default function CreatePlanScreen() {
     const fetchHabits = async () => {
       const habits = await habitRepository.listAll();
 
-      setHabitList(habits.map(habit => ({
-        value: habit.id,
-        label: habit.name
-      })));
+      setHabitList(habits);
     };
 
     fetchHabits();
   }, [habitRepository, setHabitList]);
 
   const createPlan = async () => {
-    const habit = habitList.find(h => h.value === plan.habitId);
+    const habit = habitList.find(h => h.id === plan.habitId);
 
     if (!habit) {
       console.log('Selecione um hábito para criar o plano.');
@@ -89,7 +102,7 @@ export default function CreatePlanScreen() {
     }
 
     habit.justAdded && await habitRepository.save({
-      name: habit.label,
+      name: habit.name,
     });
 
     const planSaved = await planRepository.save(plan);
@@ -100,6 +113,10 @@ export default function CreatePlanScreen() {
 
     await planRepository.join(planSaved.id, await Memory.get('userId') || '');
   };
+
+  function formatRelativeDate(startsAt: DateOnly): string {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <>
@@ -120,14 +137,15 @@ export default function CreatePlanScreen() {
         >
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Hábitos</Label>
-            <SearchableSelect
+            <SearchableSelect<Habit>
               label="Selecione o Hábito"
               placeholder="Escolha um hábito..."
               value={plan.habitId}
+              formatOptionLabel={habit => habit.name}
               options={habitList}
-              onChange={(newSelectedId) => {
-                setPlan({ ...plan, habitId: newSelectedId });
-                setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.value === newSelectedId)))
+              onChange={selectedHabit => {
+                setPlan({ ...plan, habitId: selectedHabit.id });
+                setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.id === selectedHabit.id)))
               }}
               createOption={createHabit}
             />
@@ -145,34 +163,42 @@ export default function CreatePlanScreen() {
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Período do Plano</Label>
             <DateRangeSelect
-              startValueLabel="Data de Início"
-              startValue={plan.startsAt}
-              setStartValue={startsAt => setPlan(prev => ({ ...prev, startsAt: startsAt }))}
-              minValue={formatDate(getRelativeDate(+1))}
-              finishValueLabel="Data de Término"
-              finishValue={plan.endsAt}
-              setFinishValue={endsAt => setPlan(prev => ({ ...prev, endsAt: endsAt }))}
+              startDateOnlyLabel="Data de Início"
+              startDateOnly={plan.startsAt}
+              setStartDateOnly={startsAt => setPlan(prev => ({ ...prev, startsAt: startsAt }))}
+              startDescription={startsAt => formatRelativeDate(startsAt)}
+              minDateOnly={getDateOnlyWithOffset(+1)}
+              endDateOnlyLabel="Data de Término"
+              endDateOnly={plan.endsAt}
+              setEndDateOnly={endsAt => setPlan(prev => ({ ...prev, endsAt: endsAt }))}
+              endDescription={endsAt => formatRelativeDate(endsAt)}
             />
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Folgas Permitidas por Semana</Label>
-            <NumberSelect
+              <NumberSelect
               value={plan.daysOffPerWeek}
               setValue={daysOffPerWeek => setPlan(prev => ({ ...prev, daysOffPerWeek: daysOffPerWeek as DaysOffPerWeek }))}
               minValue={0}
               maxValue={6}
+              className='flex-1'
             />
+            <View className='flex flex-row items-center justify-start mt-2'>
+            <Text className='text-sm'>Dificuldade: </Text>
+            <Text className='text-sm font-bold'>{toughnessMap[plan.daysOffPerWeek]}</Text>
+            </View>
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Multa por Descumprimento</Label>
-            <SearchableSelect
+            <SearchableSelect<PenaltyValue>
               label="Selecione o Valor"
               value={plan.penaltyValue.toString()}
               options={penaltyValueList}
-              onChange={(newSelectedId) => {
-                setPlan(prev => ({ ...prev, penaltyValue: Number.parseInt(newSelectedId) }));
+              formatOptionLabel={penaltyValue => penaltyValue.label}
+              onChange={selectedPenaltyValue => {
+                setPlan(prev => ({ ...prev, penaltyValue: Number.parseInt(selectedPenaltyValue.id) }));
               }}
             />
           </Card>

@@ -1,3 +1,5 @@
+import { DateTime } from "@/src/utils/dateUtils";
+
 export type CheckinStatus = 'Pending' | 'Validated' | 'Rejected';
 
 type ReviewStatus = Exclude<CheckinStatus, 'Pending'>;
@@ -11,7 +13,7 @@ export type Checkin = {
   planId: string;
   userId: string;
   name: string;
-  date: string;
+  dateTime: DateTime;
   title: string;
   photoUrl: string;
   status: CheckinStatus;

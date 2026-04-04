@@ -5,6 +5,7 @@ import {
   Text,
   View
 } from 'react-native';
+import { twMerge } from 'tailwind-merge';
 import { Button } from './button';
 
 type NumberSelectProps = {
@@ -12,13 +13,15 @@ type NumberSelectProps = {
   setValue: (value: number) => void;
   minValue?: number;
   maxValue?: number;
-};
+} & React.ComponentProps<typeof View>;
 
 export default function NumberSelect({
   value,
   setValue,
   minValue,
   maxValue,
+  className = '',
+  ...rest
 }: NumberSelectProps) {
   const canDecrease = () => minValue === undefined || value > minValue;
   const canIncrease = () => maxValue === undefined || value < maxValue;
@@ -34,7 +37,9 @@ export default function NumberSelect({
   }
 
   return (
-      <View className="flex flex-row items-center justify-start w-full gap-6 px-1 py-1">
+      <View 
+        className={twMerge("flex flex-row items-center justify-start gap-6 px-1 py-1", className)}
+        {...rest}>
         <Button color='gray-d' action={onDecrease} className='w-8 h-8 p-0' disabled={!canDecrease()}>
           <Ionicons name="remove-outline" size={20} color={getColor("gray-7")} />
         </Button>

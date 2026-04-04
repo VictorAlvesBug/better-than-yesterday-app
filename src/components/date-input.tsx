@@ -3,18 +3,18 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
-import { formatDate, rawDate } from '../utils/dateUtils';
+import { DateOnly, getDate, getDateOnly } from '../utils/dateUtils';
 import Input from './input';
 
 type DateInputProps = {
-  value: string;
-  setValue: (value: string) => void;
-  minValue?: string;
-  maxValue?: string;
+  dateOnly: DateOnly;
+  setDateOnly: (date: DateOnly) => void;
+  minDateOnly?: DateOnly;
+  maxDateOnly?: DateOnly;
 };
 
-export function DateInput({ value, setValue, minValue, maxValue }: DateInputProps) {
-  const [date, setDate] = useState<Date>(rawDate(value));
+export function DateInput({ dateOnly, setDateOnly, minDateOnly, maxDateOnly }: DateInputProps) {
+  const [, setDate] = useState<Date>(getDate(dateOnly));
   const [show, setShow] = useState(false);
 
   const onChange = (event: DateTimePickerEvent, selected?: Date) => {
@@ -22,10 +22,10 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
       setShow(false);
       return;
     }
-    const currentDate = selected || date;
+    const currentDate = selected || getDate(dateOnly);
     setShow(false);
     setDate(currentDate);
-    setValue(formatDate(currentDate));
+    setDateOnly(getDateOnly(currentDate));
   };
 
   const openPicker = () => {
@@ -39,7 +39,7 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
       >
         <Input
           className="flex-1 outline-none pointer-events-none"
-          value={value}
+          value={dateOnly}
           onChange={() => {}}
           icon='calendar-clear-outline'
           iconPosition='right'
@@ -51,11 +51,11 @@ export function DateInput({ value, setValue, minValue, maxValue }: DateInputProp
         <DateTimePicker
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          value={date}
+          value={getDate(dateOnly)}
           onChange={onChange}
           locale="pt-BR"
-          minimumDate={minValue ? rawDate(minValue) : undefined}
-          maximumDate={maxValue ? rawDate(maxValue) : undefined}
+          minimumDate={minDateOnly ? getDate(minDateOnly) : undefined}
+          maximumDate={maxDateOnly ? getDate(maxDateOnly) : undefined}
         />
       )}
     </View>

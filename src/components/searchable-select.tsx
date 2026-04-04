@@ -13,40 +13,55 @@ import { Button } from './button';
 import Input from './input';
 import Label from './label';
 
-export type Option = {
-  label: string;
-  value: string;
-  justAdded?: boolean;
+type ObjectOption = { 
+  id: string;
+  justAdded?: boolean; 
 };
 
-type SearchableSelectProps = {
+type BaseOption = ObjectOption | string;
+
+export const isStringOption = <TObjectOption extends ObjectOption>(
+  option: TObjectOption | string
+): option is string => {
+  return typeof option === 'string'
+}
+
+const getIdFromOption = <TBaseOption extends BaseOption>(option: TBaseOption) => {
+  if (isStringOption(option)) return option;
+
+  return option.id
+}
+
+type SearchableSelectProps<TOption> = {
+  formatOptionLabel: (value: TOption) => string;
+  options: TOption[];
   label?: string;
   placeholder?: string;
   value?: string | null;
-  options: Option[];
-  onChange: (value: string) => void;
-  createOption?: (value: string) => void;
+  onChange: (option: TOption) => void;
+  createOption?: (name: string) => TOption;
 };
 
-export default function SearchableSelect({
+export default function SearchableSelect<TBaseOption extends BaseOption>({
+  formatOptionLabel,
+  options,
   label,
   placeholder = 'Selecione...',
   value,
-  options,
   onChange,
   createOption,
-}: SearchableSelectProps) {
+}: SearchableSelectProps<TBaseOption>) {
   const inputRef = useRef<TextInput | null>(null);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const selectedOption = options.find((o) => o.value === value) || null;
+  const selectedOption = options.find((option) => getIdFromOption(option) === value);
 
   const filteredOptions = useMemo(() => {
     if (!search.trim()) return options;
     const s = search.toLowerCase();
-    return options.filter((o) => o.label.toLowerCase().includes(s));
-  }, [options, search]);
+    return options.filter((option) => formatOptionLabel(option).toLowerCase().includes(s));
+  }, [options, search, formatOptionLabel]);
 
   const onClose = () => {
     setOpen(false);
@@ -67,9 +82,9 @@ export default function SearchableSelect({
     <View className="w-full">
       <Pressable onPress={() => setOpen(true)}>
         <Input
-          value={selectedOption?.label}
+          value={selectedOption && formatOptionLabel(selectedOption)}
           onChange={() => {}}
-          placeholder={selectedOption?.label ?? placeholder}
+          placeholder={(selectedOption && formatOptionLabel(selectedOption)) ?? placeholder}
           className="pointer-events-none"
           icon="chevron-down"
           iconPosition="right"
@@ -123,7 +138,7 @@ export default function SearchableSelect({
 
                 <FlatList
                   data={filteredOptions}
-                  keyExtractor={(item) => item.value}
+                  keyExtractor={(option) => getIdFromOption(option)}
                   keyboardShouldPersistTaps="handled"
                   ItemSeparatorComponent={() => (
                     <View
@@ -131,14 +146,14 @@ export default function SearchableSelect({
                       style={{ backgroundColor: getColor('gray-d') }}
                     />
                   )}
-                  renderItem={({ item }) => {
-                    const isSelected = item.value === value;
+                  renderItem={({ item: option }) => {
+                    const isSelected = getIdFromOption(option) === value;
 
                     return (
                       <Pressable
                         className="flex-row items-center justify-between gap-3 px-2 py-3"
                         onPress={() => {
-                          onChange(item.value);
+                          onChange(option);
                           onClose();
                         }}
                       >
@@ -150,10 +165,10 @@ export default function SearchableSelect({
                             color: getColor(isSelected ? 'violet' : 'gray-3'),
                           }}
                         >
-                          {item.label}
+                          {formatOptionLabel(option)}
                         </Text>
 
-                        {item.justAdded && (
+                        {!isStringOption(option) && option.justAdded && (
                           <Text
                             className="text-xs"
                             style={{ color: getColor('gray-7') }}
@@ -183,8 +198,8 @@ export default function SearchableSelect({
                     ) : (
                       <Button
                         action={() => {
-                          createOption(search);
-                          onChange(search);
+                          const newOption = createOption(search);
+                          onChange(newOption);
                           onClose();
                         }}
                       >

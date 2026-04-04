@@ -1,3 +1,5 @@
+import { DateOnly, DateTime } from "@/src/utils/dateUtils";
+
 export type PlanType = 'private' | 'public';
 
 export type PlanStatus = 'NotStarted' | 'Running' | 'Finished' | 'Cancelled';
@@ -10,13 +12,13 @@ export type Plan = {
     id: string;
     habitId: string;
     description?: string;
-    startsAt: string;
-    endsAt: string;
+    startsAt: DateOnly;
+    endsAt: DateOnly;
     status: PlanStatus;
     type: PlanType;
     daysOffPerWeek: DaysOffPerWeek;
     penaltyValue: number;
-    createdAt: string;
+    createdAt: DateTime;
 }
 
 export type CreatePlan = Omit<Plan, 'id' | 'status'/* | 'createdAt'*/>;
@@ -29,6 +31,6 @@ export type PlanParticipant = {
     id: string;
     planId: string;
     userId: string;
-    joinedAt: string;
+    joinedAt: DateOnly;
     status: PlanParticipantStatus;
 }

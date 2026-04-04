@@ -17,6 +17,7 @@ import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
 import GradientView from '../components/gradient-view';
 import SideDrawer from '../components/side-drawer';
+import { DateOnly, getDateTime } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 import Memory from './api/repositories/memory';
 import createPlanRepository from './api/repositories/planRepository';
@@ -43,8 +44,8 @@ type Plan = {
   id: string;
   habitId: string;
   description: string;
-  startsAt: string;
-  endsAt: string;
+  startsAt: DateOnly;
+  endsAt: DateOnly;
   status: 'active' | 'inactive';
   type: 'public' | 'private';
   daysOffPerWeek: number;
@@ -101,7 +102,7 @@ export default function PlanTrackerScreen() {
     planId: '',
     userId: '',
     name: 'John Doe',
-    date: '2026-03-14 09:15',
+    dateTime: getDateTime('2026-03-14 09:15'),
     title: 'Test',
     photoUrl:
       'https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg',
@@ -113,7 +114,7 @@ export default function PlanTrackerScreen() {
     planId: '',
     userId: '',
     name: 'Victor Bug',
-    date: '2026-03-13 07:20',
+    dateTime: getDateTime('2026-03-13 07:20'),
     title: 'Hoje foi em jejum!',
     photoUrl:
       'https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all',
@@ -125,7 +126,7 @@ export default function PlanTrackerScreen() {
     planId: '',
     userId: '',
     name: 'Teste',
-    date: '2026-02-11 12:10',
+    dateTime: getDateTime('2026-02-11 12:10'),
     title: 'Lorem ipsum dolor sit amet!',
     photoUrl:
       'https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg',
@@ -137,7 +138,7 @@ export default function PlanTrackerScreen() {
     planId: '',
     userId: '',
     name: 'Teste da Silva',
-    date: '2026-03-08 12:10',
+    dateTime: getDateTime('2026-03-08 12:10'),
     title: 'Lorem ipsu44m dolor sit amet! 😋🔥',
     photoUrl: '',
     reviews: [],

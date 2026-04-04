@@ -8,7 +8,6 @@ import SideDrawer from '../components/side-drawer';
 
 import { useState } from 'react';
 import GradientView from '../components/gradient-view';
-const statusBarHeight = Constants.statusBarHeight;
 
 export default function ManagePlansScreen() {
   const router = useRouter();

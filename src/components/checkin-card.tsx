@@ -1,7 +1,7 @@
 import { getColor } from '@/types/color.type';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import { formatRelativeDate } from '../utils/dateUtils';
+import { DateTime, formatRelativeDateTime } from '../utils/dateUtils';
 import ProfilePhoto from './profile-photo';
 
 const unavailablePhotoUrl =
@@ -9,14 +9,14 @@ const unavailablePhotoUrl =
 
 type CheckinCardProps = {
   name: string;
-  date: string;
+  dateTime: DateTime;
   title: string;
   photoUrl: string;
 };
 
 export default function CheckinCard({
   name,
-  date,
+  dateTime,
   title,
   photoUrl,
 }: CheckinCardProps) {
@@ -39,7 +39,7 @@ export default function CheckinCard({
             {name}
           </Text>
           <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
-            {formatRelativeDate(date)}
+            {formatRelativeDateTime(dateTime)}
           </Text>
         </View>
       </View>

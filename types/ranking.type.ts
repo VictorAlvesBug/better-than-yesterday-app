@@ -1,5 +1,5 @@
 export type RankingItem = {
-    position: number;
+    position: number; // TODO: Create type for PositiveInteger, PositiveIntegerOrZero, ...
     name: string;
     checkinsCount: number;
     penalty: number;
