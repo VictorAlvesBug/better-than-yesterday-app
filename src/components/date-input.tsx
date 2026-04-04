@@ -1,20 +1,28 @@
+import { getColor } from '@/types/color.type';
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { Platform, Pressable, View } from 'react-native';
-import { DateOnly, getDate, getDateOnly } from '../utils/dateUtils';
+import { Platform, Pressable, Text, View } from 'react-native';
+import { DateToFront, getDate, getDateToFront } from '../utils/dateUtils';
 import Input from './input';
 
 type DateInputProps = {
-  dateOnly: DateOnly;
-  setDateOnly: (date: DateOnly) => void;
-  minDateOnly?: DateOnly;
-  maxDateOnly?: DateOnly;
+  value: DateToFront;
+  setValue: (date: DateToFront) => void;
+  minValue?: DateToFront;
+  maxValue?: DateToFront;
+  formatValueDescription?: (value: DateToFront) => string;
 };
 
-export function DateInput({ dateOnly, setDateOnly, minDateOnly, maxDateOnly }: DateInputProps) {
-  const [, setDate] = useState<Date>(getDate(dateOnly));
+export function DateInput({
+  value,
+  setValue,
+  minValue,
+  maxValue,
+  formatValueDescription
+}: DateInputProps) {
+  const [, setDate] = useState<Date>(getDate(value));
   const [show, setShow] = useState(false);
 
   const onChange = (event: DateTimePickerEvent, selected?: Date) => {
@@ -22,10 +30,10 @@ export function DateInput({ dateOnly, setDateOnly, minDateOnly, maxDateOnly }: D
       setShow(false);
       return;
     }
-    const currentDate = selected || getDate(dateOnly);
+    const currentDate = selected || getDate(value);
     setShow(false);
     setDate(currentDate);
-    setDateOnly(getDateOnly(currentDate));
+    setValue(getDateToFront(currentDate));
   };
 
   const openPicker = () => {
@@ -39,23 +47,29 @@ export function DateInput({ dateOnly, setDateOnly, minDateOnly, maxDateOnly }: D
       >
         <Input
           className="flex-1 outline-none pointer-events-none"
-          value={dateOnly}
-          onChange={() => {}}
+          value={value}
+          onChange={() => { }}
           icon='calendar-clear-outline'
           iconPosition='right'
           typeable={false}
-          />
+        />
+        {
+          formatValueDescription && 
+          <Text style={{ color: getColor('gray-7') }} className='px-2 py-1 text-xs'>
+            {formatValueDescription(value)}
+          </Text>
+        }
       </Pressable>
 
       {show && (
         <DateTimePicker
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          value={getDate(dateOnly)}
+          value={getDate(value)}
           onChange={onChange}
           locale="pt-BR"
-          minimumDate={minDateOnly ? getDate(minDateOnly) : undefined}
-          maximumDate={maxDateOnly ? getDate(maxDateOnly) : undefined}
+          minimumDate={minValue ? getDate(minValue) : undefined}
+          maximumDate={maxValue ? getDate(maxValue) : undefined}
         />
       )}
     </View>

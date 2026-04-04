@@ -36,6 +36,8 @@ export default function NumberSelect({
       setValue(value + 1);
   }
 
+  console.log({value})
+
   return (
       <View 
         className={twMerge("flex flex-row items-center justify-start gap-6 px-1 py-1", className)}

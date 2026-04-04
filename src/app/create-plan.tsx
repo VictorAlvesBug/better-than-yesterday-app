@@ -19,7 +19,7 @@ import Label from '../components/label';
 import NumberSelect from '../components/number-select';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
 import SearchableSelect from '../components/searchable-select';
-import { DateOnly, getDateOnlyWithOffset, getDateTime } from '../utils/dateUtils';
+import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import createHabitRepository from './api/repositories/habitRepository';
 import Memory from './api/repositories/memory';
@@ -114,10 +114,6 @@ export default function CreatePlanScreen() {
     await planRepository.join(planSaved.id, await Memory.get('userId') || '');
   };
 
-  function formatRelativeDate(startsAt: DateOnly): string {
-    throw new Error('Function not implemented.');
-  }
-
   return (
     <>
       <GradientView 
@@ -163,15 +159,15 @@ export default function CreatePlanScreen() {
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Período do Plano</Label>
             <DateRangeSelect
-              startDateOnlyLabel="Data de Início"
-              startDateOnly={plan.startsAt}
-              setStartDateOnly={startsAt => setPlan(prev => ({ ...prev, startsAt: startsAt }))}
-              startDescription={startsAt => formatRelativeDate(startsAt)}
-              minDateOnly={getDateOnlyWithOffset(+1)}
-              endDateOnlyLabel="Data de Término"
-              endDateOnly={plan.endsAt}
-              setEndDateOnly={endsAt => setPlan(prev => ({ ...prev, endsAt: endsAt }))}
-              endDescription={endsAt => formatRelativeDate(endsAt)}
+              startValueLabel="Data de Início"
+              startValue={getDateToFront(plan.startsAt)}
+              setStartValue={startsAt => setPlan(prev => ({ ...prev, startsAt: getDateOnly(startsAt) }))}
+              formatStartDescription={formatDateRelativeToToday}
+              minValue={getDateToFrontWithOffset(+1)}
+              endValueLabel="Data de Término"
+              endValue={getDateToFront(plan.endsAt)}
+              setEndValue={endsAt => setPlan(prev => ({ ...prev, endsAt: getDateOnly(endsAt) }))}
+              formatEndDescription={formatDateRelativeToToday}
             />
           </Card>
 

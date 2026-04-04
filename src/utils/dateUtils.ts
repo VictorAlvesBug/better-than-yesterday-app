@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs, { Dayjs, isDayjs } from 'dayjs';
 import 'dayjs/locale/pt-br';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { toCapitalize } from './stringUtils';
@@ -17,6 +17,7 @@ export type DateToFront = string & { __brand: 'DateToFront' };
 export type DateTimeToFront = string & { __brand: 'DateTimeToFront' };
 
 type AllTypes = 
+  | Dayjs
   | Date
   | DateOnly
   | Time
@@ -41,6 +42,16 @@ const defaultDateComponents: DateComponents = {
 }
 
 function getDateComponents(param: AllTypes): DateComponents{
+  if (isDayjs(param))
+    return {
+      ...defaultDateComponents,
+      year: String(param.get('year')),
+      month: String(param.get('month')).padStart(2, '0'),
+      day: String(param.get('day')).padStart(2, '0'),
+      hour: String(param.get('hour')).padStart(2, '0'),
+      minute: String(param.get('minute')).padStart(2, '0'),
+    }
+
   if (isDate(param))
     return {
       ...defaultDateComponents,
@@ -223,18 +234,23 @@ export function formatRelativeDateTime(param: AllTypes) {
 }
 
 export function formatRelativeDateOnly(param: AllTypes) {
-  const dateOnly = getDateOnly(param);
+  const date = getDate(param);
 
-  const dayjsDate = dayjs(dateOnly);
+  const dayjsDate = dayjs(date);
   const formattedDate = dayjsDate.format('DD/MM/YYYY');
   const formattedDayOfWeek = toCapitalize(dayjsDate.format('dddd'));
 
   const today = dayjs();
   const yesterday = today.subtract(1, 'day');
+  const tomorrow = today.add(1, 'day');
   const lastWeek = today.subtract(7, 'day');
 
   if (dayjsDate.isSame(yesterday, 'day')) {
     return 'Ontem';
+  }
+
+  if (dayjsDate.isSame(tomorrow, 'day')) {
+    return 'Amanhã';
   }
 
   if (dayjsDate.isSame(today, 'day')) {
@@ -243,6 +259,43 @@ export function formatRelativeDateOnly(param: AllTypes) {
 
   if (dayjsDate.isAfter(lastWeek, 'day') && dayjsDate.isBefore(today, 'day')) {
     return formattedDayOfWeek;
+  }
+
+  return formattedDate;
+}
+
+export function formatDateRelativeToToday(param: AllTypes) {
+  const date = getDate(param);
+
+  const dayjsDate = dayjs(date).startOf('day');
+
+  const formattedDate = dayjsDate.format('DD/MM/YYYY');
+
+  const today = dayjs().startOf('day');
+  const yesterday = today.subtract(1, 'day');
+  const tomorrow = today.add(1, 'day');
+
+  if (dayjsDate.isSame(yesterday, 'day')) {
+    return 'Ontem';
+  }
+
+  if (dayjsDate.isSame(tomorrow, 'day')) {
+    return 'Amanhã';
+  }
+
+  if (dayjsDate.isSame(today, 'day')) {
+    return 'Hoje';
+  }
+
+  const daysAmount = dayjsDate.diff(today, 'days');
+  const dayOrDays = Math.abs(daysAmount) === 1 ? 'dia' : 'dias';
+
+  if (daysAmount < 0) {
+    return `${daysAmount} ${dayOrDays} atrás`;
+  }
+
+  if (daysAmount > 0) {
+    return `Daqui ${daysAmount} ${dayOrDays}`;
   }
 
   return formattedDate;
@@ -308,7 +361,7 @@ export function getDateToFront(param: AllTypes) {
       day,
   } = getDateComponents(param);
 
-  const dateToFront = `${day}/^{month}/^{year}`;
+  const dateToFront = `${day}/${month}/${year}`;
 
   assertDateToFront(dateToFront);
 
@@ -324,15 +377,23 @@ export function getDateTimeToFront(param: AllTypes) {
       minute
   } = getDateComponents(param);
 
-  const dateTimeToFront = `${day}/^{month}/^{year} ${hour}:${minute}`;
+  const dateTimeToFront = `${day}/${month}/${year} ${hour}:${minute}`;
 
   assertDateTimeToFront(dateTimeToFront);
 
   return dateTimeToFront;
 }
 
-export function getDateOnlyWithOffset(daysOffset: number, param: AllTypes = new Date()) {
+export function getDateWithOffset(daysOffset: number, param: AllTypes = new Date()) {
   const initialDate = getDate(param);
   initialDate.setDate(initialDate.getDate() + daysOffset);
-  return getDateOnly(initialDate);
+  return initialDate;
+}
+
+export function getDateOnlyWithOffset(daysOffset: number, param: AllTypes = new Date()) {
+  return getDateOnly(getDateWithOffset(daysOffset, param));
+}
+
+export function getDateToFrontWithOffset(daysOffset: number, param: AllTypes = new Date()) {
+  return getDateToFront(getDateWithOffset(daysOffset, param));
 }
