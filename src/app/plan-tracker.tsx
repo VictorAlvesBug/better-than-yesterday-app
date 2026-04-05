@@ -1,3 +1,5 @@
+import Memory from '@/src/api/memory';
+import createPlanRepository from '@/src/api/planRepository';
 import Card from '@/src/components/card';
 import { Checkin } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
@@ -7,11 +9,11 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
+    ActivityIndicator,
+    Pressable,
+    ScrollView,
+    Text,
+    View,
 } from 'react-native';
 import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
@@ -19,8 +21,6 @@ import GradientView from '../components/gradient-view';
 import SideDrawer from '../components/side-drawer';
 import { parseDateTime } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
-import Memory from './api/repositories/memory';
-import createPlanRepository from './api/repositories/planRepository';
 
 const statusBarHeight = Constants.statusBarHeight;
 

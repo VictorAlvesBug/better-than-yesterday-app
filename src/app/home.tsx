@@ -1,8 +1,8 @@
+import Memory from '@/src/api/memory';
+import createPlanRepository from '@/src/api/planRepository';
+import createUserRepository from '@/src/api/userRepository';
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/auth';
-import Memory from './api/repositories/memory';
-import createPlanRepository from './api/repositories/planRepository';
-import createUserRepository from './api/repositories/userRepository';
 import LoginScreen from './login';
 import LoginAdditionalInformationScreen from './login-additional-information';
 import ManagePlansScreen from './manage-plans';

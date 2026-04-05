@@ -1,3 +1,6 @@
+import Memory from '@/src/api/memory';
+import createPlanRepository from '@/src/api/planRepository';
+import createUserRepository from '@/src/api/userRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { User } from '@/types/user.type';
@@ -6,10 +9,10 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Image,
-  Pressable,
-  Text,
-  View
+    Image,
+    Pressable,
+    Text,
+    View
 } from 'react-native';
 import { Button } from '../components/button';
 import GradientView from '../components/gradient-view';
@@ -17,9 +20,6 @@ import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import { useAuth } from '../context/auth';
-import Memory from './api/repositories/memory';
-import createPlanRepository from './api/repositories/planRepository';
-import createUserRepository from './api/repositories/userRepository';
 
 
 

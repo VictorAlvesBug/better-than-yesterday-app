@@ -2,9 +2,9 @@
 import { type AuthUser } from "@/types/user.type";
 import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from "@react-native-google-signin/google-signin";
 
+import Memory from '@/src/api/memory';
 import { router } from 'expo-router';
 import * as React from 'react';
-import Memory from '../app/api/repositories/memory';
 
 const AuthContext = React.createContext({
   isSignedIn: false,

@@ -41,6 +41,7 @@ export type Plan = {
     daysOffPerWeek: DaysOffPerWeek;
     penaltyValue: PenaltyValue;
     createdAt: DateTime;
+    isCancelled?: boolean;
 }
 
 export type CreatePlan = Omit<Plan, 'id' | 'status'/* | 'createdAt'*/>;
@@ -53,6 +54,11 @@ export type PlanParticipant = {
     id: string;
     planId: string;
     userId: string;
-    joinedAt: DateOnly;
+    joinedAt: DateTime;
+    leftAt?: DateTime;
     status: PlanParticipantStatus;
+}
+
+export type PlanWithHabitToJoin = PlanWithHabit & {
+    joined: boolean;
 }

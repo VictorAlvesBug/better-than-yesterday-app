@@ -95,29 +95,6 @@
       "createdAt": "2024-06-01"
     },
     {
-      "id": "{\"habitId\":\"3\",\"startsAt\":\"30/03/2026\",\"endsAt\":\"29/03/2027\",\"daysOffPerWeek\":2,\"penaltyValue\":10,\"type\":\"public\",\"createdAt\":\"29/03/2026\"}",
-      "habitId": "3",
-      "startsAt": "30/03/2026",
-      "endsAt": "29/03/2027",
-      "daysOffPerWeek": 2,
-      "penaltyValue": 10,
-      "type": "public",
-      "createdAt": "2026-03-29T03:54:52.404Z",
-      "status": "NotStarted"
-    },
-    {
-      "id": "{\"habitId\":\"4\",\"startsAt\":\"30/03/2026\",\"endsAt\":\"29/03/2027\",\"daysOffPerWeek\":2,\"penaltyValue\":10,\"type\":\"public\",\"createdAt\":\"29/03/2026\",\"description\":\"Lol\"}",
-      "habitId": "4",
-      "startsAt": "30/03/2026",
-      "endsAt": "29/03/2027",
-      "daysOffPerWeek": 2,
-      "penaltyValue": 10,
-      "type": "public",
-      "createdAt": "2026-03-29T03:57:54.378Z",
-      "description": "Lol",
-      "status": "NotStarted"
-    },
-    {
       "id": "7bfdd4cc-c880-45a7-8f3f-80d0bd7bb55d",
       "habitId": "388211d0-0947-4896-b54e-1f845a492b99",
       "startsAt": "2026-04-05",
@@ -131,13 +108,6 @@
     }
   ],
   "planParticipants": [
-    {
-      "id": "d9f8e7c6b5a4321f0e9d8c7b6a5f4e3d",
-      "planId": "65352d6fb37d421799f9f5fb17a42c04",
-      "userId": "103214552318957733491",
-      "joinedAt": "2024-06-01",
-      "status": "active"
-    },
     {
       "id": "e8c7b6a5f4e3d2c1b0a9d8c7b6a5f4e3d",
       "planId": "1c3037b85030421cbe3236492338eef1",
@@ -153,10 +123,10 @@
       "status": "blocked"
     },
     {
-      "id": "71c8",
-      "planId": "7bfdd4cc-c880-45a7-8f3f-80d0bd7bb55d",
+      "id": "8a081ed5-dace-4ddc-8508-6ca4b00a570d",
+      "planId": "65352d6fb37d421799f9f5fb17a42c04",
       "userId": "103214552318957733491",
-      "joinedAt": "2026-04-04 22:53",
+      "joinedAt": "2026-04-05 18:36",
       "status": "active"
     }
   ],

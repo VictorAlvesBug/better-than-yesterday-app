@@ -58,7 +58,7 @@ export default function ManagePlansScreen() {
           <Button action={() => router.push('/create-plan')}>Criar Novo Plano</Button>
           <Button action={() => console.log('TODO: Abrir modal para colar link de convidado')}>
             Tenho um Link de Convidado</Button>
-          <Button action={() => console.log('TODO: /trending-plans')}>Planos Populares</Button>
+          <Button action={() => router.push('/public-plans')}>Planos Populares</Button>
         </View>
       </ScrollView>
     </View>

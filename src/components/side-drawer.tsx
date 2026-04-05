@@ -1,3 +1,6 @@
+import Memory from '@/src/api/memory';
+import createPlanRepository from '@/src/api/planRepository';
+import createUserRepository from '@/src/api/userRepository';
 import { getColor } from '@/types/color.type';
 import { PlanWithHabit } from '@/types/plan.type';
 import { User } from '@/types/user.type';
@@ -6,9 +9,6 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import Memory from '../app/api/repositories/memory';
-import createPlanRepository from '../app/api/repositories/planRepository';
-import createUserRepository from '../app/api/repositories/userRepository';
 import { useAuth } from '../context/auth';
 import { getDateOnly } from '../utils/dateUtils';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
@@ -52,9 +52,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userId = await Memory.get('userId');
+      const userId = await Memory.get('userId') || '';
 
-      const user = await userRepository.getById(userId || '');
+      const user = await userRepository.getById(userId);
       
       if (!userId || !user){
         router.replace('/login');
@@ -64,8 +64,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       setUser(user)
     };
 
-    fetchUser();
-  }, [router, userRepository]);
+    isOpen && fetchUser();
+  }, [router, userRepository, isOpen]);
 
   useEffect(() => {
     if (!user)

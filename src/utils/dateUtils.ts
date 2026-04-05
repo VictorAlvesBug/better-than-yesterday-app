@@ -291,11 +291,11 @@ export function formatDateRelativeToToday(param: AllTypes) {
   const dayOrDays = Math.abs(daysAmount) === 1 ? 'dia' : 'dias';
 
   if (daysAmount < 0) {
-    return `${daysAmount} ${dayOrDays} atrás`;
+    return `${Math.abs(daysAmount)} ${dayOrDays} atrás`;
   }
 
   if (daysAmount > 0) {
-    return `Daqui ${daysAmount} ${dayOrDays}`;
+    return `Daqui ${Math.abs(daysAmount)} ${dayOrDays}`;
   }
 
   return formattedDate;
