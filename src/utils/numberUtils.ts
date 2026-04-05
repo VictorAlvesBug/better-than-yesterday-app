@@ -1,32 +1,30 @@
-//import { IntlNumberFormat } from '@formatjs/intl-numberformat/polyfill';
-
 export function formatPhoneNumber(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 11);
+    const digits = value.replace(/\D/g, '').slice(0, 11);
 
-  const ddd = digits.slice(0, 2);
-  const rest = digits.slice(2);
+    const ddd = digits.slice(0, 2);
+    const rest = digits.slice(2);
 
-  const firstPartLength = rest.length > 8 ? 5 : 4;
-  const first = rest.slice(0, firstPartLength);
-  const last = rest.slice(firstPartLength);
+    const firstPartLength = rest.length > 8 ? 5 : 4;
+    const first = rest.slice(0, firstPartLength);
+    const last = rest.slice(firstPartLength);
 
-  let result = '';
+    let result = '';
 
-  if (ddd) {
-    result += `(${ddd}`;
-    if (ddd.length === 2 && rest.length) result += ') ';
-  }
+    if (ddd) {
+        result += `(${ddd}`;
+        if (ddd.length === 2 && rest.length) result += ') ';
+    }
 
-  if (first) {
-    result += first;
-    if (last) result += '-';
-  }
+    if (first) {
+        result += first;
+        if (last) result += '-';
+    }
 
-  if (last) {
-    result += last;
-  }
+    if (last) {
+        result += last;
+    }
 
-  return result;
+    return result;
 }
 
 export function formatInteger(value: number) {
@@ -76,7 +74,7 @@ export function formatMoneyCompact(value: number) {
             maximumFractionDigits: 0
         });
 
-        return `R$${formatter.format(value)}`;
+    return `R$${formatter.format(value)}`;
 }
 
 export function formatPercent(value: number) {
@@ -87,6 +85,20 @@ export function formatPercent(value: number) {
 export function formatPercentCompact(value: number) {
     return getPercentFormatter({ value, useCompact: true })
         .format(value);
+}
+
+export function range(startOrEnd: number, end?: number) {
+    let start = startOrEnd;
+
+    if (end === undefined) {
+        start = 0;
+        end = startOrEnd;
+    }
+
+    return Array.from(
+        { length: end - start + 1 },
+        (_, i) => start + i
+    )
 }
 
 type GetFormatterOptions = {

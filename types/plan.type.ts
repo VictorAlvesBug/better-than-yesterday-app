@@ -6,7 +6,29 @@ export type PlanStatus = 'NotStarted' | 'Running' | 'Finished' | 'Cancelled';
 
 export type PlanParticipantStatus = 'active' | 'left' | 'blocked';
 
-export type DaysOffPerWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+export const daysOffPerWeekOptions = [0, 1, 2, 3, 4, 5, 6] as const;
+
+export type DaysOffPerWeek = typeof daysOffPerWeekOptions[number];
+
+export const penaltyValueOptions = [1, 5, 10, 20, 50, 100] as const;
+
+export type PenaltyValue = typeof penaltyValueOptions[number];
+
+export type PenaltyOption = {
+    id: string;
+    label: string;
+}
+
+export function parsePenaltyValue(strValue: string): PenaltyValue {
+    const value = Number.parseInt(strValue);
+
+    const penaltyValue = penaltyValueOptions.find(v => v === value)
+
+    if(penaltyValue === undefined)
+        throw new Error(`Não foi possível converter '${strValue}' para PenaltyValue. Valores permitidos [${penaltyValueOptions.join(',')}]`)
+        
+    return penaltyValue;
+}
 
 export type Plan = {
     id: string;
@@ -17,7 +39,7 @@ export type Plan = {
     status: PlanStatus;
     type: PlanType;
     daysOffPerWeek: DaysOffPerWeek;
-    penaltyValue: number;
+    penaltyValue: PenaltyValue;
     createdAt: DateTime;
 }
 

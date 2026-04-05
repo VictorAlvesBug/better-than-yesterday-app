@@ -17,7 +17,7 @@ import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
 import GradientView from '../components/gradient-view';
 import SideDrawer from '../components/side-drawer';
-import { DateOnly, parseDateTime } from '../utils/dateUtils';
+import { parseDateTime } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 import Memory from './api/repositories/memory';
 import createPlanRepository from './api/repositories/planRepository';
@@ -40,7 +40,7 @@ type Habit = {
   createdAt: string;
 };
 
-type Plan = {
+/*type Plan = {
   id: string;
   habitId: string;
   description: string;
@@ -48,9 +48,9 @@ type Plan = {
   endsAt: DateOnly;
   status: 'active' | 'inactive';
   type: 'public' | 'private';
-  daysOffPerWeek: number;
+  daysOffPerWeek: DaysOffPerWeek;
   createdAt: string;
-};
+};*/
 
 type PlanParticipant = {
   id: string;

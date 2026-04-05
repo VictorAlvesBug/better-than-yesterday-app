@@ -1,4 +1,5 @@
 import { getColor } from '@/types/color.type';
+import { OnlyDefinedProperties } from '@/types/utility.type';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -6,51 +7,107 @@ import {
   View
 } from 'react-native';
 import { twMerge } from 'tailwind-merge';
+import { range } from '../utils/numberUtils';
 import { Button } from './button';
 
-type NumberSelectProps = {
-  value: number;
-  setValue: (value: number) => void;
-  minValue?: number;
-  maxValue?: number;
-} & React.ComponentProps<typeof View>;
+type AvailableValuesLimit<AvailableValue extends number> = {
+  availableValues: readonly AvailableValue[];
+  minValue?: never;
+  maxValue?: never;
+}
 
-export default function NumberSelect({
+type MinAndMaxLimit<AvailableValue extends number> = {
+  availableValues?: never;
+  minValue: AvailableValue;
+  maxValue: AvailableValue;
+}
+
+type NumberSelectProps<AvailableValue extends number> = {
+  value: AvailableValue;
+  setValue: (value: AvailableValue) => void;
+}
+  & (AvailableValuesLimit<AvailableValue> | MinAndMaxLimit<AvailableValue>)
+  & React.ComponentProps<typeof View>;
+
+export default function NumberSelect<AvailableValue extends number>({
   value,
   setValue,
+  className = '',
+  availableValues,
   minValue,
   maxValue,
-  className = '',
   ...rest
-}: NumberSelectProps) {
-  const canDecrease = () => minValue === undefined || value > minValue;
-  const canIncrease = () => maxValue === undefined || value < maxValue;
+}: NumberSelectProps<AvailableValue>) {
+  const limits = getLimits(minValue, maxValue, availableValues);
+
+  const canDecrease = () => value > limits.minValue;
+  const canIncrease = () => value < limits.maxValue;
 
   const onDecrease = () => {
-    if (canDecrease())
-      setValue(value - 1);
+    if (canDecrease()){
+      const index = limits.availableValues.indexOf(value) - 1;
+      setValue(limits.availableValues[index]);
+    }
   }
 
   const onIncrease = () => {
-    if (canIncrease())
-      setValue(value + 1);
+    if (canIncrease()){
+      const index = limits.availableValues.indexOf(value) + 1;
+      setValue(limits.availableValues[index]);
+    }
   }
 
-  console.log({value})
+  console.log({ value })
 
   return (
-      <View 
-        className={twMerge("flex flex-row items-center justify-start gap-6 px-1 py-1", className)}
-        {...rest}>
-        <Button color='gray-d' action={onDecrease} className='w-8 h-8 p-0' disabled={!canDecrease()}>
-          <Ionicons name="remove-outline" size={20} color={getColor("gray-7")} />
-        </Button>
-        <Text className="text-lg outline-none">
-          {value}
-        </Text>
-        <Button color='gray-d' action={onIncrease} className='w-8 h-8 p-0' disabled={!canIncrease()}>
-          <Ionicons name="add-outline" size={20} color={getColor("gray-7")} />
-        </Button>
-      </View>
+    <View
+      className={twMerge("flex flex-row items-center justify-start gap-6 px-1 py-1", className)}
+      {...rest}>
+      <Button color='gray-d' action={onDecrease} className='w-8 h-8 p-0' disabled={!canDecrease()}>
+        <Ionicons name="remove-outline" size={20} color={getColor("gray-7")} />
+      </Button>
+      <Text className="text-lg outline-none">
+        {value}
+      </Text>
+      <Button color='gray-d' action={onIncrease} className='w-8 h-8 p-0' disabled={!canIncrease()}>
+        <Ionicons name="add-outline" size={20} color={getColor("gray-7")} />
+      </Button>
+    </View>
   );
+}
+
+type LimitIntersection<AvailableValue extends number> =
+  & OnlyDefinedProperties<AvailableValuesLimit<AvailableValue>>
+  & OnlyDefinedProperties<MinAndMaxLimit<AvailableValue>>;
+
+function getLimits<AvailableValue extends number>(
+  minValue?: AvailableValue, 
+  maxValue?: AvailableValue, 
+  availableValues?: readonly AvailableValue[]
+): LimitIntersection<AvailableValue> {
+  const min = minValue !== undefined
+    ? minValue
+    : availableValues !== undefined
+      ? Math.min(...availableValues)
+      : -Infinity;
+
+  const max = maxValue !== undefined
+    ? maxValue
+    : availableValues !== undefined
+      ? Math.max(...availableValues)
+      : Infinity;
+
+  const available = minValue !== undefined && maxValue !== undefined
+    ? range(minValue, maxValue)
+    : availableValues !== undefined
+      ? [...availableValues]
+      : [];
+
+  available.sort();
+
+  return {
+    minValue: min as AvailableValue,
+    maxValue: max as AvailableValue,
+    availableValues: available as AvailableValue[]
+  }
 }

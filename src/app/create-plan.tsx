@@ -1,7 +1,7 @@
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit } from '@/types/habit.type';
-import { CreatePlan, DaysOffPerWeek, PlanType } from '@/types/plan.type';
+import { CreatePlan, DaysOffPerWeek, daysOffPerWeekOptions, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -37,11 +37,11 @@ export default function CreatePlanScreen() {
   });
 
   const toughnessMap = {
-    0: 'Quase impossível',
+    0: 'Insano',
     1: 'Muito difícil',
     2: 'Difícil',
-    3: 'Média',
-    4: 'Média',
+    3: 'Mediana',
+    4: 'Mediana',
     5: 'Fácil',
     6: 'Muito fácil',
   }
@@ -53,15 +53,11 @@ export default function CreatePlanScreen() {
   const habitRepository = createHabitRepository();
   const planRepository = createPlanRepository();
 
-  const auxList2 = [1, 5, 10, 20, 50, 100];
 
-  type PenaltyValue = {
-    id: string;
-    label: string;
-  }
 
-  const penaltyValueList = auxList2.map(item => ({
-    id: item.toString(), label: formatMoney(item)
+  const penaltyOptions = penaltyValueOptions.map((penaltyValue): PenaltyOption => ({
+    id: penaltyValue.toString(), 
+    label: formatMoney(penaltyValue)
   }));
 
   function createHabit(habitName: string) {
@@ -173,11 +169,10 @@ export default function CreatePlanScreen() {
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Folgas Permitidas por Semana</Label>
-              <NumberSelect
+              <NumberSelect<DaysOffPerWeek>
+              availableValues={daysOffPerWeekOptions}
               value={plan.daysOffPerWeek}
-              setValue={daysOffPerWeek => setPlan(prev => ({ ...prev, daysOffPerWeek: daysOffPerWeek as DaysOffPerWeek }))}
-              minValue={0}
-              maxValue={6}
+              setValue={daysOffPerWeek => setPlan(prev => ({ ...prev, daysOffPerWeek }))}
               className='flex-1'
             />
             <View className='flex flex-row items-center justify-start mt-2'>
@@ -188,13 +183,13 @@ export default function CreatePlanScreen() {
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Multa por Descumprimento</Label>
-            <SearchableSelect<PenaltyValue>
+            <SearchableSelect<PenaltyOption>
               label="Selecione o Valor"
               value={plan.penaltyValue.toString()}
-              options={penaltyValueList}
+              options={penaltyOptions}
               formatOptionLabel={penaltyValue => penaltyValue.label}
               onChange={selectedPenaltyValue => {
-                setPlan(prev => ({ ...prev, penaltyValue: Number.parseInt(selectedPenaltyValue.id) }));
+                setPlan(prev => ({ ...prev, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) }));
               }}
             />
           </Card>
