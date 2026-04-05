@@ -65,6 +65,10 @@
       "id": "10",
       "name": "Planejar o dia seguinte",
       "createdAt": "2024-06-01"
+    },
+    {
+      "id": "388211d0-0947-4896-b54e-1f845a492b99",
+      "name": "Test"
     }
   ],
   "plans": [
@@ -112,6 +116,18 @@
       "createdAt": "2026-03-29T03:57:54.378Z",
       "description": "Lol",
       "status": "NotStarted"
+    },
+    {
+      "id": "7bfdd4cc-c880-45a7-8f3f-80d0bd7bb55d",
+      "habitId": "388211d0-0947-4896-b54e-1f845a492b99",
+      "startsAt": "2026-04-05",
+      "endsAt": "2027-04-04",
+      "daysOffPerWeek": 2,
+      "penaltyValue": 10,
+      "type": "public",
+      "createdAt": "2026-04-04 22:53",
+      "description": "Dois",
+      "status": "NotStarted"
     }
   ],
   "planParticipants": [
@@ -135,6 +151,13 @@
       "userId": "2216fe3e553145c5b12b29358a15c771",
       "joinedAt": "2024-06-01",
       "status": "blocked"
+    },
+    {
+      "id": "71c8",
+      "planId": "7bfdd4cc-c880-45a7-8f3f-80d0bd7bb55d",
+      "userId": "103214552318957733491",
+      "joinedAt": "2026-04-04 22:53",
+      "status": "active"
     }
   ],
   "checkins": [

@@ -21,6 +21,7 @@ import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button
 import SearchableSelect from '../components/searchable-select';
 import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
+import { generateId } from '../utils/stringUtils';
 import createHabitRepository from './api/repositories/habitRepository';
 import Memory from './api/repositories/memory';
 import createPlanRepository from './api/repositories/planRepository';
@@ -33,7 +34,7 @@ export default function CreatePlanScreen() {
     daysOffPerWeek: 2,
     penaltyValue: 10,
     type: 'private',
-    createdAt: getDateTime(new Date()),
+    createdAt: getDateTime(),
   });
 
   const toughnessMap = {
@@ -61,7 +62,7 @@ export default function CreatePlanScreen() {
   }));
 
   function createHabit(habitName: string) {
-    const justAddedHabit = { id: habitName, name: habitName, justAdded: true };
+    const justAddedHabit = { id: generateId(), name: habitName, justAdded: true };
     setHabitList((prev) => [...prev, justAddedHabit])
     return justAddedHabit;
   }
@@ -98,16 +99,18 @@ export default function CreatePlanScreen() {
     }
 
     habit.justAdded && await habitRepository.save({
+      id: habit.id,
       name: habit.name,
     });
 
     const planSaved = await planRepository.save(plan);
+    const userId = await Memory.get('userId') || '';
 
     await Memory.set('planId', planSaved.id);
     router.push('/plan-tracker');
     console.log('Plano criado com sucesso:', planSaved);
 
-    await planRepository.join(planSaved.id, await Memory.get('userId') || '');
+    await planRepository.join(planSaved.id, userId);
   };
 
   return (

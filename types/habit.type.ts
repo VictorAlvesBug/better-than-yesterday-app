@@ -4,7 +4,4 @@ export type Habit =
     name: string;
 };
 
-export type SaveHabit = 
-{
-    name: string;
-};
+export type SaveHabit = Habit;

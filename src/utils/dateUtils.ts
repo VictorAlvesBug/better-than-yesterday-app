@@ -41,7 +41,7 @@ const defaultDateComponents: DateComponents = {
   minute: '00',
 }
 
-function getDateComponents(param: AllTypes): DateComponents{
+function getDateComponents(param: AllTypes = new Date()): DateComponents{
   if (isDayjs(param))
     return {
       ...defaultDateComponents,
@@ -301,7 +301,7 @@ export function formatDateRelativeToToday(param: AllTypes) {
   return formattedDate;
 }
 
-export function getDate(param: AllTypes) {
+export function getDate(param: AllTypes = new Date()) {
   const {
       year,
       month,
@@ -311,7 +311,7 @@ export function getDate(param: AllTypes) {
   return new Date(year, month - 1, day);
 }
 
-export function getDateOnly(param: AllTypes) {
+export function getDateOnly(param: AllTypes = new Date()) {
   const {
       year,
       month,
@@ -325,7 +325,7 @@ export function getDateOnly(param: AllTypes) {
   return dateOnly;
 }
 
-export function getTime(param: AllTypes) {
+export function getTime(param: AllTypes = new Date()) {
   const {
       hour,
       minute
@@ -338,7 +338,7 @@ export function getTime(param: AllTypes) {
   return time;
 }
 
-export function getDateTime(param: AllTypes) {
+export function getDateTime(param: AllTypes = new Date()) {
   const {
       year,
       month,
@@ -354,7 +354,7 @@ export function getDateTime(param: AllTypes) {
   return dateTime;
 }
 
-export function getDateToFront(param: AllTypes) {
+export function getDateToFront(param: AllTypes = new Date()) {
   const {
       year,
       month,
@@ -368,7 +368,7 @@ export function getDateToFront(param: AllTypes) {
   return dateToFront;
 }
 
-export function getDateTimeToFront(param: AllTypes) {
+export function getDateTimeToFront(param: AllTypes = new Date()) {
   const {
       year,
       month,

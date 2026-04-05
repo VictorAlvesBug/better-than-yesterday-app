@@ -10,6 +10,7 @@ import Memory from '../app/api/repositories/memory';
 import createPlanRepository from '../app/api/repositories/planRepository';
 import createUserRepository from '../app/api/repositories/userRepository';
 import { useAuth } from '../context/auth';
+import { getDateOnly } from '../utils/dateUtils';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
 import GradientView from './gradient-view';
 
@@ -46,9 +47,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const [user, setUser] = useState<User | null>(null);
   const [plans, setPlans] = useState<PlanWithHabit[]>([]);
 
-  const activePlans = plans.filter(plan => plan.status === "Running");
-  const finishedPlans = plans.filter(plan => plan.status === "Finished");
-
+  const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'NotStarted' status from filter
+  const finishedPlans = plans.filter(plan => plan.endsAt < getDateOnly());
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -76,6 +76,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       setPlans(plans);
     };
 
+    console.log(123)
     fetchPlans();
   }, [planRepository, user]);
 
