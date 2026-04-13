@@ -1,4 +1,5 @@
 import { DateTime } from "@/src/utils/dateUtils";
+import { BaseResource } from "./common.type";
 
 export type CheckinStatus = 'Pending' | 'Validated' | 'Rejected';
 
@@ -8,8 +9,7 @@ export type CheckinReview = {
     status: ReviewStatus;
 };
 
-export type Checkin = {
-  id: string;
+export type Checkin = BaseResource & {
   planId: string;
   userId: string;
   name: string;

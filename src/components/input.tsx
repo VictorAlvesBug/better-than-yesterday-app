@@ -1,6 +1,4 @@
-import { ColorName, getColor } from '@/types/color.type';
-import { IoniconsName } from '@/types/common.type';
-import { Ionicons } from '@expo/vector-icons';
+import { getColor } from '@/types/color.type';
 import React, { RefObject } from 'react';
 import {
   TextInput,
@@ -8,24 +6,16 @@ import {
 } from 'react-native';
 import { twMerge } from 'tailwind-merge';
 import { formatPhoneNumber } from '../utils/numberUtils';
+import Icon from './icon';
 
 type InputType = 'email' | 'nickname' | 'pix-key' | 'phone-number' | 'default';
 
 type IconPosition = 'top' | 'right' | 'bottom' | 'left';
 
-type WithIconProps = {
-  icon: IoniconsName,
-  iconPosition?: IconPosition;
-  iconColor?: ColorName;
-  iconSize?: number;
-  iconAction?: () => void;
-} | {
-  icon?: never;
-  iconPosition?: never;
-  iconColor?: never;
-  iconSize?: never;
-  iconAction?: never;
-}
+type IconProps = React.ComponentProps<typeof Icon> & {
+  position?: IconPosition;
+  action?: () => void;
+};
 
 type InputProps = {
   placeholder?: string;
@@ -36,7 +26,8 @@ type InputProps = {
   typeable?: boolean;
   grayBackground?: boolean;
   inputType?: InputType;
-} & WithIconProps;
+  icon?: IconProps;
+};
 
 export default function Input({
   placeholder = '',
@@ -45,14 +36,15 @@ export default function Input({
   className,
   ref,
   icon,
-  iconPosition = 'left',
-  iconColor = 'gray-7',
-  iconSize = 18,
-  iconAction = () => {},
   inputType = 'default',
   typeable = true,
   grayBackground = false,
 }: InputProps) {
+
+  const {
+  position = 'left',
+  } = icon ?? {};
+
   return (
     <View
       style={{
@@ -63,7 +55,7 @@ export default function Input({
       className={
         twMerge(
           'flex items-center justify-center gap-2 w-full px-3 bg-white border rounded-lg',
-          getOrientationClass(iconPosition),
+          getOrientationClass(position),
           className
         )
       }>
@@ -78,7 +70,7 @@ export default function Input({
           {...getKeyboardTypeProps(inputType, onChange)}
         />
       {
-        icon && <Ionicons onPress={iconAction} name={icon} size={iconSize} color={getColor(iconColor)} />
+        icon && <Icon {...icon} onPress={icon.action} />
       }
     </View>
   );

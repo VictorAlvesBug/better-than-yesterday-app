@@ -1,10 +1,10 @@
 import { CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { DateTime, formatRelativeDateTime } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
+import Icon from './icon';
 import ProfilePhoto from './profile-photo';
 
 const unavailablePhotoUrl =
@@ -103,7 +103,7 @@ function renderReviews(reviews: CheckinReview[]) {
     <View className="flex flex-row items-center justify-start w-full gap-4 px-6">
       {validationReviews.length > 0 && (
         <View className="flex flex-row items-center justify-center gap-2">
-          <FontAwesome5 name="check-circle" size={14} color={getColor("success")} />
+          <Icon type="font-awesome-5" name="check-circle" size={14} color={"success"} />
           <Text style={{ color: getColor("success") }} className="font-bold">
             {formatIntegerCompact(validationReviews.length)} {validationText}
           </Text>
@@ -111,7 +111,7 @@ function renderReviews(reviews: CheckinReview[]) {
       )}
       {rejectionReviews.length > 0 && (
         <View className="flex flex-row items-center justify-center gap-2">
-          <FontAwesome6 name="flag" size={14} color={getColor("danger")} />
+          <Icon type="font-awesome-6" name="flag" size={14} color={"danger"} />
           <Text style={{ color: getColor("danger") }} className="font-bold">
             {formatIntegerCompact(rejectionReviews.length)} {rejectionText}
           </Text>
@@ -126,13 +126,13 @@ function renderReviewButtons() {
     <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
       <Pressable style={{ backgroundColor: getColor("light-success") }} className="flex-1 py-2 rounded-xl">
         <View className="flex flex-row items-center justify-center w-full gap-2">
-          <FontAwesome5 name="check-circle" size={14} color={getColor("success")} />
+          <Icon type="font-awesome-5" name="check-circle" size={14} color={"success"} />
           <Text style={{ color: getColor("success") }} className="font-bold">Validar</Text>
         </View>
       </Pressable>
       <Pressable style={{ backgroundColor: getColor("light-danger") }} className="flex-1 px-4 py-2 rounded-xl">
         <View className="flex flex-row items-center justify-center w-full gap-2">
-          <FontAwesome6 name="flag" size={14} color={getColor("danger")} />
+          <Icon type="font-awesome-6" name="flag" size={14} color={"danger"} />
           <Text style={{ color: getColor("danger") }} className="font-bold">Rejeitar</Text>
         </View>
       </Pressable>

@@ -1,4 +1,5 @@
 import { DateOnly, DateTime } from "@/src/utils/dateUtils";
+import { BaseResource } from "./common.type";
 
 export type PlanType = 'private' | 'public';
 
@@ -24,21 +25,21 @@ export function parsePenaltyValue(strValue: string): PenaltyValue {
 
     const penaltyValue = penaltyValueOptions.find(v => v === value)
 
-    if(penaltyValue === undefined)
+    if (penaltyValue === undefined)
         throw new Error(`Não foi possível converter '${strValue}' para PenaltyValue. Valores permitidos [${penaltyValueOptions.join(',')}]`)
-        
+
     return penaltyValue;
 }
 
-export type Plan = {
-    id: string;
+export type Plan = BaseResource & {
+    ownerId: string;
     habitId: string;
     description?: string;
     startsAt: DateOnly;
     endsAt: DateOnly;
     status: PlanStatus;
     type: PlanType;
-    daysOffPerWeek: DaysOffPerWeek;
+    daysOffPerWeek: number;//DaysOffPerWeek;
     penaltyValue: PenaltyValue;
     createdAt: DateTime;
     isCancelled?: boolean;
@@ -46,12 +47,15 @@ export type Plan = {
 
 export type CreatePlan = Omit<Plan, 'id' | 'status'/* | 'createdAt'*/>;
 
-export type PlanWithHabit = Plan & {
+type WithEnrichment = {
     habitName: string;
+    ownerName: string;
+    memberCount: number;
 }
 
-export type PlanParticipant = {
-    id: string;
+export type PlanEnriched = Plan & WithEnrichment;
+
+export type PlanParticipant = BaseResource & {
     planId: string;
     userId: string;
     joinedAt: DateTime;
@@ -59,6 +63,6 @@ export type PlanParticipant = {
     status: PlanParticipantStatus;
 }
 
-export type PlanWithHabitToJoin = PlanWithHabit & {
+export type PlanToJoin = PlanEnriched & {
     joined: boolean;
 }

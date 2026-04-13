@@ -1,101 +1,124 @@
 
-import { API_URL } from '@/src/utils/constants';
 import { getDateTime } from '@/src/utils/dateUtils';
 import { generateId } from '@/src/utils/stringUtils';
-import { CreatePlan, Plan, PlanParticipant, PlanParticipantStatus, PlanWithHabit } from '@/types/plan.type';
-import axios from 'axios';
+import { CreatePlan, Plan, PlanEnriched, PlanParticipant, PlanParticipantStatus } from '@/types/plan.type';
+import { User } from '@/types/user.type';
+import { api } from '../utils/apiUtils';
 import createHabitRepository from './habitRepository';
+import createUserRepository from './userRepository';
 
 export default function createPlanRepository() {
     const habitRepository = createHabitRepository();
+    const userRepository = createUserRepository();
 
-    const withHabits = async (plans: Plan[]): Promise<PlanWithHabit[]> => {
+    const listPlanMembers = async (planId: Plan['id']) =>
+        await api.list('planParticipants', { planId });
+
+    const listUserPlans = async (userId: User['id']) =>
+        await api.list('planParticipants', { userId });
+
+    const withEnrichment = async (plans: Plan[]): Promise<PlanEnriched[]> => {
         const tasks = plans
             .map(async plan => {
                 const habit = await habitRepository.getById(plan.habitId);
+                const owner = await userRepository.getById(plan.ownerId);
+
+                const planParticipants = await listPlanMembers(plan.id);
 
                 if (!habit)
                     throw new Error("Habit not found...");
 
-                return { ...plan, habitName: habit.name } as PlanWithHabit;
+                if (!owner)
+                    throw new Error("Owner not found...");
+
+                return {
+                    ...plan,
+                    habitName: habit.name,
+                    ownerName: owner.nickname,
+                    memberCount: planParticipants.filter(pp => ['active', 'blocked'].includes(pp.status)).length
+                } as PlanEnriched;
             });
 
         return (await Promise.all(tasks))
-            .filter(planWithHabit => Boolean(planWithHabit)) as PlanWithHabit[];
+            .filter(planWithHabit => Boolean(planWithHabit)) as PlanEnriched[];
     }
 
     const listByPlanIds = async (planIds: string[]) => {
-            const plansTasks = planIds
-                .map(async planId => {
-                    return (await axios.get<Plan>(`${API_URL}/plans/${planId}`)).data;
-                });
+        const plansTasks = planIds
+            .map(async planId => {
+                return await api.get('plans', { id: planId });
+            });
 
-            const plans = (await Promise.all(plansTasks))
-                .filter(plan => Boolean(plan)) as Plan[];
+        const plans = (await Promise.all(plansTasks))
+            .filter(plan => Boolean(plan)) as Plan[];
 
-            return withHabits(plans);
-        }
+        return withEnrichment(plans);
+    }
+
+    const listAll = async () => {
+        return await api.list('plans');
+    };
+
+    const getById = async (id: string) => {
+        const plan = await api.get('plans', { id });
+
+        if (!plan)
+            throw new Error("Plan not found...");
+
+        return withEnrichment([plan]).then(plans => plans[0]);
+    };
+
+    const listByUserId = async (userId: string) => {
+        const planParticipants = await listUserPlans(userId);
+        const planIds = planParticipants.map(pp => pp.planId);
+
+        return listByPlanIds(planIds);
+    };
+
+    const save = async (createPlan: CreatePlan) => {
+        const plan = { ...createPlan, id: generateId(), status: 'NotStarted', createdAt: getDateTime() } satisfies Plan;
+        return await api.save('plans', plan);
+    };
+
+    const join = async (planId: string, userId: string) => {
+        const payload: PlanParticipant = {
+            id: generateId(),
+            planId,
+            userId,
+            joinedAt: getDateTime(),
+            status: 'active'
+        };
+        return await api.save('planParticipants', payload);
+    };
+
+    const leave = async (planId: string, userId: string) => {
+        await api.delete('planParticipants', { planId, userId });
+    };
+
+    const listPublic = async () => {
+        return withEnrichment(await api.list('plans', { type: 'public' }));
+    };
+
+    const joinedPlans = async (userId: string) => {
+        const validStatuses: PlanParticipantStatus[] = ['active', 'blocked'];
+
+        const planParticipants = await listUserPlans(userId);
+
+        const joinedPlanIds = planParticipants
+            .filter(pp => validStatuses.includes(pp.status))
+            .map(pp => pp.planId);
+        return listByPlanIds(joinedPlanIds);
+    };
+
 
     return {
-        listAll: async () => {
-            return (await axios.get<Plan[]>(`${API_URL}/plans`)).data;
-        },
-        getById: async (id: string) => {
-            const plan = (await axios.get<Plan | null>(`${API_URL}/plans/${id}`)).data;
-
-            if (!plan)
-                throw new Error("Plan not found...");
-
-            const habit = await habitRepository.getById(plan.habitId);
-
-            if (!habit)
-                throw new Error("Habit not found...");
-
-            return { ...plan, habitName: habit.name } as PlanWithHabit;
-        },
-        listByUserId: async (userId: string) => {
-            const planParticipants = (await axios.get<PlanParticipant[]>(`${API_URL}/planParticipants?userId=${userId}`)).data;
-            console.log(planParticipants.map(p => ({ userId: p.userId, planId: p.planId })))
-            const planIds = planParticipants.map(pp => pp.planId);
-
-            return listByPlanIds(planIds);
-        },
-        save: async (createPlan: CreatePlan) => {
-            const plan = { ...createPlan, id: generateId(), status: 'NotStarted', createdAt: getDateTime() }
-            await axios.post<Plan>(`${API_URL}/plans`, plan);
-            return plan;
-        },
-        join: async (planId: string, userId: string) => {
-            const payload: PlanParticipant = {
-                id: generateId(),
-                planId,
-                userId,
-                joinedAt: getDateTime(),
-                status: 'active'
-            };
-            const response = await axios.post<PlanParticipant>(`${API_URL}/planParticipants`, payload);
-            return response.data;
-        },
-        abandon: async (planId: string, userId: string) => {
-            const planParticipants = (await axios.get<PlanParticipant[]>(`${API_URL}/planParticipants?planId=${planId}&userId=${userId}`)).data;
-
-            if(planParticipants.length === 0)
-                throw new Error(`O usuário '${userId}' não está neste plano '${planId}'`);
-
-            const first = planParticipants[0];
-            await axios.delete(`${API_URL}/planParticipants/${first.id}`)
-        },
-        listPublic: async () => {
-            const plans = (await axios.get<Plan[]>(`${API_URL}/plans?type=public`)).data;
-            return withHabits(plans);
-        },
-        joinedPlans: async (userId: string) => {
-            const response = await axios.get<PlanParticipant[]>(`${API_URL}/planParticipants?userId=${userId}`);
-            const validStatuses: PlanParticipantStatus[] = ['active', 'blocked'];
-            const joinedPlanIds = response.data
-                .filter(pp => validStatuses.includes(pp.status))
-                .map(pp => pp.planId);
-            return listByPlanIds(joinedPlanIds);
-        } 
+        listAll,
+        getById,
+        listByUserId,
+        save,
+        join,
+        leave,
+        listPublic,
+        joinedPlans
     }
 }

@@ -4,14 +4,16 @@ import createPlanRepository from '@/src/api/planRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit } from '@/types/habit.type';
-import { CreatePlan, DaysOffPerWeek, daysOffPerWeekOptions, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
+import { CreatePlan, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Text,
-    View
+  Switch,
+  Text,
+  View
 } from 'react-native';
+import AmountSelect from '../components/amount-select';
 import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import DateRangeSelect from '../components/date-range-select';
@@ -19,23 +21,27 @@ import GradientView from '../components/gradient-view';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
-import NumberSelect from '../components/number-select';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
 import SearchableSelect from '../components/searchable-select';
-import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
+import { formatDateRelativeToToday, formatDateToFront, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import { generateId } from '../utils/stringUtils';
 
 export default function CreatePlanScreen() {
+  const [daysPerWeek, setDaysPerWeek] = useState(5);
+
   const [plan, setPlan] = useState<CreatePlan>({
+    ownerId: '',
     habitId: '',
     startsAt: getDateOnlyWithOffset(+1),
     endsAt: getDateOnlyWithOffset(+365),
-    daysOffPerWeek: 2,
+    daysOffPerWeek: daysPerWeek,
     penaltyValue: 10,
     type: 'private',
-    createdAt: getDateTime(),
+    createdAt: getDateTime()
   });
+
+  const [joinAfterCreated, setJoinAfterCreated] = useState(false);
 
   const toughnessMap = {
     0: 'Insano',
@@ -54,10 +60,8 @@ export default function CreatePlanScreen() {
   const habitRepository = createHabitRepository();
   const planRepository = createPlanRepository();
 
-
-
   const penaltyOptions = penaltyValueOptions.map((penaltyValue): PenaltyOption => ({
-    id: penaltyValue.toString(), 
+    id: penaltyValue.toString(),
     label: formatMoney(penaltyValue)
   }));
 
@@ -69,13 +73,13 @@ export default function CreatePlanScreen() {
 
   const radioButtonOptions: RadioButtonOption[] = [{
     value: 'private',
-    icon: 'lock-closed-outline',
+    icon: { name: 'lock-closed-outline', size: 20 },
     title: 'Privado',
     complement: 'Apenas para amigos e família'
   },
   {
     value: 'public',
-    icon: 'globe-outline',
+    icon: { name: 'globe-outline', size: 20 },
     title: 'Público',
     complement: 'Qualquer pessoa pode participar'
   }]
@@ -103,19 +107,28 @@ export default function CreatePlanScreen() {
       name: habit.name,
     });
 
-    const planSaved = await planRepository.save(plan);
-    const userId = await Memory.get('userId') || '';
+    plan.ownerId = await Memory.get('userId') || '';
 
-    await Memory.set('planId', planSaved.id);
-    router.push('/plan-tracker');
+
+    plan.daysOffPerWeek = 7 - daysPerWeek;
+
+    const planSaved = await planRepository.save(plan);
+
     console.log('Plano criado com sucesso:', planSaved);
 
-    await planRepository.join(planSaved.id, userId);
+    if (joinAfterCreated) {
+      await planRepository.join(planSaved.id, plan.ownerId);
+      await Memory.set('planId', planSaved.id);
+      router.push('/plan-tracker');
+      return;
+    }
+
+    router.back();
   };
 
   return (
     <>
-      <GradientView 
+      <GradientView
         style={{
           paddingTop: Constants.statusBarHeight,
         }}
@@ -159,29 +172,35 @@ export default function CreatePlanScreen() {
             <Label>Período do Plano</Label>
             <DateRangeSelect
               startValueLabel="Data de Início"
-              startValue={getDateToFront(plan.startsAt)}
+              startValue={formatDateToFront(plan.startsAt)}
               setStartValue={startsAt => setPlan(prev => ({ ...prev, startsAt: getDateOnly(startsAt) }))}
               formatStartDescription={formatDateRelativeToToday}
               minValue={getDateToFrontWithOffset(+1)}
               endValueLabel="Data de Término"
-              endValue={getDateToFront(plan.endsAt)}
+              endValue={formatDateToFront(plan.endsAt)}
               setEndValue={endsAt => setPlan(prev => ({ ...prev, endsAt: getDateOnly(endsAt) }))}
               formatEndDescription={formatDateRelativeToToday}
             />
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Folgas Permitidas por Semana</Label>
-              <NumberSelect<DaysOffPerWeek>
-              availableValues={daysOffPerWeekOptions}
-              value={plan.daysOffPerWeek}
-              setValue={daysOffPerWeek => setPlan(prev => ({ ...prev, daysOffPerWeek }))}
-              className='flex-1'
+            <Label>Quantas vezes por semana?</Label>
+            <AmountSelect
+              value={daysPerWeek}
+              setValue={value => setDaysPerWeek(value)}
+              minValue={1}
+              maxValue={7}
+              selectedIcon={{
+                type: 'octicons',
+                name: 'check-circle-fill',
+                color: 'violet'
+              }}
+              nonSelectedIcon={{
+                type: 'font-awesome-6',
+                name: 'umbrella-beach'
+              }}
+              className='w-full'
             />
-            <View className='flex flex-row items-center justify-start mt-2'>
-            <Text className='text-sm'>Dificuldade: </Text>
-            <Text className='text-sm font-bold'>{toughnessMap[plan.daysOffPerWeek]}</Text>
-            </View>
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
@@ -203,6 +222,17 @@ export default function CreatePlanScreen() {
               selectedValue={plan.type}
               onChange={value => setPlan(prev => ({ ...prev, type: value as PlanType }))}
               options={radioButtonOptions} />
+          </Card>
+
+          <Card className="flex flex-row items-center justify-between w-full gap-1">
+            <Label>Participar do Plano</Label>
+            <Switch
+              value={joinAfterCreated}
+              onValueChange={checked => setJoinAfterCreated(checked)}
+              trackColor={{ true: getColor('light-purple'), false: getColor('gray-9') }}
+              thumbColor={getColor(joinAfterCreated ? 'light-violet' : 'gray-d')}
+              ios_backgroundColor="#767577"
+            />
           </Card>
 
           <Button className='p-0 overflow-hidden' action={createPlan}>

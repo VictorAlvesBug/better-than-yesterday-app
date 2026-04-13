@@ -1,9 +1,9 @@
 import { getColor } from '@/types/color.type'
-import { FontAwesome6 } from '@expo/vector-icons'
 import React from 'react'
 import { Text, View } from 'react-native'
 import { formatInteger } from '../utils/numberUtils'
 import { Button } from './button'
+import Icon from './icon'
 
 type DaysOffCardProps = {
     onUseDayOff?: () => void;
@@ -27,7 +27,7 @@ export default function DaysOffCard({
             style={{ backgroundColor: getColor(`light-${baseColor}`), borderColor: getColor(baseColor) }}
             className="flex flex-row items-center justify-center flex-1 w-full gap-4 px-4 py-2 border shadow-md rounded-xl">
             {anyDayOffIsAvailable
-                && <FontAwesome6 name="gift" size={20} color={getColor("success")} />}
+                && <Icon type="font-awesome-6" name="gift" size={20} color={"success"} />}
             <View className="flex flex-col items-start justify-center flex-1">
                 <Text style={{ color: getColor(baseColor) }} className="text-base font-semibold">
                     {title}

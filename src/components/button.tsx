@@ -79,7 +79,7 @@ export function Button({ action = () => { }, children, className, color = defaul
           style={{
             color: colorSet.text,
           }}
-          className={`font-semibold ${textSize}`}>{children}</Text>
+          className={`${type === "default" ? 'font-bold' : 'font-semibold'} ${textSize}`}>{children}</Text>
       )}
     </Pressable>
 

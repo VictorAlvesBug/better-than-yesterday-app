@@ -1,4 +1,7 @@
-import { FontAwesome, FontAwesome5, FontAwesome6, Ionicons } from "@expo/vector-icons";
+
+export type BaseResource = {
+  id: string;
+}
 
 export type TextSize =
   | "text-xs"   // 12px
@@ -12,7 +15,6 @@ export type TextSize =
   | "text-5xl"  // 48px
   | "text-6xl"; // 60px
 
-export type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
-export type FontAwesomeName = React.ComponentProps<typeof FontAwesome>['name'];
-export type FontAwesome5Name = React.ComponentProps<typeof FontAwesome5>['name'];
-export type FontAwesome6Name = React.ComponentProps<typeof FontAwesome6>['name'];
+export type Never<T extends object> = {
+  [P in keyof T]?: never;
+}

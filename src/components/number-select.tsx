@@ -1,6 +1,4 @@
-import { getColor } from '@/types/color.type';
 import { OnlyDefinedProperties } from '@/types/utility.type';
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
   Text,
@@ -9,6 +7,7 @@ import {
 import { twMerge } from 'tailwind-merge';
 import { range } from '../utils/numberUtils';
 import { Button } from './button';
+import Icon from './icon';
 
 type AvailableValuesLimit<AvailableValue extends number> = {
   availableValues: readonly AvailableValue[];
@@ -57,20 +56,18 @@ export default function NumberSelect<AvailableValue extends number>({
     }
   }
 
-  console.log({ value })
-
   return (
     <View
       className={twMerge("flex flex-row items-center justify-start gap-6 px-1 py-1", className)}
       {...rest}>
       <Button color='gray-d' action={onDecrease} className='w-8 h-8 p-0' disabled={!canDecrease()}>
-        <Ionicons name="remove-outline" size={20} color={getColor("gray-7")} />
+        <Icon name="remove-outline" size={20} />
       </Button>
       <Text className="text-lg outline-none">
         {value}
       </Text>
       <Button color='gray-d' action={onIncrease} className='w-8 h-8 p-0' disabled={!canIncrease()}>
-        <Ionicons name="add-outline" size={20} color={getColor("gray-7")} />
+        <Icon name="add-outline" size={20} />
       </Button>
     </View>
   );

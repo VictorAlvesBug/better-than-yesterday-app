@@ -41,6 +41,7 @@ const colors = {
   violet: "#9810fa",
   "light-violet": "#a250fb",
   purple: "#5038f6",
+  'light-purple': "#eb9fff",
   "purple-violet": "#8100d9",
   gold: "#ffd43b",
   silver: "#a6aab4",

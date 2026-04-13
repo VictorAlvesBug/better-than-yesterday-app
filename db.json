@@ -74,28 +74,33 @@
   "plans": [
     {
       "id": "65352d6fb37d421799f9f5fb17a42c04",
+      "ownerId": "103214552318957733491",
       "habitId": "3e7536df6a734ad0be43fc9653e2d74b",
       "description": "Ler 10 páginas por dia em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
       "status": "Running",
+      "penaltyValue": 1,
       "type": "public",
       "daysOffPerWeek": 1,
       "createdAt": "2024-06-01"
     },
     {
       "id": "1c3037b85030421cbe3236492338eef1",
+      "ownerId": "103214552318957733491",
       "habitId": "75f460343d0946938e987f64b3be9d2d",
       "description": "Treinar 5 vezes por semana em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
       "status": "Finished",
+      "penaltyValue": 5,
       "type": "public",
       "daysOffPerWeek": 2,
       "createdAt": "2024-06-01"
     },
     {
       "id": "7bfdd4cc-c880-45a7-8f3f-80d0bd7bb55d",
+      "ownerId": "103214552318957733491",
       "habitId": "388211d0-0947-4896-b54e-1f845a492b99",
       "startsAt": "2026-04-05",
       "endsAt": "2027-04-04",
@@ -104,6 +109,54 @@
       "type": "public",
       "createdAt": "2026-04-04 22:53",
       "description": "Dois",
+      "status": "NotStarted"
+    },
+    {
+      "id": "fd678770-40ba-4a5d-a60d-96440c6fa952",
+      "ownerId": "103214552318957733491",
+      "habitId": "9",
+      "startsAt": "2026-04-12",
+      "endsAt": "2027-04-11",
+      "daysOffPerWeek": 1,
+      "penaltyValue": 10,
+      "type": "private",
+      "createdAt": "2026-04-11 19:44",
+      "status": "NotStarted"
+    },
+    {
+      "id": "4ca54c6b-901a-4a0a-bee0-a2113e99bc58",
+      "ownerId": "103214552318957733491",
+      "habitId": "6",
+      "startsAt": "2026-04-12",
+      "endsAt": "2027-04-11",
+      "daysOffPerWeek": 0,
+      "penaltyValue": 20,
+      "type": "public",
+      "createdAt": "2026-04-11 19:45",
+      "status": "NotStarted"
+    },
+    {
+      "id": "adfa86a8-fc90-4e52-9a29-210538038f45",
+      "ownerId": "103214552318957733491",
+      "habitId": "388211d0-0947-4896-b54e-1f845a492b99",
+      "startsAt": "2026-04-12",
+      "endsAt": "2027-04-11",
+      "daysOffPerWeek": 6,
+      "penaltyValue": 50,
+      "type": "public",
+      "createdAt": "2026-04-11 19:56",
+      "status": "NotStarted"
+    },
+    {
+      "id": "b69d45ca-04cd-4e06-a3d5-3c1b1c5069bf",
+      "ownerId": "103214552318957733491",
+      "habitId": "10",
+      "startsAt": "2026-01-01",
+      "endsAt": "2027-04-12",
+      "daysOffPerWeek": 0,
+      "penaltyValue": 100,
+      "type": "public",
+      "createdAt": "2026-04-12 17:56",
       "status": "NotStarted"
     }
   ],
@@ -123,10 +176,10 @@
       "status": "blocked"
     },
     {
-      "id": "8a081ed5-dace-4ddc-8508-6ca4b00a570d",
-      "planId": "65352d6fb37d421799f9f5fb17a42c04",
+      "id": "8bca856f-9b98-49e3-ad69-7af5451ea9a3",
+      "planId": "b69d45ca-04cd-4e06-a3d5-3c1b1c5069bf",
       "userId": "103214552318957733491",
-      "joinedAt": "2026-04-05 18:36",
+      "joinedAt": "2026-04-12 23:59",
       "status": "active"
     }
   ],

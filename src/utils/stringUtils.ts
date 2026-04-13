@@ -29,6 +29,15 @@ export function getInitials(text: string) {
     }
 }
 
+export function getAbbreviatedName(name: string): string {
+    const [givenName,] = name.split(' ');
+
+    let familyNameInitials = getInitials(name).substring(1).split('').map(n => `${n}.`).join(' ');
+    familyNameInitials = familyNameInitials ? ` ${familyNameInitials}` : '';
+
+    return `${givenName}${familyNameInitials}`
+}
+
 export function generateId(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();

@@ -1,8 +1,7 @@
-import { getColor } from '@/types/color.type';
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import GradientView from '../components/gradient-view';
+import Icon from '../components/icon';
 import { useAuth } from '../context/auth';
 import { formatIntegerCompact, formatMoneyCompact } from '../utils/numberUtils';
 
@@ -25,7 +24,7 @@ export default function LoginScreen() {
           Better Than Yesterday
         </Text>
         <View className="flex flex-row items-center justify-center gap-2 px-8 mb-12">
-          <Ionicons name="trending-up-outline" size={18} color={getColor("gold")} />
+          <Icon name="trending-up-outline" color={"gold"} />
           <Text className="text-sm font-thin text-white">
             Construa hábitos. Ganhe recompensas.
           </Text>

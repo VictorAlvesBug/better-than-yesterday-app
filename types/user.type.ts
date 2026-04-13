@@ -1,3 +1,5 @@
+import { BaseResource } from "./common.type";
+
 export type AuthUser = {
     name: string | null;
     email: string;
@@ -7,8 +9,7 @@ export type AuthUser = {
     givenName: string | null;
 }
 
-export type User = {
-    id: string;
+export type User = BaseResource & {
     email: string;
     name: string;
     photo: string;
@@ -17,20 +18,6 @@ export type User = {
     pixKey: string;
 }
 
-export type CreateUser = {
-    email: string;
-    name: string;
-    photo: string;
-    nickname: string;
-    phoneNumber: string;
-    pixKey: string;
-}
+export type CreateUser = Omit<User, 'id'>;
 
-export type UpdateUser = {
-    id: string;
-    name: string;
-    photo: string;
-    nickname: string;
-    phoneNumber: string;
-    pixKey: string;
-}
+export type UpdateUser = Omit<User, 'email'>;

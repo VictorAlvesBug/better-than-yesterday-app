@@ -2,17 +2,17 @@ import Memory from '@/src/api/memory';
 import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import { getColor } from '@/types/color.type';
-import { PlanWithHabit } from '@/types/plan.type';
+import { PlanEnriched } from '@/types/plan.type';
 import { User } from '@/types/user.type';
-import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { useAuth } from '../context/auth';
 import { getDateOnly } from '../utils/dateUtils';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
 import GradientView from './gradient-view';
+import Icon from './icon';
 
 type TextBalanceProps = {
   balance: number;
@@ -44,8 +44,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const userRepository = createUserRepository();
   const planRepository = createPlanRepository();
 
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [plans, setPlans] = useState<PlanWithHabit[]>([]);
+  const [plans, setPlans] = useState<PlanEnriched[]>([]);
 
   const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'NotStarted' status from filter
   const finishedPlans = plans.filter(plan => plan.endsAt < getDateOnly());
@@ -55,8 +56,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       const userId = await Memory.get('userId') || '';
 
       const user = await userRepository.getById(userId);
-      
-      if (!userId || !user){
+
+      if (!userId || !user) {
         router.replace('/login');
         return;
       }
@@ -74,9 +75,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
     const fetchPlans = async () => {
       const plans = await planRepository.listByUserId(user.id);
       setPlans(plans);
+      setLoading(false);
     };
 
-    console.log(123)
     fetchPlans();
   }, [planRepository, user]);
 
@@ -85,22 +86,22 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
   return (
     <View
-        style={{
-          paddingTop: Constants.statusBarHeight,
-        }}
+      style={{
+        paddingTop: Constants.statusBarHeight,
+      }}
       className={`absolute z-30 flex flex-row w-full h-full ${isOpen ? '' : 'hidden'}`}
     >
       <View
         className={`flex flex-col w-[80%] bg-white transition-all duration-500 ${isOpen ? 'right-0' : 'right-[100%]'}`}
       >
         <GradientView
-        className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
+          className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
           <Image
-                    source={{ uri: user.photo }}
-                    resizeMode="cover"
-                    className="w-12 h-12 rounded-full"
-                  />
+            source={{ uri: user.photo }}
+            resizeMode="cover"
+            className="w-12 h-12 rounded-full"
+          />
           <View className="flex flex-col items-start justify-center flex-1">
             <Text className="font-semibold text-white">{user.name}</Text>
             <Text className="font-thin text-white">
@@ -111,12 +112,15 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             className="flex flex-row items-center justify-center w-10 h-10"
             onPress={onClose}
           >
-            <Ionicons name="close" size={26} color="white" />
+            <Icon name="close" size={26} color="white" />
           </Pressable>
         </GradientView>
         <View className="flex flex-col">
+          {loading && (
+              <ActivityIndicator size="large" color={getColor("gray-6")} />
+          )}
           {
-            activePlans.length > 0
+            !loading && activePlans.length > 0
             && <View className="flex flex-col">
               <Text style={{ color: getColor("gray-7") }} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
                 Planos Ativos
@@ -140,7 +144,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             </View>
           }
           {
-            finishedPlans.length > 0
+            !loading && finishedPlans.length > 0
             && <View className="flex flex-col">
               <Text style={{ color: getColor("gray-7") }} className="px-6 pt-4 pb-2 text-xs font-semibold uppercase">
                 Planos Finalizados
@@ -157,14 +161,14 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             </View>
           }
           {
-            plans.length > 0 
+            !loading && plans.length > 0
             && <View style={{ backgroundColor: getColor("gray-9"), width: "90%", height: 0.5 }} className="mx-auto my-6"></View>
-            }
+          }
           <Pressable
             onPress={() => { router.replace('/manage-plans'); onClose(); }}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="add-circle-outline" size={16} color={getColor("gray-3")} />
+              <Icon name="add-circle-outline" size={16} color={"gray-3"} />
             </View>
             <Text style={{ color: getColor("gray-3") }} className="font-semibold">
               Gerenciar Planos
@@ -172,7 +176,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           </Pressable>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="settings-outline" size={16} color={getColor("gray-3")} />
+              <Icon name="settings-outline" size={16} color={"gray-3"} />
             </View>
             <Text style={{ color: getColor("gray-3") }} className="my-auto font-semibold">
               Configurações
@@ -180,10 +184,10 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           </View>
           <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons
+              <Icon
                 name="information-circle-outline"
                 size={16}
-                color={getColor("gray-3")}
+                color={"gray-3"}
               />
             </View>
             <Text style={{ color: getColor("gray-3") }} className="font-semibold">Sobre nós</Text>
@@ -193,7 +197,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"
           >
             <View className="flex flex-row items-center justify-center w-5">
-              <Ionicons name="log-out-outline" size={16} color={getColor("danger")} />
+              <Icon name="log-out-outline" size={16} color={"danger"} />
             </View>
             <Text style={{ color: getColor("danger") }} className="font-semibold">Sair</Text>
           </Pressable>
@@ -206,3 +210,21 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
     </View>
   );
 }
+
+type SideDrawerOpenButtonProps = { 
+  setIsDrawerOpen: (open: boolean) => void
+};
+
+export function SideDrawerOpenButton({ setIsDrawerOpen }: SideDrawerOpenButtonProps) {
+  return (
+
+    <Pressable
+      className="flex items-center justify-center w-20 h-20"
+      onPress={() => setIsDrawerOpen(true)}
+      hitSlop={10}
+    >
+      <Icon name="menu" size={24} color={"white"} />
+    </Pressable>
+  )
+}
+

@@ -1,10 +1,9 @@
 import { getColor } from '@/types/color.type';
-import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Button } from '../components/button';
-import SideDrawer from '../components/side-drawer';
+import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
 
 import { useState } from 'react';
 import GradientView from '../components/gradient-view';
@@ -35,14 +34,7 @@ export default function ManagePlansScreen() {
         className="flex flex-col items-center justify-center w-full"
       >
         <View className="flex flex-row items-center justify-start w-full">
-          <Pressable
-            className="flex items-center justify-center w-20 h-20"
-            onPress={() => setIsDrawerOpen(true)}
-            hitSlop={10}
-          >
-            <Ionicons name="menu" size={24} color={getColor("white")} />
-          </Pressable>
-
+          <SideDrawerOpenButton setIsDrawerOpen={setIsDrawerOpen} />
           <View className="flex flex-col items-center justify-center">
             <Text className="text-xl font-bold text-center text-white">
               Gerenciar Planos

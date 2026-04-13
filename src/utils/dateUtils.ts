@@ -354,7 +354,15 @@ export function getDateTime(param: AllTypes = new Date()) {
   return dateTime;
 }
 
-export function getDateToFront(param: AllTypes = new Date()) {
+export function getDifferenceInDays(param1: AllTypes, param2: AllTypes) {
+  const date1 = getDate(param1);
+  const date2 = getDate(param2);
+  const differenceInTime = date2.getTime() - date1.getTime();
+  const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+  return Math.abs(differenceInDays);
+}
+
+export function formatDateToFront(param: AllTypes = new Date()) {
   const {
       year,
       month,
@@ -395,5 +403,5 @@ export function getDateOnlyWithOffset(daysOffset: number, param: AllTypes = new 
 }
 
 export function getDateToFrontWithOffset(daysOffset: number, param: AllTypes = new Date()) {
-  return getDateToFront(getDateWithOffset(daysOffset, param));
+  return formatDateToFront(getDateWithOffset(daysOffset, param));
 }

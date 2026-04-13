@@ -49,8 +49,6 @@ export default function HomeScreen() {
 
         fetchUser();
     }, [authUser, isSignedIn, planRepository, userRepository]);
-    
-    console.log({redirectionScreen})
 
     switch (redirectionScreen) {
         case 'login':

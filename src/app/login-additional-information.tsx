@@ -4,18 +4,18 @@ import createUserRepository from '@/src/api/userRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { User } from '@/types/user.type';
-import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    Image,
-    Pressable,
-    Text,
-    View
+  Image,
+  Pressable,
+  Text,
+  View
 } from 'react-native';
 import { Button } from '../components/button';
 import GradientView from '../components/gradient-view';
+import Icon from '../components/icon';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
@@ -66,8 +66,7 @@ export default function LoginAdditionalInformationScreen() {
   const createUser = async () => {
     //TODO: Validar campos informados...
 
-    const result = await userRepository.save(user);
-    console.log(result);
+    await userRepository.save(user);
 
     await Memory.set('userId', user.id);
     router.replace('./manage-plans');
@@ -90,7 +89,7 @@ export default function LoginAdditionalInformationScreen() {
             signOut();
           }}
         >
-          <Ionicons name="log-out-outline" size={24} color="#fff" />
+          <Icon name="log-out-outline" size={24} color="white" />
         </Pressable>
       </GradientView>
 

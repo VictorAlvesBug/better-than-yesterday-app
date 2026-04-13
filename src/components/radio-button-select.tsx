@@ -1,12 +1,11 @@
 import { getColor } from '@/types/color.type';
-import { IoniconsName } from '@/types/common.type';
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+import Icon from './icon';
 
 export type RadioButtonOption = {
   value: string;
-  icon?: IoniconsName;
+  icon?: React.ComponentProps<typeof Icon>;
   title: string;
   complement?: string;
 }
@@ -44,7 +43,7 @@ export default function RadioButtonSelect({
             </View>
             {
               icon
-              && <Ionicons name={icon} size={18} color={getColor('gray-7')} />
+              && <Icon {...icon} />
             }
             <View className='flex flex-col items-start justify-center'>
               <Text className='text-base font-bold'>{title}</Text>

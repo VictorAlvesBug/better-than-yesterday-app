@@ -1,5 +1,4 @@
 import { getColor } from '@/types/color.type';
-import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -13,6 +12,7 @@ import {
 import BackButton from '../components/back-button';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import GradientView from '../components/gradient-view';
+import Icon from '../components/icon';
 import Ranking from '../components/ranking';
 import {
   formatInteger,
@@ -74,7 +74,7 @@ export default function PlanSettingsScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => { }}
             >
-              <Ionicons name="share-social-outline" size={24} color="#fff" />
+              <Icon name="share-social" size={24} color="white" />
             </Pressable>
           </View>
 

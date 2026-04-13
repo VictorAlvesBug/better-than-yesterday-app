@@ -1,28 +1,16 @@
 
-import { API_URL } from '@/src/utils/constants';
-import { Habit, SaveHabit } from '@/types/habit.type';
-import axios from 'axios';
+import { Habit } from '@/types/habit.type';
+import { api } from '../utils/apiUtils';
 
-export default function createHabitRepository(){
-    const listAll = async () => {
-            return (await axios.get<Habit[]>(`${API_URL}/habits`)).data;
-        };
+export default function createHabitRepository() {
+    const listAll = async () => await api.list('habits');
 
-        const getById = async (id: string) => {
-            return (await axios.get<Habit | null>(`${API_URL}/habits/${id}`)).data;
-        };
+    const getById = async (id: string) => await api.get('habits', { id });
 
-        const save = async (saveHabit: SaveHabit) => {
-            const response = await axios.post(`${API_URL}/habits`, saveHabit);
-            console.log(response.data);
-            if (response.status !== 201)
-                throw new Error(`HTTP: ${response.status} - ${response.data}`);
+    const save = async (saveHabit: Habit) => await api.save('habits', saveHabit);
 
-            return await getById('');
-        };
-    
     return {
-        listAll: listAll,
+        listAll,
         getById,
         save
     }

@@ -1,5 +1,4 @@
 import { getColor } from '@/types/color.type';
-import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
@@ -10,12 +9,13 @@ import {
   View
 } from 'react-native';
 import { Button } from './button';
+import Icon from './icon';
 import Input from './input';
 import Label from './label';
 
-type ObjectOption = { 
+type ObjectOption = {
   id: string;
-  justAdded?: boolean; 
+  justAdded?: boolean;
 };
 
 type BaseOption = ObjectOption | string;
@@ -83,11 +83,14 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
       <Pressable onPress={() => setOpen(true)}>
         <Input
           value={selectedOption && formatOptionLabel(selectedOption)}
-          onChange={() => {}}
+          onChange={() => { }}
           placeholder={(selectedOption && formatOptionLabel(selectedOption)) ?? placeholder}
           className="pointer-events-none"
-          icon="chevron-down"
-          iconPosition="right"
+          icon={{
+            name: "chevron-down",
+            size: 20,
+            position: "right"
+          }}
           typeable={false}
         />
       </Pressable>
@@ -107,108 +110,106 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
           className="items-center justify-start flex-1 px-4 pt-24 bg-black/40"
         >
           <Pressable
-            onPress={() => {}}
+            onPress={() => { }}
             android_disableSound={false}
             className="w-full max-w-[420px] rounded-2xl bg-white"
           >
-              <View className="max-h-[35vh] p-4 overflow-scroll">
-                <View className="flex-row items-center justify-between mb-3">
-                  <Label>{label || 'Selecionar opção'}</Label>
+            <View className="max-h-[35vh] p-4 overflow-scroll">
+              <View className="flex-row items-center justify-between mb-3">
+                <Label>{label || 'Selecionar opção'}</Label>
 
-                  <Pressable className="p-1" onPress={onClose}>
-                    <Ionicons
-                      name="close"
-                      size={22}
-                      color={getColor('gray-7')}
-                    />
-                  </Pressable>
-                </View>
-
-                <View className="flex-row items-center mb-3">
-                  <Input
-                    ref={inputRef}
-                    className="flex-1 outline-none"
-                    placeholder="Buscar..."
-                    value={search}
-                    onChange={setSearch}
-                    icon="search"
-                    iconPosition="left"
+                <Pressable className="p-1" onPress={onClose}>
+                  <Icon
+                    name="close"
+                    size={22}
+                    color={'gray-7'}
                   />
-                </View>
+                </Pressable>
+              </View>
 
-                <FlatList
-                  data={filteredOptions}
-                  keyExtractor={(option) => getIdFromOption(option)}
-                  keyboardShouldPersistTaps="handled"
-                  ItemSeparatorComponent={() => (
-                    <View
-                      className="h-[1px]"
-                      style={{ backgroundColor: getColor('gray-d') }}
-                    />
-                  )}
-                  renderItem={({ item: option }) => {
-                    const isSelected = getIdFromOption(option) === value;
-
-                    return (
-                      <Pressable
-                        className="flex-row items-center justify-between gap-3 px-2 py-3"
-                        onPress={() => {
-                          onChange(option);
-                          onClose();
-                        }}
-                      >
-                        <Text
-                          className={`flex-1 text-base ${
-                            isSelected ? 'font-bold' : ''
-                          }`}
-                          style={{
-                            color: getColor(isSelected ? 'violet' : 'gray-3'),
-                          }}
-                        >
-                          {formatOptionLabel(option)}
-                        </Text>
-
-                        {!isStringOption(option) && option.justAdded && (
-                          <Text
-                            className="text-xs"
-                            style={{ color: getColor('gray-7') }}
-                          >
-                            Recém-adicionado
-                          </Text>
-                        )}
-
-                        {isSelected && (
-                          <Ionicons
-                            name="checkmark"
-                            size={18}
-                            color={getColor('violet')}
-                          />
-                        )}
-                      </Pressable>
-                    );
-                  }}
-                  ListEmptyComponent={
-                    createOption === undefined ? (
-                      <Text
-                        className="py-4 text-sm text-center"
-                        style={{ color: getColor('gray-7') }}
-                      >
-                        Nenhum resultado encontrado
-                      </Text>
-                    ) : (
-                      <Button
-                        action={() => {
-                          const newOption = createOption(search);
-                          onChange(newOption);
-                          onClose();
-                        }}
-                      >
-                        {`Criar "${search}"`}
-                      </Button>
-                    )
-                  }
+              <View className="flex-row items-center mb-3">
+                <Input
+                  ref={inputRef}
+                  className="flex-1 outline-none"
+                  placeholder="Buscar..."
+                  value={search}
+                  onChange={setSearch}
+                  icon={{ name: "search", size: 20, position: "left" }}
                 />
               </View>
+
+              <FlatList
+                data={filteredOptions}
+                keyExtractor={(option) => getIdFromOption(option)}
+                keyboardShouldPersistTaps="handled"
+                ItemSeparatorComponent={() => (
+                  <View
+                    className="h-[1px]"
+                    style={{ backgroundColor: getColor('gray-d') }}
+                  />
+                )}
+                renderItem={({ item: option }) => {
+                  const isSelected = getIdFromOption(option) === value;
+
+                  return (
+                    <Pressable
+                      className="flex-row items-center justify-between gap-3 px-2 py-3"
+                      onPress={() => {
+                        onChange(option);
+                        onClose();
+                      }}
+                    >
+                      <Text
+                        className={`flex-1 text-base ${isSelected ? 'font-bold' : ''
+                          }`}
+                        style={{
+                          color: getColor(isSelected ? 'violet' : 'gray-3'),
+                        }}
+                      >
+                        {formatOptionLabel(option)}
+                      </Text>
+
+                      {!isStringOption(option) && option.justAdded && (
+                        <Text
+                          className="text-xs"
+                          style={{ color: getColor('gray-7') }}
+                        >
+                          Recém-adicionado
+                        </Text>
+                      )}
+
+                      {isSelected && (
+                        <Icon
+                          name="checkmark"
+                          size={18}
+                          color={'violet'}
+                        />
+                      )}
+                    </Pressable>
+                  );
+                }}
+                ListEmptyComponent={
+                  createOption === undefined ? (
+                    <Text
+                      className="py-4 text-sm text-center"
+                      style={{ color: getColor('gray-7') }}
+                    >
+                      Nenhum resultado encontrado
+                    </Text>
+                  ) : (
+                    <Button
+                      action={() => {
+                        const newOption = createOption(search);
+                        onChange(newOption);
+                        onClose();
+                      }}
+                    >
+                      {`Criar "${search}"`}
+                    </Button>
+                  )
+                }
+              />
+            </View>
           </Pressable>
         </Pressable>
       </Modal>

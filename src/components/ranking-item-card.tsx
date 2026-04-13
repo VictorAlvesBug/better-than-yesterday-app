@@ -1,5 +1,4 @@
 import { getColor } from '@/types/color.type';
-import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { Text, View } from 'react-native';
 import {
@@ -9,6 +8,7 @@ import {
   formatPercent,
 } from '../utils/numberUtils';
 import GradientView from './gradient-view';
+import Icon from './icon';
 import ProfilePhoto from './profile-photo';
 
 type RankingItemCardProps = {
@@ -47,7 +47,7 @@ export default function RankingItemCard({
               {name}
             </Text>
             <View className="flex flex-row items-center justify-center gap-1">
-              <FontAwesome5 name="check-circle" size={12} color={getColor("success")} />
+              <Icon type="font-awesome-5" name="check-circle" size={12} color={"success"} />
               <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
                 {`${formatInteger(checkinsCount)}/${formatInteger(totalCount)}`}
               </Text>
@@ -78,15 +78,18 @@ export default function RankingItemCard({
 }
 
 function renderPosition(position: number) {
-  const iconName = 'trophy';
-  const iconSize = 32;
+  const iconProps = {
+    type: 'octicons' as const,
+    name: 'trophy' as const,
+    size: 32,
+  };
   switch (position) {
     case 1:
-      return <FontAwesome6 name={iconName} size={iconSize} color={getColor("gold")} />;
+      return <Icon {...iconProps} color={"gold"} />;
     case 2:
-      return <FontAwesome6 name={iconName} size={iconSize} color={getColor("silver")} />;
+      return <Icon {...iconProps} color={"silver"} />;
     case 3:
-      return <FontAwesome6 name={iconName} size={iconSize} color={getColor("bronze")} />;
+      return <Icon {...iconProps} color={"bronze"} />;
     default:
       const positionLength = position.toString().length;
       const textSize =
@@ -107,7 +110,7 @@ function renderPenaltyStatus(penalty: number) {
     <View className="flex flex-row items-center justify-center gap-1">
       {penalty <= 0 ? (
         <>
-          <FontAwesome5 name="check-circle" size={12} color={getColor("success")} />
+          <Icon type="font-awesome-5" name="check-circle" size={12} color={"success"} />
           <Text style={{
             color: getColor("success")
           }}
@@ -115,7 +118,7 @@ function renderPenaltyStatus(penalty: number) {
         </>
       ) : (
         <>
-          <FontAwesome6 name="arrow-trend-down" size={14} color={getColor("danger")} />
+          <Icon name="trending-down-outline" size={14} color={"danger"} />
           <Text style={{
            color: getColor("danger")
           }} className="text-sm font-bold">

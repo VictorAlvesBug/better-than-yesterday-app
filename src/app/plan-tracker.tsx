@@ -3,23 +3,23 @@ import createPlanRepository from '@/src/api/planRepository';
 import Card from '@/src/components/card';
 import { Checkin } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import { PlanWithHabit } from '@/types/plan.type';
-import { FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { PlanEnriched } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-    ActivityIndicator,
-    Pressable,
-    ScrollView,
-    Text,
-    View,
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
 } from 'react-native';
 import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
 import GradientView from '../components/gradient-view';
-import SideDrawer from '../components/side-drawer';
-import { parseDateTime } from '../utils/dateUtils';
+import Icon from '../components/icon';
+import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
+import { getDifferenceInDays, parseDateTime } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -40,18 +40,6 @@ type Habit = {
   createdAt: string;
 };
 
-/*type Plan = {
-  id: string;
-  habitId: string;
-  description: string;
-  startsAt: DateOnly;
-  endsAt: DateOnly;
-  status: 'active' | 'inactive';
-  type: 'public' | 'private';
-  daysOffPerWeek: DaysOffPerWeek;
-  createdAt: string;
-};*/
-
 type PlanParticipant = {
   id: string;
   planId: string;
@@ -63,7 +51,7 @@ type PlanParticipant = {
 export default function PlanTrackerScreen() {
   const planRepository = createPlanRepository();
 
-  const [plan, setPlan] = useState<PlanWithHabit | null>(null);
+  const [plan, setPlan] = useState<PlanEnriched | null>(null);
 
   const [users, setUsers] = useState<User[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -71,7 +59,7 @@ export default function PlanTrackerScreen() {
     [],
   );
   const [checkins, setCheckins] = useState<Checkin[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -149,20 +137,21 @@ export default function PlanTrackerScreen() {
     const fetchPlan = async () => {
       const planId = await Memory.get('planId');
 
-      if (!planId){
+      if (!planId) {
         router.replace('/manage-plans');
         return;
       }
-
+      
       const plan = await planRepository.getById(planId);
 
-      if (!plan){
+      if (!plan) {
         await Memory.remove('planId');
         router.replace('/manage-plans');
         return;
       }
 
       setPlan(plan);
+      setLoading(false);
     };
 
     fetchPlan();
@@ -188,10 +177,10 @@ export default function PlanTrackerScreen() {
     userId: '456',
     streak: 7,
     position: 3,
-    totalParticipants: 8,
     checkinCount: 13,
     totalCheckinCount: 21,
-    daysToFinish: 23,
+    daysSinceStart: getDifferenceInDays(new Date(), plan.startsAt),
+    totalDays: getDifferenceInDays(plan.startsAt, plan.endsAt),
     daysOffAvailable: 1,
     ...plan
   };
@@ -213,19 +202,13 @@ export default function PlanTrackerScreen() {
         contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
       >
         <GradientView
-        style={{
-          paddingTop: Constants.statusBarHeight,
-        }}
+          style={{
+            paddingTop: Constants.statusBarHeight,
+          }}
           className="flex flex-col items-center justify-center w-full"
         >
           <View className="flex flex-row items-center justify-between w-full">
-            <Pressable
-              className="flex items-center justify-center w-20 h-20"
-              onPress={() => setIsDrawerOpen(true)}
-              hitSlop={10}
-            >
-              <Ionicons name="menu" size={24} color={getColor("white")} />
-            </Pressable>
+            <SideDrawerOpenButton setIsDrawerOpen={setIsDrawerOpen} />
 
             <View className="flex flex-col items-center justify-center">
               <Text style={{ color: getColor("white") }} className="text-xl font-bold text-center ">
@@ -237,7 +220,7 @@ export default function PlanTrackerScreen() {
               className="flex items-center justify-center w-20 h-20"
               onPress={() => router.push('/plan-settings')}
             >
-              <Ionicons name="people-outline" size={24} color={getColor("white")} />
+              <Icon name="people" size={24} color={"white"} />
             </Pressable>
           </View>
           <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
@@ -254,7 +237,7 @@ export default function PlanTrackerScreen() {
           <View className="flex flex-row items-center justify-between flex-1 w-full gap-4">
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-3">
-                <FontAwesome5 name="fire" size={16} color={getColor("warning")} />
+                <Icon type="font-awesome-5" name="fire" size={16} color={"warning"} />
                 <Text style={{ color: getColor("gray-7") }} className="">Sequência</Text>
               </View>
               <Text style={{ color: getColor("black") }} className="text-3xl font-bold">
@@ -266,14 +249,14 @@ export default function PlanTrackerScreen() {
             </Card>
             <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
               <View className="flex flex-row items-center justify-start gap-3">
-                <FontAwesome5 name="award" size={16} color={getColor("violet")} />
+                <Icon type="font-awesome-5" name="award" size={16} color={"violet"} />
                 <Text style={{ color: getColor("gray-7") }} className="">Posição</Text>
               </View>
               <Text style={{ color: getColor("black") }} className="text-3xl font-bold">
                 #{formatInteger(planInfoMock.position)}
               </Text>
               <Text style={{ color: getColor("gray-7") }} className="text-xs font-semibold ">
-                de {formatInteger(planInfoMock.totalParticipants)} pessoas
+                de {planInfoMock.memberCount/*formatInteger(planInfoMock.memberCount)*/} pessoas
               </Text>
             </Card>
           </View>
@@ -292,26 +275,26 @@ export default function PlanTrackerScreen() {
                   flex: 1,
                   height: '100%',
                   borderRadius: 9999,
-                  width: `${(100 * planInfoMock.checkinCount) /
-                    planInfoMock.totalCheckinCount
+                  width: `${(100 * planInfoMock.daysSinceStart) /
+                    planInfoMock.totalDays
                     }%`,
                 }}
               />
             </View>
             <View className="flex flex-row items-center justify-between w-full gap-2">
-              <FontAwesome5 name="calendar" size={16} color={getColor("gray-7")} />
+              <Icon name="calendar-clear-outline" size={16} />
               <Text style={{ color: getColor("gray-7") }} className="flex-1 ">
-                {`Termina em ${formatInteger(planInfoMock.daysToFinish)} ${planInfoMock.daysToFinish === 1 ? 'dia' : 'dias'
+                {`Termina em ${formatInteger(planInfoMock.totalDays - planInfoMock.daysSinceStart)} ${planInfoMock.totalDays - planInfoMock.daysSinceStart === 1 ? 'dia' : 'dias'
                   }`}
               </Text>
               <Text style={{ color: getColor("violet") }} className="font-semibold">
                 {formatPercentCompact(
-                  planInfoMock.checkinCount / planInfoMock.totalCheckinCount,
+                  planInfoMock.daysSinceStart / planInfoMock.totalDays,
                 )}
               </Text>
             </View>
           </Card>
-          <DaysOffCard daysOffAvailable={planInfoMock.daysOffAvailable} onUseDayOff={() => {}} />
+          <DaysOffCard daysOffAvailable={planInfoMock.daysOffAvailable} onUseDayOff={() => { }} />
           {/* Lista dos últimos check-ins dos participantes */}
           <View className="mt-2 -mb-5">
             <Text style={{ color: getColor("black") }} className="mb-3 text-lg font-extrabold">
@@ -335,7 +318,7 @@ export default function PlanTrackerScreen() {
         <GradientView
           className="flex flex-col items-center justify-center w-full h-full"
         >
-          <FontAwesome6 name="camera" size={24} color={getColor("white")} />
+          <Icon name="camera" size={24} color={"white"} />
         </GradientView>
       </Pressable>
     </View>
