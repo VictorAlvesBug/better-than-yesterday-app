@@ -2,11 +2,11 @@ import { ColorName, getColor } from '@/types/color.type';
 import { Feather, FontAwesome, FontAwesome5, FontAwesome6, Ionicons, MaterialIcons, Octicons } from '@expo/vector-icons';
 import React from 'react';
 
-export type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
-export type FontAwesomeName = React.ComponentProps<typeof FontAwesome>['name'];
-export type MaterialIconsName = React.ComponentProps<typeof MaterialIcons>['name'];
-export type OcticonsName = React.ComponentProps<typeof Octicons>['name'];
-export type FeatherName = React.ComponentProps<typeof Feather>['name'];
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+type FontAwesomeName = React.ComponentProps<typeof FontAwesome>['name'];
+type MaterialIconsName = React.ComponentProps<typeof MaterialIcons>['name'];
+type OcticonsName = React.ComponentProps<typeof Octicons>['name'];
+type FeatherName = React.ComponentProps<typeof Feather>['name'];
 
 type IconProps = {
     size?: number;

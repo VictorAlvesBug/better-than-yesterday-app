@@ -1,15 +1,12 @@
 import { DateOnly, DateTime } from "@/src/utils/dateUtils";
 import { BaseResource } from "./common.type";
+import { User } from "./user.type";
 
 export type PlanType = 'private' | 'public';
 
-export type PlanStatus = 'NotStarted' | 'Running' | 'Finished' | 'Cancelled';
+export type PlanStatus = 'not-started' | 'running' | 'finished' | 'cancelled';
 
-export type PlanParticipantStatus = 'active' | 'left' | 'blocked';
-
-export const daysOffPerWeekOptions = [0, 1, 2, 3, 4, 5, 6] as const;
-
-export type DaysOffPerWeek = typeof daysOffPerWeekOptions[number];
+export type PlanMemberStatus = 'active' | 'left' | 'blocked';
 
 export const penaltyValueOptions = [1, 5, 10, 20, 50, 100] as const;
 
@@ -37,31 +34,37 @@ export type Plan = BaseResource & {
     description?: string;
     startsAt: DateOnly;
     endsAt: DateOnly;
-    status: PlanStatus;
     type: PlanType;
-    daysOffPerWeek: number;//DaysOffPerWeek;
+    daysOffPerWeek: number;
     penaltyValue: PenaltyValue;
-    createdAt: DateTime;
     isCancelled?: boolean;
 }
 
-export type CreatePlan = Omit<Plan, 'id' | 'status'/* | 'createdAt'*/>;
+export type CreatePlan = Omit<Plan, 'id' | 'createdAt' | 'isCancelled'>;
 
-type WithEnrichment = {
-    habitName: string;
+//export type UpdatePlan = Partial<Omit<Plan, 'createdAt' | 'ownerId'>>;
+
+export type PlanEnriched = Plan & {
+    status: PlanStatus;
     ownerName: string;
+    habitName: string;
     memberCount: number;
-}
+};
 
-export type PlanEnriched = Plan & WithEnrichment;
-
-export type PlanParticipant = BaseResource & {
+export type PlanMember = BaseResource & {
     planId: string;
     userId: string;
     joinedAt: DateTime;
     leftAt?: DateTime;
-    status: PlanParticipantStatus;
+    status: PlanMemberStatus;
 }
+
+export type PlanMemberEnriched = PlanMember & {
+    user: User;
+    plan: PlanEnriched;
+}
+
+export type CreateOrDeletePlanMember = Omit<PlanMember, 'id' | 'createdAt' | 'joinedAt' | 'leftAt' | 'status'>;
 
 export type PlanToJoin = PlanEnriched & {
     joined: boolean;

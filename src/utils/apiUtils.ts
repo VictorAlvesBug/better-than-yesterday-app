@@ -158,20 +158,20 @@ await api.habits.create({ body: { title: "Hello" } });*/
 import { API_URL } from '@/src/utils/constants';
 import { Checkin } from "@/types/checkin.type";
 import { Habit } from "@/types/habit.type";
-import { Plan, PlanParticipant } from "@/types/plan.type";
+import { Plan, PlanMember } from "@/types/plan.type";
 import { User } from "@/types/user.type";
 import axios from "axios";
 
 const isSuccessfulStatusCode = (statusCode: number) => 
     statusCode >= 200 && statusCode <= 299;
 
-export type ResourceName = 'users' | 'habits' | 'plans' | 'planParticipants' | 'checkins';
+type ResourceName = 'users' | 'habits' | 'plans' | 'planMembers' | 'checkins';
 
 type ResourceFor<TResourceName extends ResourceName> = 
     TResourceName extends 'users' ? User :
     TResourceName extends 'habits' ? Habit :
     TResourceName extends 'plans' ? Plan :
-    TResourceName extends 'planParticipants' ? PlanParticipant :
+    TResourceName extends 'planMembers' ? PlanMember :
     TResourceName extends 'checkins' ? Checkin 
     : never;
 
@@ -234,13 +234,13 @@ function createApi(){
         }
     };
 
-    const save = async <TResourceName extends ResourceName>
+    const create = async <TResourceName extends ResourceName>
     (
         resourceName: TResourceName, 
         body: ResourceFor<TResourceName>
     ): Promise<ResourceFor<TResourceName>> => {
         try {
-            const response = await axios.post<PlanParticipant>(`${API_URL}/${resourceName}`, body);
+            const response = await axios.post<PlanMember>(`${API_URL}/${resourceName}`, body);
             
             if (isSuccessfulStatusCode(response.status))
                 return body;
@@ -288,7 +288,7 @@ function createApi(){
     return {
         get,
         list,
-        save,
+        create,
         delete: remove
     }
 }

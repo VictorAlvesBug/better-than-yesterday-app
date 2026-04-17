@@ -1,6 +1,8 @@
+import { DateTime } from "@/src/utils/dateUtils";
 
 export type BaseResource = {
   id: string;
+  createdAt: DateTime;
 }
 
 export type TextSize =
@@ -14,7 +16,3 @@ export type TextSize =
   | "text-4xl"  // 36px
   | "text-5xl"  // 48px
   | "text-6xl"; // 60px
-
-export type Never<T extends object> = {
-  [P in keyof T]?: never;
-}

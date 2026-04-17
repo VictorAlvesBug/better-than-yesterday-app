@@ -12,7 +12,7 @@ export function toCapitalize(text: string) {
 }
 
 export function getInitials(text: string) {
-    if (text === null || text === undefined)
+    if (!text)
         throw new Error(`Texto inválido (${text})`);
 
     const allInitials = text

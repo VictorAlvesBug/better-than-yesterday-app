@@ -21,7 +21,10 @@ export default function HomeScreen() {
             return;
 
         const fetchUser = async () => {
-            const dbUser = await userRepository.getByEmail(authUser.email);
+            const dbUser = await userRepository.get({ email: authUser.email }).catch(() => {
+                setRedirectionScreen('login-additional-information');
+                return;
+            });
 
             if (!dbUser) {
                 setRedirectionScreen('login-additional-information');

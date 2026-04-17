@@ -1,8 +1,8 @@
-import { CheckinReview, CheckinStatus } from '@/types/checkin.type';
+import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import { DateTime, formatRelativeDateTime } from '../utils/dateUtils';
+import { formatRelativeDateTime } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
 import Icon from './icon';
 import ProfilePhoto from './profile-photo';
@@ -10,23 +10,14 @@ import ProfilePhoto from './profile-photo';
 const unavailablePhotoUrl =
   'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
 
-type CheckinWithReviewsCardProps = {
-  name: string;
-  dateTime: DateTime;
-  title: string;
-  photoUrl: string;
-  status: CheckinStatus;
-  reviews: CheckinReview[];
-};
-
 export default function CheckinWithReviewsCard({
-  name,
+  userName,
   dateTime,
   title,
   photoUrl,
   status,
   reviews,
-}: CheckinWithReviewsCardProps) {
+}: CheckinEnriched) {
   return (
     <View className="flex flex-col items-start justify-center w-full gap-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
       <Image
@@ -36,13 +27,13 @@ export default function CheckinWithReviewsCard({
       />
 
       <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
-        <ProfilePhoto name={name} />
+        <ProfilePhoto name={userName} />
         <View className="flex flex-col items-start justify-center flex-1 px-4 py-2">
           <Text className="w-full text-base font-medium"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {name}
+            {userName}
           </Text>
           <Text style={{ color: getColor("gray-7") }} className="text-xs" numberOfLines={1}>
             {formatRelativeDateTime(dateTime)}
@@ -53,12 +44,12 @@ export default function CheckinWithReviewsCard({
 
       <Text className="px-6 text-md">{title}</Text>
 
-      {(reviews.length > 0 || status === 'Pending') 
+      {(reviews.length > 0 || status === 'pending') 
       && <View style={{ backgroundColor: getColor("gray-d"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}
 
       {reviews.length > 0 && renderReviews(reviews)}
 
-      {status === 'Pending' && renderReviewButtons()}
+      {status === 'pending' && renderReviewButtons()}
     </View>
   );
 }
@@ -66,19 +57,19 @@ export default function CheckinWithReviewsCard({
 function renderStatus(status: CheckinStatus) {
   const defaultClasses = 'px-3 py-1 font-semibold rounded-full text-sm';
 
-  if (status === 'Pending')
+  if (status === 'pending')
     return (
       <Text style={{ backgroundColor: getColor("light-warning"), color: getColor("warning") }} className={`${defaultClasses}`}>
         Pendente
       </Text>
     );
-  if (status === 'Validated')
+  if (status === 'validated')
     return (
       <Text style={{ backgroundColor: getColor("light-success"), color: getColor("success") }} className={`${defaultClasses}`}>
         Validado
       </Text>
     );
-  if (status === 'Rejected')
+  if (status === 'rejected')
     return (
       <Text style={{ backgroundColor: getColor("light-danger"), color: getColor("danger") }} className={`${defaultClasses}`}>
         Rejeitado
@@ -88,10 +79,10 @@ function renderStatus(status: CheckinStatus) {
 
 function renderReviews(reviews: CheckinReview[]) {
   const validationReviews = reviews.filter(
-    (review) => review.status === 'Validated',
+    (review) => review.status === 'validated',
   );
   const rejectionReviews = reviews.filter(
-    (review) => review.status === 'Rejected',
+    (review) => review.status === 'rejected',
   );
 
   const validationText =

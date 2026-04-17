@@ -1,4 +1,3 @@
-import { ColorName } from '@/types/color.type';
 import React from 'react';
 import {
     Pressable,
@@ -6,12 +5,6 @@ import {
 } from 'react-native';
 import { twMerge } from 'tailwind-merge';
 import Icon from './icon';
-
-type WithIconsProps = {
-    name: React.ComponentProps<typeof Icon>['name'];
-    color?: ColorName;
-    size?: number;
-}
 
 type AmountSelectProps = {
     value: number;

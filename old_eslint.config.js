@@ -15,10 +15,10 @@ module.exports = defineConfig([
     rules: {
       ...reactHooks.configs.recommended.rules,
     },
-    settings: {
+    /*settings: {
       'react-hooks': {
         additionalEffectHooks: '(useEffectAsync)',
       },
-    },
+    },*/
   },
 ]);

@@ -3,8 +3,8 @@ import { type AuthUser } from "@/types/user.type";
 import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from "@react-native-google-signin/google-signin";
 
 import Memory from '@/src/api/memory';
-import { router } from 'expo-router';
 import * as React from 'react';
+import useNavigation from "../hooks/useNavigation";
 
 const AuthContext = React.createContext({
   isSignedIn: false,
@@ -16,6 +16,8 @@ const AuthContext = React.createContext({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const navigation = useNavigation();  
+
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isSignedIn, setIsSignedIn] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -49,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setAuthUser(user);
         Memory.set("google_user", user);
         setIsSignedIn(true);
-        router.replace('/home');
+        navigation.replace('/home');
       }
       else {
         setErrorMessage('Login com Google foi cancelado');
@@ -84,7 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await GoogleSignin.signOut();
       setIsSignedIn(false);
-      router.replace('/login');
+      navigation.replace('/login');
     }
     catch (error) {
       console.error(error);

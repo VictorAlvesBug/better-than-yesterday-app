@@ -12,7 +12,7 @@ import AmountSelect from './amount-select'
 import { Button } from './button'
 import Icon from './icon'
 
-type ButtonRole = 'join' | 'leave' | 'see-ranking';
+type ButtonRole = 'join' | 'leave' | 'peek';
 
 type PlanCardProps = {
     plan: PlanToJoin;
@@ -40,24 +40,6 @@ export default function PlanCard({
         callback,
         planRepository
     });
-
-    /*
-    ----------------------------------------------------
-      🎯  Saúde Física                 ( Victor A. B. )
-            Treinar 5x na semana
-    ----------------------------------------------------
-      🗓  Início:                              Duração:
-            10/04/2026 (em 3 dias)             25 dias
-    
-      💰  Penalidade por falha:     👥  20k
-            R$ 10,00
-    
-      ✅️  ✅️  ✅️  ✅️  ✅️   🏖  🏖
-    
-    ----------------------------------------------------
-    ########   Participar / Sair / Ver   ########
-    ----------------------------------------------------
-    */
 
     return (
         <View className="flex flex-col items-start justify-center w-full gap-2 py-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
@@ -93,9 +75,9 @@ export default function PlanCard({
                     </Text>
                 }
             </View>
-            
+
             <View style={{ backgroundColor: getColor("gray-7"), width: "95%", height: 0.5 }} className="mx-auto"></View>
-            
+
             {/* Content */}
             <View className='flex flex-col items-start justify-center gap-4 px-6'>
                 <View className="flex flex-row items-center justify-between w-full">
@@ -207,20 +189,20 @@ function getButtonRole(plan: PlanToJoin): ButtonRole {
     const planStatus = getPlanStatus(plan);
 
     switch (planStatus) {
-        case 'Finished':
-            return 'see-ranking';
+        case 'finished':
+            return 'peek';
 
-        case 'NotStarted':
+        case 'not-started':
             if (plan.joined)
                 return 'leave';
             return 'join'
 
-        case 'Running':
+        case 'running':
             if (plan.joined)
                 return 'leave';
-            return 'see-ranking'
+            return 'peek'
 
-        case 'Cancelled':
+        case 'cancelled':
             throw new Error('Planos cancelados não devem ser exibidos nessa tela');
 
         default:
@@ -231,15 +213,15 @@ function getButtonRole(plan: PlanToJoin): ButtonRole {
 
 function getPlanStatus(plan: PlanToJoin): PlanStatus {
     if (plan.isCancelled)
-        return 'Cancelled';
+        return 'cancelled';
 
     if (getDateOnly() < plan.startsAt)
-        return 'NotStarted';
+        return 'not-started';
 
     if (getDateOnly() < plan.endsAt)
-        return 'Running';
+        return 'running';
 
-    return 'Finished';
+    return 'finished';
 }
 
 type GetActionOptions = {
@@ -265,7 +247,7 @@ function getButtonInfo({ role, planId, userId, planRepository, callback }: GetAc
                 baseColor: 'success',
                 lightColor: 'light-success',
                 action: async () => {
-                    await planRepository.join(planId, userId);
+                    await planRepository.join({ planId, userId });
                     callback && await callback(planId, true);
                 },
             };
@@ -276,12 +258,12 @@ function getButtonInfo({ role, planId, userId, planRepository, callback }: GetAc
                 baseColor: 'danger',
                 lightColor: 'light-danger',
                 action: async () => {
-                    await planRepository.leave(planId, userId);
+                    await planRepository.leave({planId, userId});
                     callback && await callback(planId, false);
                 },
             };
 
-        case 'see-ranking':
+        case 'peek':
             return {
                 text: 'Ver',
                 baseColor: 'info',

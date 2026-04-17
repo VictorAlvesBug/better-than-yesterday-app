@@ -3,12 +3,12 @@ import Memory from '@/src/api/memory';
 import createPlanRepository from '@/src/api/planRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { Habit } from '@/types/habit.type';
+import { Habit, HabitWithJustAdded } from '@/types/habit.type';
 import { CreatePlan, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
-import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Switch,
   Text,
   View
@@ -23,37 +23,20 @@ import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
 import SearchableSelect from '../components/searchable-select';
+import useNavigation from '../hooks/useNavigation';
 import { formatDateRelativeToToday, formatDateToFront, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import { generateId } from '../utils/stringUtils';
 
 export default function CreatePlanScreen() {
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+
   const [daysPerWeek, setDaysPerWeek] = useState(5);
 
-  const [plan, setPlan] = useState<CreatePlan>({
-    ownerId: '',
-    habitId: '',
-    startsAt: getDateOnlyWithOffset(+1),
-    endsAt: getDateOnlyWithOffset(+365),
-    daysOffPerWeek: daysPerWeek,
-    penaltyValue: 10,
-    type: 'private',
-    createdAt: getDateTime()
-  });
+  const [plan, setPlan] = useState<CreatePlan | null>(null);
 
   const [joinAfterCreated, setJoinAfterCreated] = useState(false);
-
-  const toughnessMap = {
-    0: 'Insano',
-    1: 'Muito difícil',
-    2: 'Difícil',
-    3: 'Mediana',
-    4: 'Mediana',
-    5: 'Fácil',
-    6: 'Muito fácil',
-  }
-
-  type HabitWithJustAdded = Habit & { justAdded?: boolean };
 
   const [habitList, setHabitList] = useState<HabitWithJustAdded[]>([]);
 
@@ -66,7 +49,13 @@ export default function CreatePlanScreen() {
   }));
 
   function createHabit(habitName: string) {
-    const justAddedHabit = { id: generateId(), name: habitName, justAdded: true };
+    const temporaryId = generateId();
+    const justAddedHabit: HabitWithJustAdded = {
+      id: temporaryId,
+      name: habitName,
+      justAdded: true,
+      createdAt: getDateTime()
+    };
     setHabitList((prev) => [...prev, justAddedHabit])
     return justAddedHabit;
   }
@@ -85,14 +74,32 @@ export default function CreatePlanScreen() {
   }]
 
   useEffect(() => {
-    const fetchHabits = async () => {
-      const habits = await habitRepository.listAll();
+    const fetchData = async () => {
+      if (loading) {
+        const habits = await habitRepository.list();
+        setHabitList(habits);
 
-      setHabitList(habits);
+        const userId = await Memory.get('userId') || '';
+
+        setPlan({
+          ownerId: userId,
+          habitId: '',
+          startsAt: getDateOnlyWithOffset(1),
+          endsAt: getDateOnlyWithOffset(8),
+          daysOffPerWeek: daysPerWeek,
+          penaltyValue: 10,
+          type: 'private',
+        });
+
+        setLoading(false);
+      }
     };
 
-    fetchHabits();
-  }, [habitRepository, setHabitList]);
+    fetchData();
+  }, [habitRepository, Memory]);
+
+  if (loading || !plan)
+    return <ActivityIndicator size="large" color={getColor("gray-6")} />
 
   const createPlan = async () => {
     const habit = habitList.find(h => h.id === plan.habitId);
@@ -102,8 +109,7 @@ export default function CreatePlanScreen() {
       return;
     }
 
-    habit.justAdded && await habitRepository.save({
-      id: habit.id,
+    habit.justAdded && await habitRepository.create({
       name: habit.name,
     });
 
@@ -112,18 +118,19 @@ export default function CreatePlanScreen() {
 
     plan.daysOffPerWeek = 7 - daysPerWeek;
 
-    const planSaved = await planRepository.save(plan);
+    const createdPlan = await planRepository.create(plan);
 
-    console.log('Plano criado com sucesso:', planSaved);
+    console.log('Plano criado com sucesso:', createdPlan);
 
     if (joinAfterCreated) {
-      await planRepository.join(planSaved.id, plan.ownerId);
-      await Memory.set('planId', planSaved.id);
-      router.push('/plan-tracker');
+      await planRepository.join({ planId: createdPlan.id, userId: plan.ownerId });
+      const forceReload = await Memory.get('planId') !== createdPlan.id;
+      await Memory.set('planId', createdPlan.id);
+      navigation.push('/plan-tracker', forceReload);
       return;
     }
 
-    router.back();
+    navigation.back();
   };
 
   return (
@@ -173,12 +180,12 @@ export default function CreatePlanScreen() {
             <DateRangeSelect
               startValueLabel="Data de Início"
               startValue={formatDateToFront(plan.startsAt)}
-              setStartValue={startsAt => setPlan(prev => ({ ...prev, startsAt: getDateOnly(startsAt) }))}
+              setStartValue={startsAt => setPlan({ ...plan, startsAt: getDateOnly(startsAt) })}
               formatStartDescription={formatDateRelativeToToday}
               minValue={getDateToFrontWithOffset(+1)}
               endValueLabel="Data de Término"
               endValue={formatDateToFront(plan.endsAt)}
-              setEndValue={endsAt => setPlan(prev => ({ ...prev, endsAt: getDateOnly(endsAt) }))}
+              setEndValue={endsAt => setPlan({ ...plan, endsAt: getDateOnly(endsAt) })}
               formatEndDescription={formatDateRelativeToToday}
             />
           </Card>
@@ -211,7 +218,7 @@ export default function CreatePlanScreen() {
               options={penaltyOptions}
               formatOptionLabel={penaltyValue => penaltyValue.label}
               onChange={selectedPenaltyValue => {
-                setPlan(prev => ({ ...prev, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) }));
+                setPlan({ ...plan, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
               }}
             />
           </Card>
@@ -220,7 +227,7 @@ export default function CreatePlanScreen() {
             <Label>Tipo de Plano</Label>
             <RadioButtonSelect
               selectedValue={plan.type}
-              onChange={value => setPlan(prev => ({ ...prev, type: value as PlanType }))}
+              onChange={value => setPlan({ ...plan, type: value as PlanType })}
               options={radioButtonOptions} />
           </Card>
 

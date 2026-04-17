@@ -32,7 +32,7 @@ function createMemory(){
             const jsonValue = await AsyncStorage.getItem(prefix + key);
             return jsonValue === null 
                 ? null 
-                : (JSON.parse(jsonValue) as StoredValue<TKey>);
+                : (JSON.parse(jsonValue) satisfies StoredValue<TKey>);
         } catch (e) {
             console.error(`Erro ao recuperar a chave '${key}' do AsyncStorage:`, e);
             return null;

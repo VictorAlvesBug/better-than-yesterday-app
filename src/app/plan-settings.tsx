@@ -24,8 +24,8 @@ import {
 const statusBarHeight = Constants.statusBarHeight;
 
 export default function PlanSettingsScreen() {
-  const [currentTab, setCurrentTab] = useState<'Ranking' | 'Check-ins'>(
-    'Ranking',
+  const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins'>(
+    'ranking',
   );
 
   // ---- ANIMAÇÃO DAS ABAS ----
@@ -37,7 +37,7 @@ export default function PlanSettingsScreen() {
 
   useEffect(() => {
     Animated.spring(translateX, {
-      toValue: currentTab === 'Ranking' ? 0 : tabWidth,
+      toValue: currentTab === 'ranking' ? 0 : tabWidth,
       useNativeDriver: true,
     }).start();
   }, [currentTab, tabWidth, translateX]);
@@ -102,7 +102,7 @@ export default function PlanSettingsScreen() {
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
                 <Text style={{ color: getColor("white") }} className="text-xs font-thin">
-                  Participantes
+                  Membros
                 </Text>
                 <Text style={{ color: getColor("white") }} className="font-semibold">
                   {formatInteger(8)}
@@ -143,11 +143,11 @@ export default function PlanSettingsScreen() {
             {/* Aba Ranking */}
             <Pressable
               className="flex-1 h-full"
-              onPress={() => setCurrentTab('Ranking')}
+              onPress={() => setCurrentTab('ranking')}
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  style={{ color: getColor(currentTab === 'Ranking' ? "white" : "gray-7") }} className={`font-semibold text-lg`}
+                  style={{ color: getColor(currentTab === 'ranking' ? "white" : "gray-7") }} className={`font-semibold text-lg`}
                 >
                   Ranking
                 </Text>
@@ -157,11 +157,11 @@ export default function PlanSettingsScreen() {
             {/* Aba Check-ins */}
             <Pressable
               className="flex-1 h-full"
-              onPress={() => setCurrentTab('Check-ins')}
+              onPress={() => setCurrentTab('checkins')}
             >
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  style={{ color: getColor(currentTab === 'Check-ins' ? "white" : "gray-7") }} className={`font-semibold block text-lg`}
+                  style={{ color: getColor(currentTab === 'checkins' ? "white" : "gray-7") }} className={`font-semibold block text-lg`}
                 >
                   Check-ins
                 </Text>
@@ -170,12 +170,12 @@ export default function PlanSettingsScreen() {
           </View>
 
           <View
-            className={`flex flex-col items-center justify-center gap-4 w-full ${currentTab === 'Ranking' ? 'block' : 'hidden'}`}
+            className={`flex flex-col items-center justify-center gap-4 w-full ${currentTab === 'ranking' ? 'block' : 'hidden'}`}
           >
             <Ranking planId={'abc'} />
           </View>
           <View
-            className={`flex flex-col items-center justify-center gap-4  w-full ${currentTab === 'Check-ins' ? 'block' : 'hidden'}`}
+            className={`flex flex-col items-center justify-center gap-4  w-full ${currentTab === 'checkins' ? 'block' : 'hidden'}`}
           >
             <CheckinsWithReviewsList planId={'abc'} />
           </View>

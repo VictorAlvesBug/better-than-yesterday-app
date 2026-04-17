@@ -1,19 +1,7 @@
-import { ColorName, getColor, getLightColor } from '@/types/color.type';
+import { ColorName, ColorNameSet, ColorSet, getColor, getLightColor } from '@/types/color.type';
 import { TextSize } from '@/types/common.type';
 import { Pressable, Text } from 'react-native';
 import { twMerge } from 'tailwind-merge';
-
-type ColorNameSet = {
-  text: ColorName,
-  border: ColorName,
-  background: ColorName,
-}
-
-type ColorSet = {
-  text: string,
-  border: string,
-  background: string,
-}
 
 type WithColorNameProps = {
   color?: ColorName;

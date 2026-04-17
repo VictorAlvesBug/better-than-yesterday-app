@@ -18,6 +18,6 @@ export type User = BaseResource & {
     pixKey: string;
 }
 
-export type CreateUser = Omit<User, 'id'>;
+export type CreateUser = Omit<User, 'id' | 'createdAt'>;
 
-export type UpdateUser = Omit<User, 'email'>;
+//export type UpdateUser = Omit<User, 'email'>;

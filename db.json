@@ -3,11 +3,20 @@
     {
       "id": "103214552318957733491",
       "email": "victoralvesbug@gmail.com",
-      "name": "Vitão",
-      "nickname": "Victor Alves",
+      "name": "Victor Alves",
+      "nickname": "Vitão",
       "photo": "https://lh3.googleusercontent.com/a/ACg8ocJEyTQXTDWLXcS49Y4lHHuuyG3KiNJYIID6ve3l7azTFg7czA7MKA",
       "phoneNumber": "(11) 97562-3736",
       "pixKey": "victoralvesbug@gmail.com"
+    },
+    {
+      "id": "123123123123123123123",
+      "email": "fake@user.com",
+      "name": "Fake User",
+      "nickname": "Feiki Iuzer",
+      "photo": "",
+      "phoneNumber": "(11) 98765-4321",
+      "pixKey": "fake@user.com"
     }
   ],
   "habits": [
@@ -79,7 +88,7 @@
       "description": "Ler 10 páginas por dia em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
-      "status": "Running",
+      "status": "running",
       "penaltyValue": 1,
       "type": "public",
       "daysOffPerWeek": 1,
@@ -92,7 +101,7 @@
       "description": "Treinar 5 vezes por semana em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
-      "status": "Finished",
+      "status": "finished",
       "penaltyValue": 5,
       "type": "public",
       "daysOffPerWeek": 2,
@@ -109,7 +118,7 @@
       "type": "public",
       "createdAt": "2026-04-04 22:53",
       "description": "Dois",
-      "status": "NotStarted"
+      "status": "not-started"
     },
     {
       "id": "fd678770-40ba-4a5d-a60d-96440c6fa952",
@@ -121,7 +130,7 @@
       "penaltyValue": 10,
       "type": "private",
       "createdAt": "2026-04-11 19:44",
-      "status": "NotStarted"
+      "status": "not-started"
     },
     {
       "id": "4ca54c6b-901a-4a0a-bee0-a2113e99bc58",
@@ -133,7 +142,7 @@
       "penaltyValue": 20,
       "type": "public",
       "createdAt": "2026-04-11 19:45",
-      "status": "NotStarted"
+      "status": "not-started"
     },
     {
       "id": "adfa86a8-fc90-4e52-9a29-210538038f45",
@@ -145,7 +154,7 @@
       "penaltyValue": 50,
       "type": "public",
       "createdAt": "2026-04-11 19:56",
-      "status": "NotStarted"
+      "status": "not-started"
     },
     {
       "id": "b69d45ca-04cd-4e06-a3d5-3c1b1c5069bf",
@@ -157,10 +166,22 @@
       "penaltyValue": 100,
       "type": "public",
       "createdAt": "2026-04-12 17:56",
-      "status": "NotStarted"
+      "status": "not-started"
+    },
+    {
+      "id": "62d891e9-4bb9-4b5f-b944-037e23c5d7c4",
+      "ownerId": "103214552318957733491",
+      "habitId": "2",
+      "startsAt": "2026-04-21",
+      "endsAt": "2026-04-29",
+      "daysOffPerWeek": 5,
+      "penaltyValue": 1,
+      "type": "private",
+      "description": "Aaaa",
+      "createdAt": "2026-04-17 19:42"
     }
   ],
-  "planParticipants": [
+  "planMembers": [
     {
       "id": "e8c7b6a5f4e3d2c1b0a9d8c7b6a5f4e3d",
       "planId": "1c3037b85030421cbe3236492338eef1",
@@ -181,32 +202,154 @@
       "userId": "103214552318957733491",
       "joinedAt": "2026-04-12 23:59",
       "status": "active"
+    },
+    {
+      "id": "1bf1572b-e65a-4bbe-9c17-c408f1faeeef",
+      "planId": "62d891e9-4bb9-4b5f-b944-037e23c5d7c4",
+      "userId": "103214552318957733491",
+      "joinedAt": "2026-04-17 19:42",
+      "createdAt": "2026-04-17 19:42",
+      "status": "active"
     }
   ],
   "checkins": [
     {
+      "kind": "checkin",
       "id": "a1b2c3d4e5f67890abcdef1234567890",
-      "planId": "65352d6fb37d421799f9f5fb17a42c04",
+      "planId": "1c3037b85030421cbe3236492338eef1",
       "userId": "103214552318957733491",
-      "date": "2026-02-13",
-      "title": "Leitura diária",
-      "description": "Consegui ler 10 páginas hoje! Me sinto mais próximo do meu objetivo de leitura diária. Estou animado para continuar essa jornada e ver meu progresso ao longo do tempo."
+      "dateTime": "2026-03-14 09:15",
+      "title": "Consegui ler 10 páginas hoje! Me sinto mais próximo do meu objetivo de leitura diária. Estou animado para continuar essa jornada e ver meu progresso ao longo do tempo.",
+      "photoUrl": "https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg",
+      "reviews": [
+        {
+          "reviewerId": "abc",
+          "status": "validated"
+        }
+      ],
+      "status": "validated",
+      "createdAt": "2026-03-14 09:15"
     },
     {
+      "kind": "checkin",
       "id": "b1c2d3e4f5a67890abcdef1234567890",
       "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
-      "date": "2026-02-14",
-      "title": "Treino de hoje",
-      "description": "Hoje foi um dia de treino intenso! Consegui completar minha rotina de exercícios e me sinto mais forte. Estou determinado a manter esse ritmo e alcançar meus objetivos de fitness ao longo do ano."
+      "userId": "103214552318957733491",
+      "dateTime": "2026-03-14 09:15",
+      "title": "Hoje foi um dia de treino intenso! Consegui completar minha rotina de exercícios e me sinto mais forte. Estou determinado a manter esse ritmo e alcançar meus objetivos de fitness ao longo do ano.",
+      "photoUrl": "https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg",
+      "reviews": [],
+      "status": "pending",
+      "createdAt": "2026-03-14 09:15"
     },
     {
+      "kind": "checkin",
       "id": "c1d2e3f4a5b67890abcdef1234567890",
       "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "2216fe3e553145c5b12b29358a15c771",
-      "date": "2026-02-14",
-      "title": "Treinão TOP",
-      "description": "Tá pago!!"
+      "userId": "103214552318957733491",
+      "dateTime": "2026-03-14 09:15",
+      "title": "Tá pago!!",
+      "photoUrl": "https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all",
+      "reviews": [
+        {
+          "reviewerId": "abc",
+          "status": "validated"
+        }
+      ],
+      "status": "validated",
+      "createdAt": "2026-03-14 09:15"
+    },
+    {
+      "kind": "checkin",
+      "id": "checkin1",
+      "planId": "65352d6fb37d421799f9f5fb17a42c04",
+      "userId": "103214552318957733491",
+      "dateTime": "2026-03-14 09:15",
+      "title": "Test",
+      "photoUrl": "",
+      "reviews": [
+        {
+          "reviewerId": "xyz",
+          "status": "validated"
+        }
+      ],
+      "status": "pending",
+      "createdAt": "2026-03-14 09:15"
+    },
+    {
+      "kind": "checkin",
+      "id": "checkin2",
+      "planId": "1c3037b85030421cbe3236492338eef1",
+      "userId": "103214552318957733491",
+      "dateTime": "2026-03-13 07:20",
+      "title": "Hoje foi em jejum!",
+      "photoUrl": "https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all",
+      "reviews": [
+        {
+          "reviewerId": "xyz",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "xyz",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "xyz",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "xyz",
+          "status": "rejected"
+        }
+      ],
+      "status": "validated",
+      "createdAt": "2026-03-13 07:20"
+    },
+    {
+      "kind": "checkin",
+      "id": "checkin3",
+      "planId": "65352d6fb37d421799f9f5fb17a42c04",
+      "userId": "123123123123123123123",
+      "dateTime": "2026-02-11 12:10",
+      "title": "Lorem ipsum dolor sit amet!",
+      "photoUrl": "https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg",
+      "reviews": [
+        {
+          "reviewerId": "abc",
+          "status": "rejected"
+        }
+      ],
+      "status": "rejected",
+      "createdAt": "2026-02-11 12:10"
+    },
+    {
+      "kind": "checkin",
+      "id": "checkin4",
+      "planId": "1c3037b85030421cbe3236492338eef1",
+      "userId": "123123123123123123123",
+      "dateTime": "2026-03-08 12:10",
+      "title": "Lorem ipsu44m dolor sit amet! 😋🔥",
+      "photoUrl": "",
+      "reviews": [
+        {
+          "reviewerId": "xyz",
+          "status": "rejected"
+        },
+        {
+          "reviewerId": "xyz",
+          "status": "rejected"
+        },
+        {
+          "reviewerId": "xyz",
+          "status": "rejected"
+        },
+        {
+          "reviewerId": "xyz",
+          "status": "rejected"
+        }
+      ],
+      "status": "rejected",
+      "createdAt": "2026-03-08 12:10"
     }
   ]
 }

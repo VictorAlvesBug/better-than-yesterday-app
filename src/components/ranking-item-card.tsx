@@ -14,7 +14,7 @@ import ProfilePhoto from './profile-photo';
 type RankingItemCardProps = {
   position: number;
   name: string;
-  checkinsCount: number;
+  checkinCount: number;
   penalty: number;
   streak: number;
   totalCount: number;
@@ -23,12 +23,12 @@ type RankingItemCardProps = {
 export default function RankingItemCard({
   position,
   name,
-  checkinsCount,
+  checkinCount,
   penalty,
   streak,
   totalCount,
 }: RankingItemCardProps) {
-  const checkinsPercent = checkinsCount / totalCount;
+  const checkinsPercent = checkinCount / totalCount;
   return (
     <View className="flex flex-col items-center justify-between w-full gap-1 px-5 py-3 bg-white shadow-md rounded-2xl">
       <View className="flex flex-row items-center justify-between w-full gap-1">
@@ -49,7 +49,7 @@ export default function RankingItemCard({
             <View className="flex flex-row items-center justify-center gap-1">
               <Icon type="font-awesome-5" name="check-circle" size={12} color={"success"} />
               <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
-                {`${formatInteger(checkinsCount)}/${formatInteger(totalCount)}`}
+                {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
               </Text>
               <Text style={{color: getColor("gray-7")}} className="ml-3 text-xs" numberOfLines={1}>
                 {`Streak: ${formatInteger(streak)}`}

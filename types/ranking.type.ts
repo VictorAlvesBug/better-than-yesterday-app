@@ -1,7 +1,11 @@
 export type RankingItem = {
-    position: number; // TODO: Create type for PositiveInteger, PositiveIntegerOrZero, ...
-    name: string;
-    checkinsCount: number;
+    position: number;
+    userId: string;
     penalty: number;
     streak: number;
+};
+
+export type RankingItemEnriched = RankingItem & {
+    userName: string;
+    checkinCount: number;
 };

@@ -5,10 +5,10 @@ import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import { User } from '@/types/user.type';
 import Constants from 'expo-constants';
-import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { useAuth } from '../context/auth';
+import useNavigation from '../hooks/useNavigation';
 import { getDateOnly } from '../utils/dateUtils';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
 import GradientView from './gradient-view';
@@ -40,7 +40,7 @@ type SideDrawerProps = {
 
 export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const { signOut } = useAuth();
-  const router = useRouter();
+  const navigation = useNavigation();
   const userRepository = createUserRepository();
   const planRepository = createPlanRepository();
 
@@ -48,7 +48,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const [user, setUser] = useState<User | null>(null);
   const [plans, setPlans] = useState<PlanEnriched[]>([]);
 
-  const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'NotStarted' status from filter
+  const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'not-started' status from filter
   const finishedPlans = plans.filter(plan => plan.endsAt < getDateOnly());
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       const user = await userRepository.getById(userId);
 
       if (!userId || !user) {
-        router.replace('/login');
+        navigation.replace('/login');
         return;
       }
 
@@ -66,7 +66,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
     };
 
     isOpen && fetchUser();
-  }, [router, userRepository, isOpen]);
+  }, [navigation, userRepository, isOpen]);
 
   useEffect(() => {
     if (!user)
@@ -117,7 +117,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
         </GradientView>
         <View className="flex flex-col">
           {loading && (
-              <ActivityIndicator size="large" color={getColor("gray-6")} />
+            <ActivityIndicator size="large" color={getColor("gray-6")} />
           )}
           {
             !loading && activePlans.length > 0
@@ -131,8 +131,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                     key={plan.id}
                     className="flex flex-row items-center justify-start gap-3 px-8 py-4"
                     onPress={async () => {
+                      const forceReload = await Memory.get('planId') !== plan.id;
                       await Memory.set('planId', plan.id);
-                      router.push('/plan-tracker');
+                      navigation.push('/plan-tracker', forceReload);
                       onClose();
                     }}
                   >
@@ -165,7 +166,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             && <View style={{ backgroundColor: getColor("gray-9"), width: "90%", height: 0.5 }} className="mx-auto my-6"></View>
           }
           <Pressable
-            onPress={() => { router.replace('/manage-plans'); onClose(); }}
+            onPress={() => { navigation.replace('/manage-plans'); onClose(); }}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
               <Icon name="add-circle-outline" size={16} color={"gray-3"} />
@@ -211,7 +212,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   );
 }
 
-type SideDrawerOpenButtonProps = { 
+type SideDrawerOpenButtonProps = {
   setIsDrawerOpen: (open: boolean) => void
 };
 

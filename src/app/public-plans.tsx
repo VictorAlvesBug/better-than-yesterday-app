@@ -18,7 +18,7 @@ export default function PublicPlansScreen() {
 
     const pseudoRefreshPlan = (planId: string, joined: boolean) => {
         setPlans(prev => prev.map(plan => {
-            if(plan.id === planId)
+            if (plan.id === planId)
                 return { ...plan, joined: joined };
 
             return plan;
@@ -28,20 +28,20 @@ export default function PublicPlansScreen() {
     useEffectAsync(async () => {
         const userId = await Memory.get('userId') || '';// TODO: Always logout user if userId was not found
 
-        const joinedPlanIds = (await planRepository.joinedPlans(userId))
+        const joinedPlanIds = (await planRepository.listPlanMembers({ userId, status: 'active' }))
             .map(joinedPlan => joinedPlan.id);
 
-        const publicPlans = (await planRepository.listPublic())
+        const publicPlans = (await planRepository.list({ type: 'public' }))
             .map(publicPlan => {
                 return {
                     ...publicPlan,
                     joined: joinedPlanIds.includes(publicPlan.id)
                 } satisfies PlanToJoin;
             });
-            
+
         setPlans(publicPlans);
         setLoading(false);
-    }, []);
+    }, [planRepository]);
 
     return (
         <View

@@ -1,20 +1,46 @@
 
-import { User } from '@/types/user.type';
+import { CreateUser, User } from '@/types/user.type';
 import { api } from '../utils/apiUtils';
+import { getDateTime } from '../utils/dateUtils';
+import { generateId } from '../utils/stringUtils';
 
 export default function createUserRepository() {
-    const listAll = async () => await api.list('users');
+    const list = async (filter?: Partial<User>): Promise<User[]> => {
+        return await api.list('users', filter);
+    };
 
-    const getById = async (id: string) => await api.get('users', { id });
+    const getById = async (id: string): Promise<User> => {
+        const user = await api.get('users', { id });
 
-    const getByEmail = async (email: string) => await api.get('users', { email });
+        if (!user)
+            throw new Error(`Usuário não encontrado para o id '${id}'`);
 
-    const save = async (user: User) => await api.save('users', user);
+        return user;
+    }
+
+    const get = async (filter?: Partial<User>): Promise<User> => {
+        const user = await api.get('users', filter);
+
+        if (!user)
+            throw new Error(`Usuário não encontrado para o filtro ${JSON.stringify(filter)}`);
+
+        return user;
+    }
+
+    const create = async (createUser: CreateUser): Promise<User> => {
+        const user = {
+            ...createUser,
+            id: generateId(),
+            createdAt: getDateTime(),
+        } satisfies User;
+        
+        return await api.create('users', user);
+    }
 
     return {
-        listAll,
+        list,
         getById,
-        getByEmail,
-        save,
+        get,
+        create,
     }
 }

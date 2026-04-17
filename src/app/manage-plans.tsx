@@ -1,15 +1,15 @@
 import { getColor } from '@/types/color.type';
 import Constants from 'expo-constants';
-import { useRouter } from 'expo-router';
 import { ScrollView, Text, View } from 'react-native';
 import { Button } from '../components/button';
 import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
 
 import { useState } from 'react';
 import GradientView from '../components/gradient-view';
+import useNavigation from '../hooks/useNavigation';
 
 export default function ManagePlansScreen() {
-  const router = useRouter();
+  const navigation = useNavigation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
@@ -47,10 +47,10 @@ export default function ManagePlansScreen() {
           className={`w-full px-4 gap-3 py-3`}
         >
 
-          <Button action={() => router.push('/create-plan')}>Criar Novo Plano</Button>
+          <Button action={() => navigation.push('/create-plan')}>Criar Novo Plano</Button>
           <Button action={() => console.log('TODO: Abrir modal para colar link de convidado')}>
             Tenho um Link de Convidado</Button>
-          <Button action={() => router.push('/public-plans')}>Planos Populares</Button>
+          <Button action={() => navigation.push('/public-plans')}>Planos Populares</Button>
         </View>
       </ScrollView>
     </View>

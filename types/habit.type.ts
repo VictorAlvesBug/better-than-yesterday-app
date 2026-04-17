@@ -4,4 +4,10 @@ export type Habit = BaseResource & {
   name: string;
 };
 
-export type SaveHabit = Habit;
+export type HabitEnriched = Habit & {
+  planCount: number;
+};
+
+export type CreateHabit = Omit<Habit, 'id' | 'createdAt'>;
+
+export type HabitWithJustAdded = Habit & { justAdded?: boolean };

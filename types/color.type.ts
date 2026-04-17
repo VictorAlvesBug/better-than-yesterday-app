@@ -59,6 +59,18 @@ type Colors = typeof colors;
 
 export type ColorName = keyof Colors;
 
+export type ColorNameSet = {
+  text: ColorName,
+  border: ColorName,
+  background: ColorName,
+}
+
+export type ColorSet = {
+  text: string,
+  border: string,
+  background: string,
+}
+
 export const getColor = (colorName: keyof Colors): string => {
   return colors[colorName];
 }

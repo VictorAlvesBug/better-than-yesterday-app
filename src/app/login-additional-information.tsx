@@ -3,9 +3,8 @@ import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { User } from '@/types/user.type';
+import { CreateUser, User } from '@/types/user.type';
 import Constants from 'expo-constants';
-import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Image,
@@ -20,27 +19,38 @@ import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import { useAuth } from '../context/auth';
+import useNavigation from '../hooks/useNavigation';
 
 
 
 export default function LoginAdditionalInformationScreen() {
   const { isSignedIn, signOut, authUser } = useAuth();
-  const router = useRouter();
+  const navigation = useNavigation();
   const userRepository = createUserRepository();
   const planRepository = createPlanRepository();
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<CreateUser | null>(null);
 
   useEffect(() => {
     if (!isSignedIn || !authUser)
       return;
 
     const fetchUser = async () => {
-      const dbUser = await userRepository.getByEmail(authUser.email);
+      const dbUser = await userRepository.get({ email: authUser.email }).catch(() => {
+        setUser({
+          email: authUser.email,
+          name: authUser.name ?? '',
+          nickname: authUser.name ?? '',
+          photo: authUser.photo ?? '',
+          phoneNumber: '',
+          pixKey: authUser.email,
+        });
+
+        return;
+      });
 
       if (!dbUser) {
         setUser({
-          id: authUser.id,
           email: authUser.email,
           name: authUser.name ?? '',
           nickname: authUser.name ?? '',
@@ -54,7 +64,7 @@ export default function LoginAdditionalInformationScreen() {
     };
 
     fetchUser();
-  }, [authUser, isSignedIn, planRepository, router, userRepository]);
+  }, [authUser, isSignedIn, planRepository, navigation, userRepository]);
 
   if (!authUser || !user)
     return null;
@@ -66,10 +76,10 @@ export default function LoginAdditionalInformationScreen() {
   const createUser = async () => {
     //TODO: Validar campos informados...
 
-    await userRepository.save(user);
+    const createdUser = await userRepository.create(user);
 
-    await Memory.set('userId', user.id);
-    router.replace('./manage-plans');
+    await Memory.set('userId', createdUser.id);
+    navigation.replace('./manage-plans');
   };
 
   return (

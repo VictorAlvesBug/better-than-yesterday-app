@@ -1,11 +1,12 @@
 import Memory from '@/src/api/memory';
 import createPlanRepository from '@/src/api/planRepository';
 import Card from '@/src/components/card';
-import { Checkin } from '@/types/checkin.type';
+import { CheckinEnriched } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { Habit } from '@/types/habit.type';
+import { PlanEnriched, PlanMember } from '@/types/plan.type';
+import { User } from '@/types/user.type';
 import Constants from 'expo-constants';
-import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,12 +15,14 @@ import {
   Text,
   View,
 } from 'react-native';
+import createCheckinRepository from '../api/checkinRepository';
 import CheckinCard from '../components/checkin-card';
 import DaysOffCard from '../components/days-off-card';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
 import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
-import { getDifferenceInDays, parseDateTime } from '../utils/dateUtils';
+import useNavigation from '../hooks/useNavigation';
+import { getDifferenceInDays } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 
 const statusBarHeight = Constants.statusBarHeight;
@@ -27,135 +30,75 @@ const statusBarHeight = Constants.statusBarHeight;
 // IDs fixos para o plano de leitura (poderia vir via rota/params)
 const READING_PLAN_ID = '65352d6fb37d421799f9f5fb17a42c04';
 
-type User = {
-  id: string;
-  nickname: string;
-  email: string;
-  createdAt: string;
-};
-
-type Habit = {
-  id: string;
-  name: string;
-  createdAt: string;
-};
-
-type PlanParticipant = {
-  id: string;
-  planId: string;
-  userId: string;
-  joinedAt: string;
-  status: 'active' | 'blocked';
-};
-
 export default function PlanTrackerScreen() {
   const planRepository = createPlanRepository();
+  const checkinRepository = createCheckinRepository();
 
   const [plan, setPlan] = useState<PlanEnriched | null>(null);
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [planParticipants, setPlanParticipants] = useState<PlanParticipant[]>(
+  const [users,] = useState<User[]>([]);
+  const [habits,] = useState<Habit[]>([]);
+  const [planMembers,] = useState<PlanMember[]>(
     [],
   );
-  const [checkins, setCheckins] = useState<Checkin[]>([]);
+  const [checkins, setCheckins] = useState<CheckinEnriched[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const router = useRouter();
+  const navigation = useNavigation();
 
   const habit = useMemo(
     () => habits.find((h) => h.id === plan?.habitId),
     [habits, plan],
   );
 
-  const readingParticipants = useMemo(() => {
-    return planParticipants
-      .filter((pp) => pp.planId === READING_PLAN_ID && pp.status === 'active')
-      .map((pp) => {
-        const user = users.find((u) => u.id === pp.userId);
+  const readingMembers = useMemo(() => {
+    return planMembers
+      .filter((member) => member.planId === READING_PLAN_ID && member.status === 'active')
+      .map((member) => {
+        const user = users.find((u) => u.id === member.userId);
         return {
-          id: pp.id,
-          userId: pp.userId,
-          nickname: user?.nickname ?? 'Participante',
-          status: pp.status,
+          id: member.id,
+          userId: member.userId,
+          nickname: user?.nickname ?? 'Membro',
+          status: member.status,
         };
       });
-  }, [planParticipants, users]);
-
-  const readingCheckins: Checkin[] = [];
-  readingCheckins.push({
-    id: 'checkin1',
-    planId: '',
-    userId: '',
-    name: 'John Doe',
-    dateTime: parseDateTime('2026-03-14 09:15'),
-    title: 'Test',
-    photoUrl:
-      'https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg',
-    reviews: [],
-    status: 'Validated',
-  });
-  readingCheckins.push({
-    id: 'checkin2',
-    planId: '',
-    userId: '',
-    name: 'Victor Bug',
-    dateTime: parseDateTime('2026-03-13 07:20'),
-    title: 'Hoje foi em jejum!',
-    photoUrl:
-      'https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all',
-    reviews: [],
-    status: 'Validated',
-  });
-  readingCheckins.push({
-    id: 'checkin3',
-    planId: '',
-    userId: '',
-    name: 'Teste',
-    dateTime: parseDateTime('2026-02-11 12:10'),
-    title: 'Lorem ipsum dolor sit amet!',
-    photoUrl:
-      'https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg',
-    reviews: [],
-    status: 'Validated',
-  });
-  readingCheckins.push({
-    id: 'checkin4',
-    planId: '',
-    userId: '',
-    name: 'Teste da Silva',
-    dateTime: parseDateTime('2026-03-08 12:10'),
-    title: 'Lorem ipsu44m dolor sit amet! 😋🔥',
-    photoUrl: '',
-    reviews: [],
-    status: 'Validated',
-  });
+  }, [planMembers, users]);
 
   useEffect(() => {
-    const fetchPlan = async () => {
+    const fetchData = async () => {
       const planId = await Memory.get('planId');
 
+      if(plan && plan.id === planId) {
+        setLoading(false);
+        return;
+      }
+
       if (!planId) {
-        router.replace('/manage-plans');
+        navigation.replace('/manage-plans');
         return;
       }
       
-      const plan = await planRepository.getById(planId);
+      const dbPlan = await planRepository.getById(planId);
 
-      if (!plan) {
+      if (!dbPlan) {
         await Memory.remove('planId');
-        router.replace('/manage-plans');
+        navigation.replace('/manage-plans');
         return;
       }
 
-      setPlan(plan);
+      setPlan(dbPlan);
+
+      const checkins = await checkinRepository.list();
+      setCheckins(checkins);
+
       setLoading(false);
     };
 
-    fetchPlan();
-  }, [planRepository, router]);
+    fetchData();
+  }, [planRepository, checkinRepository, navigation]);
 
   if (loading) {
     return (
@@ -218,7 +161,7 @@ export default function PlanTrackerScreen() {
 
             <Pressable
               className="flex items-center justify-center w-20 h-20"
-              onPress={() => router.push('/plan-settings')}
+              onPress={() => navigation.push('/plan-settings')}
             >
               <Icon name="people" size={24} color={"white"} />
             </Pressable>
@@ -295,19 +238,19 @@ export default function PlanTrackerScreen() {
             </View>
           </Card>
           <DaysOffCard daysOffAvailable={planInfoMock.daysOffAvailable} onUseDayOff={() => { }} />
-          {/* Lista dos últimos check-ins dos participantes */}
+          {/* Lista dos últimos check-ins dos membros */}
           <View className="mt-2 -mb-5">
             <Text style={{ color: getColor("black") }} className="mb-3 text-lg font-extrabold">
               Check-ins Recentes
             </Text>
-            {readingCheckins.length === 0 && (
+            {checkins.length === 0 && (
               <Text style={{ color: getColor("gray-7") }} className="text-xs ">
                 Faça seu primeiro check-in hoje para aparecer aqui!
               </Text>
             )}
           </View>
 
-          {readingCheckins.map((checkin) => {
+          {checkins.map((checkin) => {
             return <CheckinCard key={checkin.id} {...checkin} />;
           })}
         </View>
