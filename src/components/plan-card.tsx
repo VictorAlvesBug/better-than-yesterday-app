@@ -5,7 +5,7 @@ import { Text, View } from 'react-native'
 import Memory from '../api/memory'
 import createPlanRepository from '../api/planRepository'
 import useEffectAsync from '../hooks/useEffectAsync'
-import { formatDateRelativeToToday, formatDateToFront, getDateOnly, getDifferenceInDays } from '../utils/dateUtils'
+import { formatDateRelativeToToday, getDateOnly, getDateToFront, getDifferenceInDays } from '../utils/dateUtils'
 import { formatIntegerCompact, formatMoney } from '../utils/numberUtils'
 import { getAbbreviatedName } from '../utils/stringUtils'
 import { toastInfoMessage } from '../utils/toastUtils'
@@ -96,7 +96,7 @@ export default function PlanCard({
                                 className={`text-sm`}
                                 numberOfLines={1}
                                 ellipsizeMode="tail">
-                                {`${formatDateToFront(plan.startsAt)} (${formatDateRelativeToToday(plan.startsAt).toLocaleLowerCase()})`}
+                                {`${getDateToFront(plan.startsAt)} (${formatDateRelativeToToday(plan.startsAt).toLocaleLowerCase()})`}
                             </Text>
                         </View>
                     </View>

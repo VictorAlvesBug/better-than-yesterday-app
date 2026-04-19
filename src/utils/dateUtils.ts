@@ -362,7 +362,7 @@ export function getDifferenceInDays(param1: AllTypes, param2: AllTypes) {
   return Math.abs(differenceInDays);
 }
 
-export function formatDateToFront(param: AllTypes = new Date()) {
+export function getDateToFront(param: AllTypes = new Date()) {
   const {
       year,
       month,
@@ -403,5 +403,5 @@ export function getDateOnlyWithOffset(daysOffset: number, param: AllTypes = new 
 }
 
 export function getDateToFrontWithOffset(daysOffset: number, param: AllTypes = new Date()) {
-  return formatDateToFront(getDateWithOffset(daysOffset, param));
+  return getDateToFront(getDateWithOffset(daysOffset, param));
 }

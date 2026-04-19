@@ -1,7 +1,7 @@
 
 import { getDateTime } from '@/src/utils/dateUtils';
 import { generateId } from '@/src/utils/stringUtils';
-import { Checkin, CheckinEnriched, CreateCheckin } from '@/types/checkin.type';
+import { Checkin, CheckinEnriched, CheckinReview, CreateCheckin } from '@/types/checkin.type';
 import { api } from '../utils/apiUtils';
 import createPlanRepository from './planRepository';
 import createUserRepository from './userRepository';
@@ -63,10 +63,22 @@ export default function createCheckinRepository() {
         return oneWithEnrichment(checkinCreated);
     };
 
+    const saveReview = async (checkinId: string, checkinReview: CheckinReview): Promise<CheckinEnriched> => {
+
+        const checkin = await getById(checkinId) satisfies Checkin;
+
+        checkin.reviews.push(checkinReview)
+
+        await api.delete('checkins', {id: checkin.id});
+        const checkinUpdated = await api.create('checkins', checkin);
+        return oneWithEnrichment(checkinUpdated);
+    };
+
     return {
         list,
         get,
         getById,
         create,
+        saveReview
     }
 }

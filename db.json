@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": "103214552318957733491",
+      "id": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "email": "victoralvesbug@gmail.com",
       "name": "Victor Alves",
       "nickname": "Vitão",
@@ -10,7 +10,7 @@
       "pixKey": "victoralvesbug@gmail.com"
     },
     {
-      "id": "123123123123123123123",
+      "id": "68471071-ce4a-48f3-a692-cbee928e5810",
       "email": "fake@user.com",
       "name": "Fake User",
       "nickname": "Feiki Iuzer",
@@ -21,12 +21,12 @@
   ],
   "habits": [
     {
-      "id": "3e7536df6a734ad0be43fc9653e2d74b",
+      "id": "3e7536df-6a73-4ad0-be43-fc9653e2d74b",
       "name": "Leitura",
       "createdAt": "2024-06-01"
     },
     {
-      "id": "75f460343d0946938e987f64b3be9d2d",
+      "id": "75f46034-3d09-4693-8e98-7f64b3be9d2d",
       "name": "Exercícios",
       "createdAt": "2024-06-01"
     },
@@ -82,9 +82,9 @@
   ],
   "plans": [
     {
-      "id": "65352d6fb37d421799f9f5fb17a42c04",
-      "ownerId": "103214552318957733491",
-      "habitId": "3e7536df6a734ad0be43fc9653e2d74b",
+      "id": "65352d6f-b37d-4217-99f9-f5fb17a42c04",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "habitId": "3e7536df-6a73-4ad0-be43-fc9653e2d74b",
       "description": "Ler 10 páginas por dia em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
@@ -95,9 +95,9 @@
       "createdAt": "2024-06-01"
     },
     {
-      "id": "1c3037b85030421cbe3236492338eef1",
-      "ownerId": "103214552318957733491",
-      "habitId": "75f460343d0946938e987f64b3be9d2d",
+      "id": "1c3037b8-5030-421c-be32-36492338eef1",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "habitId": "75f46034-3d09-4693-8e98-7f64b3be9d2d",
       "description": "Treinar 5 vezes por semana em 2026",
       "startsAt": "2026-01-01",
       "endsAt": "2026-12-31",
@@ -109,7 +109,7 @@
     },
     {
       "id": "7bfdd4cc-c880-45a7-8f3f-80d0bd7bb55d",
-      "ownerId": "103214552318957733491",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "habitId": "388211d0-0947-4896-b54e-1f845a492b99",
       "startsAt": "2026-04-05",
       "endsAt": "2027-04-04",
@@ -122,7 +122,7 @@
     },
     {
       "id": "fd678770-40ba-4a5d-a60d-96440c6fa952",
-      "ownerId": "103214552318957733491",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "habitId": "9",
       "startsAt": "2026-04-12",
       "endsAt": "2027-04-11",
@@ -134,7 +134,7 @@
     },
     {
       "id": "4ca54c6b-901a-4a0a-bee0-a2113e99bc58",
-      "ownerId": "103214552318957733491",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "habitId": "6",
       "startsAt": "2026-04-12",
       "endsAt": "2027-04-11",
@@ -146,7 +146,7 @@
     },
     {
       "id": "adfa86a8-fc90-4e52-9a29-210538038f45",
-      "ownerId": "103214552318957733491",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "habitId": "388211d0-0947-4896-b54e-1f845a492b99",
       "startsAt": "2026-04-12",
       "endsAt": "2027-04-11",
@@ -158,7 +158,7 @@
     },
     {
       "id": "b69d45ca-04cd-4e06-a3d5-3c1b1c5069bf",
-      "ownerId": "103214552318957733491",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "habitId": "10",
       "startsAt": "2026-01-01",
       "endsAt": "2027-04-12",
@@ -170,7 +170,7 @@
     },
     {
       "id": "62d891e9-4bb9-4b5f-b944-037e23c5d7c4",
-      "ownerId": "103214552318957733491",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "habitId": "2",
       "startsAt": "2026-04-21",
       "endsAt": "2026-04-29",
@@ -182,8 +182,8 @@
     },
     {
       "id": "b8c63c66-e617-42a4-9265-8df81afa6d21",
-      "ownerId": "103214552318957733491",
-      "habitId": "75f460343d0946938e987f64b3be9d2d",
+      "ownerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "habitId": "75f46034-3d09-4693-8e98-7f64b3be9d2d",
       "startsAt": "2026-04-19",
       "endsAt": "2026-04-26",
       "daysOffPerWeek": 2,
@@ -195,29 +195,29 @@
   "planMembers": [
     {
       "id": "e8c7b6a5f4e3d2c1b0a9d8c7b6a5f4e3d",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "b1c8e4f9a2d34e5a8c9f1b2d3e4f5678",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "b1c8e4f9-a2d3-4e5a-8c9f-1b2d3e4f5678",
       "joinedAt": "2024-06-01",
       "status": "active"
     },
     {
       "id": "f7a6b5c4d3e2f1a0b9d8c7b6a5f4e3d2c",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "2216fe3e553145c5b12b29358a15c771",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "2216fe3e-5531-45c5-b12b-29358a15c771",
       "joinedAt": "2024-06-01",
       "status": "blocked"
     },
     {
       "id": "8bca856f-9b98-49e3-ad69-7af5451ea9a3",
       "planId": "b69d45ca-04cd-4e06-a3d5-3c1b1c5069bf",
-      "userId": "103214552318957733491",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "joinedAt": "2026-04-12 23:59",
       "status": "active"
     },
     {
       "id": "1bf1572b-e65a-4bbe-9c17-c408f1faeeef",
       "planId": "62d891e9-4bb9-4b5f-b944-037e23c5d7c4",
-      "userId": "103214552318957733491",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
       "joinedAt": "2026-04-17 19:42",
       "createdAt": "2026-04-17 19:42",
       "status": "active"
@@ -226,10 +226,10 @@
   "checkins": [
     {
       "kind": "checkin",
-      "id": "a1b2c3d4e5f67890abcdef1234567890",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "103214552318957733491",
-      "dateTime": "2026-03-14 09:15",
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "date": "2026-03-14",
       "title": "Consegui ler 10 páginas hoje! Me sinto mais próximo do meu objetivo de leitura diária. Estou animado para continuar essa jornada e ver meu progresso ao longo do tempo.",
       "photoUrl": "https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg",
       "reviews": [
@@ -243,22 +243,10 @@
     },
     {
       "kind": "checkin",
-      "id": "b1c2d3e4f5a67890abcdef1234567890",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "103214552318957733491",
-      "dateTime": "2026-03-14 09:15",
-      "title": "Hoje foi um dia de treino intenso! Consegui completar minha rotina de exercícios e me sinto mais forte. Estou determinado a manter esse ritmo e alcançar meus objetivos de fitness ao longo do ano.",
-      "photoUrl": "https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg",
-      "reviews": [],
-      "status": "pending",
-      "createdAt": "2026-03-14 09:15"
-    },
-    {
-      "kind": "checkin",
-      "id": "c1d2e3f4a5b67890abcdef1234567890",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "103214552318957733491",
-      "dateTime": "2026-03-14 09:15",
+      "id": "c1d2e3f4-a5b6-7890-abcd-ef1234567890",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "date": "2026-03-14",
       "title": "Tá pago!!",
       "photoUrl": "https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all",
       "reviews": [
@@ -273,9 +261,9 @@
     {
       "kind": "checkin",
       "id": "checkin1",
-      "planId": "65352d6fb37d421799f9f5fb17a42c04",
-      "userId": "103214552318957733491",
-      "dateTime": "2026-03-14 09:15",
+      "planId": "65352d6f-b37d-4217-99f9-f5fb17a42c04",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "date": "2026-03-14",
       "title": "Test",
       "photoUrl": "",
       "reviews": [
@@ -290,9 +278,9 @@
     {
       "kind": "checkin",
       "id": "checkin2",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "103214552318957733491",
-      "dateTime": "2026-03-13 07:20",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "date": "2026-03-13",
       "title": "Hoje foi em jejum!",
       "photoUrl": "https://i0.wp.com/www.muscleandfitness.com/wp-content/uploads/2016/09/Bodybuilder-Working-Out-His-Upper-Body-With-Cable-Crossover-Exercise.jpg?quality=86&strip=all",
       "reviews": [
@@ -319,9 +307,9 @@
     {
       "kind": "checkin",
       "id": "checkin3",
-      "planId": "65352d6fb37d421799f9f5fb17a42c04",
-      "userId": "123123123123123123123",
-      "dateTime": "2026-02-11 12:10",
+      "planId": "65352d6f-b37d-4217-99f9-f5fb17a42c04",
+      "userId": "68471071-ce4a-48f3-a692-cbee928e5810",
+      "date": "2026-02-11",
       "title": "Lorem ipsum dolor sit amet!",
       "photoUrl": "https://www.auraleisure.ie/wp-content/uploads/2023/03/john-arano-h4i9G-de7Po-unsplash-1-scaled.jpg",
       "reviews": [
@@ -336,9 +324,9 @@
     {
       "kind": "checkin",
       "id": "checkin4",
-      "planId": "1c3037b85030421cbe3236492338eef1",
-      "userId": "123123123123123123123",
-      "dateTime": "2026-03-08 12:10",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "68471071-ce4a-48f3-a692-cbee928e5810",
+      "date": "2026-03-08",
       "title": "Lorem ipsu44m dolor sit amet! 😋🔥",
       "photoUrl": "",
       "reviews": [
@@ -361,6 +349,45 @@
       ],
       "status": "rejected",
       "createdAt": "2026-03-08 12:10"
+    },
+    {
+      "id": "b1c2d3e4-f5a6-7890-abcd-ef1234567890",
+      "kind": "checkin",
+      "planId": "1c3037b8-5030-421c-be32-36492338eef1",
+      "userId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+      "date": "2026-03-14",
+      "title": "Hoje foi um dia de treino intenso! Consegui completar minha rotina de exercícios e me sinto mais forte. Estou determinado a manter esse ritmo e alcançar meus objetivos de fitness ao longo do ano.",
+      "photoUrl": "https://images.pexels.com/photos/6941666/pexels-photo-6941666.jpeg",
+      "reviews": [
+        {
+          "reviewerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+          "status": "validated"
+        },
+        {
+          "reviewerId": "69e40bcd-4525-427c-a073-b26d2160acb7",
+          "status": "rejected"
+        }
+      ],
+      "status": "pending",
+      "createdAt": "2026-03-14 09:15",
+      "planName": "Treinar 5 vezes por semana em 2026",
+      "userName": "Vitão"
     }
   ]
 }

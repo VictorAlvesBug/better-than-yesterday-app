@@ -241,7 +241,7 @@ function createApi(){
         body: ResourceFor<TResourceName>
     ): Promise<ResourceFor<TResourceName>> => {
         try {
-            const response = await axios.post<PlanMember>(`${API_URL}/${resourceName}`, body);
+            const response = await axios.post(`${API_URL}/${resourceName}`, body);
             
             if (isSuccessfulStatusCode(response.status))
                 return body;
@@ -255,6 +255,28 @@ function createApi(){
             throw error;
         }
     };
+
+    /*const update = async <TResourceName extends ResourceName>
+    (
+        resourceName: TResourceName, 
+        body: ResourceFor<TResourceName>
+    ): Promise<ResourceFor<TResourceName>> => {
+        try {
+            const path = getPath({id: body.id});
+            const response = await axios.post(`${API_URL}/${resourceName}${path ?? ''}`, body);
+            
+            if (isSuccessfulStatusCode(response.status))
+                return body;
+            
+            throw new Error(`Erro ao atualizar recurso '${resourceName}' com payload: '${JSON.stringify(body)}'`);
+        } catch (error) {
+            if (axios.isAxiosError(error)){
+                toastErrorMessage(`API Error - StatusCode: ${error.response?.status} - Message: ${error.response?.data}`);
+            }
+
+            throw error;
+        }
+    };*/
 
     const remove = async <TResourceName extends ResourceName>
     (
@@ -290,6 +312,7 @@ function createApi(){
         get,
         list,
         create,
+        //update,
         delete: remove
     }
 }

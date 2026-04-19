@@ -1,4 +1,4 @@
-import { parseDateTime } from "@/src/utils/dateUtils";
+import { parseDateOnly } from "@/src/utils/dateUtils";
 import { zodEnumWithValidation, zodExtractWithValidation } from "@/src/utils/zodUtils";
 import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
@@ -26,7 +26,7 @@ const checkinSchema = baseResourceSchema.extend({
   kind: z.literal('checkin'),
   planId: z.guid({ error: "ID do plano deve ser um UUID válido" }),
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
-  dateTime: z.string().transform((str) => parseDateTime(str)),
+  date: z.string().transform((str) => parseDateOnly(str)),
   title: z.string().min(3, { error: "Título é obrigatório" }),
   photoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
   status: checkinStatusSchema,
@@ -52,7 +52,7 @@ const dayOffSchema = baseResourceSchema.extend({
   kind: z.literal('dayoff'),
   planId: z.guid({ error: "ID do plano é obrigatório" }),
   userId: z.guid({ error: "ID do usuário é obrigatório" }),
-  dateTime: z.string().transform((str) => parseDateTime(str)),
+  date: z.string().transform((str) => parseDateOnly(str)),
 });
 export type DayOff = z.infer<typeof dayOffSchema>;
 

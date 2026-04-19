@@ -24,7 +24,7 @@ import Label from '../components/label';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
 import SearchableSelect from '../components/searchable-select';
 import useNavigation from '../hooks/useNavigation';
-import { formatDateRelativeToToday, formatDateToFront, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFrontWithOffset } from '../utils/dateUtils';
+import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import { generateId } from '../utils/stringUtils';
 import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
@@ -184,12 +184,12 @@ export default function CreatePlanScreen() {
             <Label>Período do Plano</Label>
             <DateRangeSelect
               startValueLabel="Data de Início"
-              startValue={formatDateToFront(plan.startsAt)}
+              startValue={getDateToFront(plan.startsAt)}
               setStartValue={startsAt => setPlan({ ...plan, startsAt: getDateOnly(startsAt) })}
               formatStartDescription={formatDateRelativeToToday}
               minValue={getDateToFrontWithOffset(+1)}
               endValueLabel="Data de Término"
-              endValue={formatDateToFront(plan.endsAt)}
+              endValue={getDateToFront(plan.endsAt)}
               setEndValue={endsAt => setPlan({ ...plan, endsAt: getDateOnly(endsAt) })}
               formatEndDescription={formatDateRelativeToToday}
             />

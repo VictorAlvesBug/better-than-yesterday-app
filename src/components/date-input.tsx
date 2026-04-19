@@ -4,7 +4,7 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
-import { DateToFront, formatDateToFront, getDate } from '../utils/dateUtils';
+import { DateToFront, getDate, getDateToFront } from '../utils/dateUtils';
 import Input from './input';
 
 type DateInputProps = {
@@ -33,7 +33,7 @@ export function DateInput({
     const currentDate = selected || getDate(value);
     setShow(false);
     setDate(currentDate);
-    setValue(formatDateToFront(currentDate));
+    setValue(getDateToFront(currentDate));
   };
 
   const openPicker = () => {
@@ -41,7 +41,7 @@ export function DateInput({
   };
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 w-full">
       <Pressable
         onPress={openPicker}
       >

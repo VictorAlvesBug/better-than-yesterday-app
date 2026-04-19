@@ -2,7 +2,9 @@ import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.t
 import { getColor } from '@/types/color.type';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
-import { formatRelativeDateTime } from '../utils/dateUtils';
+import createCheckinRepository from '../api/checkinRepository';
+import Memory from '../api/memory';
+import { formatRelativeDateOnly } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
 import Icon from './icon';
 import ProfilePhoto from './profile-photo';
@@ -10,14 +12,41 @@ import ProfilePhoto from './profile-photo';
 const unavailablePhotoUrl =
   'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
 
-export default function CheckinWithReviewsCard({
+export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
+  const {
+  id,
   userName,
-  dateTime,
+  date,
   title,
   photoUrl,
   status,
   reviews,
-}: CheckinEnriched) {
+} = checkin;
+
+  const checkinRepository = createCheckinRepository();
+
+  const reviewAsValidated = async () => {
+    const userId = await Memory.get('userId') || '';
+
+    const review: CheckinReview = {
+      reviewerId: userId,
+      status: 'validated' // TODO: Validate string to 'validated' or 'rejected'
+    }
+
+    checkinRepository.saveReview(id, review);
+  }
+
+  const reviewAsRejected = async () => {
+    const userId = await Memory.get('userId') || '';
+    
+    const review: CheckinReview = {
+      reviewerId: userId,
+      status: 'rejected' // TODO: Validate string to 'validated' or 'rejected'
+    }
+
+    checkinRepository.saveReview(id, review);
+  }
+
   return (
     <View className="flex flex-col items-start justify-center w-full gap-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
       <Image
@@ -36,7 +65,7 @@ export default function CheckinWithReviewsCard({
             {userName}
           </Text>
           <Text style={{ color: getColor("gray-7") }} className="text-xs" numberOfLines={1}>
-            {formatRelativeDateTime(dateTime)}
+            {formatRelativeDateOnly(date)}
           </Text>
         </View>
         {renderStatus(status)}
@@ -44,12 +73,12 @@ export default function CheckinWithReviewsCard({
 
       <Text className="px-6 text-md">{title}</Text>
 
-      {(reviews.length > 0 || status === 'pending') 
-      && <View style={{ backgroundColor: getColor("gray-d"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}
+      {(reviews.length > 0 || status === 'pending')
+        && <View style={{ backgroundColor: getColor("gray-d"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}
 
       {reviews.length > 0 && renderReviews(reviews)}
 
-      {status === 'pending' && renderReviewButtons()}
+      {status === 'pending' && renderReviewButtons(reviewAsValidated, reviewAsRejected)}
     </View>
   );
 }
@@ -112,16 +141,25 @@ function renderReviews(reviews: CheckinReview[]) {
   );
 }
 
-function renderReviewButtons() {
+function renderReviewButtons(
+  reviewAsValidated: () => Promise<void>,
+  reviewAsRejected: () => Promise<void>
+) {
   return (
     <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
-      <Pressable style={{ backgroundColor: getColor("light-success") }} className="flex-1 py-2 rounded-xl">
+      <Pressable
+        style={{ backgroundColor: getColor("light-success") }}
+        onPress={reviewAsValidated}
+        className="flex-1 py-2 rounded-xl">
         <View className="flex flex-row items-center justify-center w-full gap-2">
           <Icon type="font-awesome-5" name="check-circle" size={14} color={"success"} />
           <Text style={{ color: getColor("success") }} className="font-bold">Validar</Text>
         </View>
       </Pressable>
-      <Pressable style={{ backgroundColor: getColor("light-danger") }} className="flex-1 px-4 py-2 rounded-xl">
+      <Pressable
+        style={{ backgroundColor: getColor("light-danger") }}
+        onPress={reviewAsRejected}
+        className="flex-1 px-4 py-2 rounded-xl">
         <View className="flex flex-row items-center justify-center w-full gap-2">
           <Icon type="font-awesome-6" name="flag" size={14} color={"danger"} />
           <Text style={{ color: getColor("danger") }} className="font-bold">Rejeitar</Text>

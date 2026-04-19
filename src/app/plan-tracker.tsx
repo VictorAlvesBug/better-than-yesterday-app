@@ -257,7 +257,10 @@ export default function PlanTrackerScreen() {
       </ScrollView>
 
       {/* Botão flutuante fixo */}
-      <Pressable style={{ backgroundColor: getColor('violet') }} className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
+      <Pressable 
+        style={{ backgroundColor: getColor('violet') }} 
+        onPress={() => navigation.push('/create-checkin')}
+        className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80">
         <GradientView
           className="flex flex-col items-center justify-center w-full h-full"
         >

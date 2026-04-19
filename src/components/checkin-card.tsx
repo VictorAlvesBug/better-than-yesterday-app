@@ -2,7 +2,7 @@ import { CheckinEnriched } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import { formatRelativeDateTime } from '../utils/dateUtils';
+import { formatRelativeDateOnly } from '../utils/dateUtils';
 import ProfilePhoto from './profile-photo';
 
 const unavailablePhotoUrl =
@@ -10,7 +10,7 @@ const unavailablePhotoUrl =
 
 export default function CheckinCard({
   userName,
-  dateTime,
+  date,
   title,
   photoUrl,
 }: CheckinEnriched) {
@@ -33,7 +33,7 @@ export default function CheckinCard({
             {userName}
           </Text>
           <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
-            {formatRelativeDateTime(dateTime)}
+            {formatRelativeDateOnly(date)}
           </Text>
         </View>
       </View>
