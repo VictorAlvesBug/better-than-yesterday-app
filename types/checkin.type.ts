@@ -12,7 +12,7 @@ const reviewStatusSchema = zodExtractWithValidation(checkinStatusSchema, reviewS
 export type ReviewStatus = z.infer<typeof reviewStatusSchema>;
 
 const checkinReviewSchema = z.object({
-  reviewerId: z.string({ error: "ID do revisor é obrigatório" }),
+  reviewerId: z.guid({ error: "ID do revisor é obrigatório" }),
   status: reviewStatusSchema,
 });
 export type CheckinReview = z.infer<typeof checkinReviewSchema>;
@@ -26,9 +26,9 @@ const checkinSchema = baseResourceSchema.extend({
   kind: z.literal('checkin'),
   planId: z.guid({ error: "ID do plano deve ser um UUID válido" }),
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
-  dateTime: z.string({ error: "Data e hora são obrigatórias" }).transform((str) => parseDateTime(str)),
-  title: z.string({ error: "Título é obrigatório" }),
-  photoUrl: z.string({ error: "Foto é obrigatória" }),
+  dateTime: z.string().transform((str) => parseDateTime(str)),
+  title: z.string().min(3, { error: "Título é obrigatório" }),
+  photoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
   status: checkinStatusSchema,
   reviews: z.array(checkinReviewSchema),
 });
@@ -50,9 +50,9 @@ export type CreateCheckin = z.infer<typeof createCheckinSchema>;
 
 const dayOffSchema = baseResourceSchema.extend({
   kind: z.literal('dayoff'),
-  planId: z.string({ error: "ID do plano é obrigatório" }),
-  userId: z.string({ error: "ID do usuário é obrigatório" }),
-  dateTime: z.string({ error: "Data e hora são obrigatórias" }).transform((str) => parseDateTime(str)),
+  planId: z.guid({ error: "ID do plano é obrigatório" }),
+  userId: z.guid({ error: "ID do usuário é obrigatório" }),
+  dateTime: z.string().transform((str) => parseDateTime(str)),
 });
 export type DayOff = z.infer<typeof dayOffSchema>;
 

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
 
 const habitSchema = baseResourceSchema.extend({
-  name: z.string({ error: "Nome do hábito é obrigatório" }),
+  name: z.string().min(3, { error: "Nome do hábito é obrigatório" }),
 });
 export type Habit = z.infer<typeof habitSchema>;
 

@@ -179,6 +179,17 @@
       "type": "private",
       "description": "Aaaa",
       "createdAt": "2026-04-17 19:42"
+    },
+    {
+      "id": "b8c63c66-e617-42a4-9265-8df81afa6d21",
+      "ownerId": "103214552318957733491",
+      "habitId": "75f460343d0946938e987f64b3be9d2d",
+      "startsAt": "2026-04-19",
+      "endsAt": "2026-04-26",
+      "daysOffPerWeek": 2,
+      "penaltyValue": 10,
+      "type": "private",
+      "createdAt": "2026-04-18 22:22"
     }
   ],
   "planMembers": [

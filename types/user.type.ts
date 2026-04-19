@@ -12,11 +12,11 @@ export type AuthUser = {
 
 const userSchema = baseResourceSchema.extend({
     email: z.email({ error: "E-mail é obrigatório e deve ser válido" }),
-    name: z.string({ error: "Nome é obrigatório" }),
-    photo: z.string({ error: "Foto é obrigatória" }),
-    nickname: z.string({ error: "Nickname é obrigatório" }),
-    phoneNumber: z.string({ error: "Número de telefone é obrigatório" }),
-    pixKey: z.string({ error: "Chave PIX é obrigatória" }),
+    name: z.string().min(3, { error: "Nome é obrigatório" }),
+    photo: z.string().min(3, { error: "Foto é obrigatória" }),
+    nickname: z.string().min(3, { error: "Nickname é obrigatório" }),
+    phoneNumber: z.string().min(8, { error: "Número de telefone é obrigatório" }),
+    pixKey: z.string().min(3, { error: "Chave PIX é obrigatória" }),
 });
 export type User = z.infer<typeof userSchema>;
 

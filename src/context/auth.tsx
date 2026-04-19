@@ -5,6 +5,7 @@ import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from "@
 import Memory from '@/src/api/memory';
 import * as React from 'react';
 import useNavigation from "../hooks/useNavigation";
+import { toastErrorMessage, toastInfoMessage } from "../utils/toastUtils";
 
 const AuthContext = React.createContext({
   isSignedIn: false,
@@ -62,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:
-            console.log("Login com Google está em progresso");
+            toastInfoMessage("Login com Google está em progresso");
             break;
 
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
@@ -89,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigation.replace('/login');
     }
     catch (error) {
-      console.error(error);
+      toastErrorMessage(String(error));
     }
   }
 

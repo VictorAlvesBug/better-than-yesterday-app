@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const baseResourceSchema = z.object({
   id: z.guid({ error: "ID deve ser um UUID válido" }),
-  createdAt: z.string({ error: "Data de criação é obrigatória"}).transform((str) => parseDateTime(str)),
+  createdAt: z.string().min(3, { error: "Data de criação é obrigatória"}).transform((str) => parseDateTime(str)),
 });
 export type BaseResource = z.infer<typeof baseResourceSchema>;
 

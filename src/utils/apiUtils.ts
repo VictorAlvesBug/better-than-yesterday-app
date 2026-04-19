@@ -161,6 +161,7 @@ import { Habit } from "@/types/habit.type";
 import { Plan, PlanMember } from "@/types/plan.type";
 import { User } from "@/types/user.type";
 import axios from "axios";
+import { toastErrorMessage } from './toastUtils';
 
 const isSuccessfulStatusCode = (statusCode: number) => 
     statusCode >= 200 && statusCode <= 299;
@@ -205,7 +206,7 @@ function createApi(){
             throw new Error(`Erro ao buscar item do recurso '${resourceName}' com parâmetro: '${path}'`);
         } catch (error) {
             if (axios.isAxiosError(error)){
-                console.error('API Error:', error.response?.status, error.response?.data);
+                toastErrorMessage(`API Error - StatusCode: ${error.response?.status} - Message: ${error.response?.data}`);
             }
 
             throw error;
@@ -227,7 +228,7 @@ function createApi(){
             throw new Error(`Erro ao listar itens do recurso '${resourceName}' com parâmetro: '${path}'`);
         } catch (error) {
             if (axios.isAxiosError(error)){
-                console.error('API Error:', error.response?.status, error.response?.data);
+                toastErrorMessage(`API Error - StatusCode: ${error.response?.status} - Message: ${error.response?.data}`);
             }
 
             throw error;
@@ -248,7 +249,7 @@ function createApi(){
             throw new Error(`Erro ao salvar item do recurso '${resourceName}' com payload: '${JSON.stringify(body)}'`);
         } catch (error) {
             if (axios.isAxiosError(error)){
-                console.error('API Error:', error.response?.status, error.response?.data);
+                toastErrorMessage(`API Error - StatusCode: ${error.response?.status} - Message: ${error.response?.data}`);
             }
 
             throw error;
@@ -277,7 +278,7 @@ function createApi(){
             await Promise.all(tasks);
         } catch (error) {
             if (axios.isAxiosError(error)){
-                console.error('API Error:', error.response?.status, error.response?.data);
+                toastErrorMessage(`API Error - StatusCode: ${error.response?.status} - Message: ${error.response?.data}`);
             }
 
             throw error;

@@ -3,12 +3,12 @@ import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/auth';
+import CreateUserScreen from './create-user';
 import LoginScreen from './login';
-import LoginAdditionalInformationScreen from './login-additional-information';
 import ManagePlansScreen from './manage-plans';
 import PlanTrackerScreen from './plan-tracker';
 
-type RedirectionScreen = 'initial' | 'login' | 'login-additional-information' | 'plan-tracker' | 'manage-plans';
+type RedirectionScreen = 'initial' | 'login' | 'create-user' | 'plan-tracker' | 'manage-plans';
 
 export default function HomeScreen() {
     const { isSignedIn, authUser } = useAuth();
@@ -22,12 +22,12 @@ export default function HomeScreen() {
 
         const fetchUser = async () => {
             const dbUser = await userRepository.get({ email: authUser.email }).catch(() => {
-                setRedirectionScreen('login-additional-information');
+                setRedirectionScreen('create-user');
                 return;
             });
 
             if (!dbUser) {
-                setRedirectionScreen('login-additional-information');
+                setRedirectionScreen('create-user');
                 return;
             }
 
@@ -56,8 +56,8 @@ export default function HomeScreen() {
     switch (redirectionScreen) {
         case 'login':
             return <LoginScreen />;
-        case 'login-additional-information':
-            return <LoginAdditionalInformationScreen />;
+        case 'create-user':
+            return <CreateUserScreen />;
         case 'plan-tracker':
             return <PlanTrackerScreen />;
         case 'manage-plans':

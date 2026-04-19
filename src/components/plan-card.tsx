@@ -8,6 +8,7 @@ import useEffectAsync from '../hooks/useEffectAsync'
 import { formatDateRelativeToToday, formatDateToFront, getDateOnly, getDifferenceInDays } from '../utils/dateUtils'
 import { formatIntegerCompact, formatMoney } from '../utils/numberUtils'
 import { getAbbreviatedName } from '../utils/stringUtils'
+import { toastInfoMessage } from '../utils/toastUtils'
 import AmountSelect from './amount-select'
 import { Button } from './button'
 import Icon from './icon'
@@ -269,7 +270,7 @@ function getButtonInfo({ role, planId, userId, planRepository, callback }: GetAc
                 baseColor: 'info',
                 lightColor: 'light-info',
                 action: async () => {
-                    console.log('TODO: See ranking without join')
+                    toastInfoMessage('TODO: See ranking without join')
                 },
             };
 

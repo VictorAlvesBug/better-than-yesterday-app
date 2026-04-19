@@ -3,7 +3,7 @@ import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { CreateUser, User } from '@/types/user.type';
+import { CreateUser, createUserSchema, User } from '@/types/user.type';
 import Constants from 'expo-constants';
 import React, { useEffect, useState } from 'react';
 import {
@@ -20,10 +20,11 @@ import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
+import { checkIfIsValidAndToast } from '../utils/toastUtils';
 
 
 
-export default function LoginAdditionalInformationScreen() {
+export default function CreateUserScreen() {
   const { isSignedIn, signOut, authUser } = useAuth();
   const navigation = useNavigation();
   const userRepository = createUserRepository();
@@ -75,6 +76,10 @@ export default function LoginAdditionalInformationScreen() {
 
   const createUser = async () => {
     //TODO: Validar campos informados...
+
+    if(!checkIfIsValidAndToast(createUserSchema, user)){
+      return;
+    }
 
     const createdUser = await userRepository.create(user);
 

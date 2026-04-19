@@ -4,7 +4,7 @@ import createPlanRepository from '@/src/api/planRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit, HabitWithJustAdded } from '@/types/habit.type';
-import { CreatePlan, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
+import { CreatePlan, createPlanSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import React, { useEffect, useState } from 'react';
 import {
@@ -27,6 +27,7 @@ import useNavigation from '../hooks/useNavigation';
 import { formatDateRelativeToToday, formatDateToFront, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import { generateId } from '../utils/stringUtils';
+import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
 export default function CreatePlanScreen() {
   const navigation = useNavigation();
@@ -105,7 +106,7 @@ export default function CreatePlanScreen() {
     const habit = habitList.find(h => h.id === plan.habitId);
 
     if (!habit) {
-      console.log('Selecione um hábito para criar o plano.');
+      toastErrorMessage('Selecione um hábito para criar o plano.');
       return;
     }
 
@@ -118,9 +119,13 @@ export default function CreatePlanScreen() {
 
     plan.daysOffPerWeek = 7 - daysPerWeek;
 
+    if(!checkIfIsValidAndToast(createPlanSchema, plan)){
+      return;
+    }
+
     const createdPlan = await planRepository.create(plan);
 
-    console.log('Plano criado com sucesso:', createdPlan);
+    toastSuccessMessage('Plano criado com sucesso');
 
     if (joinAfterCreated) {
       await planRepository.join({ planId: createdPlan.id, userId: plan.ownerId });

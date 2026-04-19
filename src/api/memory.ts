@@ -1,6 +1,7 @@
 
 import { AuthUser } from '@/types/user.type';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { toastErrorMessage } from '../utils/toastUtils';
 
 type StoredPairs = {
     'google_idToken' : string;
@@ -23,7 +24,7 @@ function createMemory(){
             const jsonValue = JSON.stringify(value);
             await AsyncStorage.setItem(prefix + key, jsonValue);
         } catch (e) {
-            console.error(`Erro ao salvar a chave '${key}' (${typeof value}) com valor '${value}' no AsyncStorage:`, e);
+            toastErrorMessage(`Erro ao salvar a chave '${key}' (${typeof value}) com valor '${value}' no AsyncStorage: ${e}`);
         }
     };
 
@@ -34,7 +35,7 @@ function createMemory(){
                 ? null 
                 : (JSON.parse(jsonValue) satisfies StoredValue<TKey>);
         } catch (e) {
-            console.error(`Erro ao recuperar a chave '${key}' do AsyncStorage:`, e);
+            toastErrorMessage(`Erro ao recuperar a chave '${key}' do AsyncStorage: ${e}`);
             return null;
         }
     }
@@ -43,7 +44,7 @@ function createMemory(){
         try {
             await AsyncStorage.removeItem(key);
         } catch (e) {
-            console.error(`Erro ao remover a chave '${key}' do AsyncStorage:`, e);
+            toastErrorMessage(`Erro ao remover a chave '${key}' do AsyncStorage: ${e}`);
         }
     }
 

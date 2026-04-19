@@ -7,6 +7,7 @@ import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
 import { useState } from 'react';
 import GradientView from '../components/gradient-view';
 import useNavigation from '../hooks/useNavigation';
+import { toastInfoMessage } from '../utils/toastUtils';
 
 export default function ManagePlansScreen() {
   const navigation = useNavigation();
@@ -48,7 +49,7 @@ export default function ManagePlansScreen() {
         >
 
           <Button action={() => navigation.push('/create-plan')}>Criar Novo Plano</Button>
-          <Button action={() => console.log('TODO: Abrir modal para colar link de convidado')}>
+          <Button action={() => toastInfoMessage('TODO: Abrir modal para colar link de convidado')}>
             Tenho um Link de Convidado</Button>
           <Button action={() => navigation.push('/public-plans')}>Planos Populares</Button>
         </View>

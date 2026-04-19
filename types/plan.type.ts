@@ -43,11 +43,11 @@ export function parsePenaltyValue(strValue: string): PenaltyValue {
 }
 
 const planSchema = baseResourceSchema.extend({
-    ownerId: z.string({ error: "ID do criador do plano é obrigatório" }),
-    habitId: z.string({ error: "ID do hábito é obrigatório" }),
-    description: z.string().optional(),
-    startsAt: z.string("Data de início do plano é obrigatória").transform((str) => parseDateOnly(str)),
-    endsAt: z.string("Data de término do plano é obrigatória").transform((str) => parseDateOnly(str)),
+    ownerId: z.guid({ error: "ID do criador do plano é obrigatório" }),
+    habitId: z.guid({ error: "ID do hábito é obrigatório" }),
+    description: z.string().min(3, { error: "Descrição do plano deve ter ao menos 3 caracteres"}).optional(),
+    startsAt: z.string().min(3, { error: "Data de início do plano é obrigatória"}).transform((str) => parseDateOnly(str)),
+    endsAt: z.string().min(3, { error: "Data de término do plano é obrigatória"}).transform((str) => parseDateOnly(str)),
     type: planTypeSchema,
     daysOffPerWeek: z.number("Folgas por semana é obrigatório").min(0, { error: "Selecione um número positivo para as folgas por semana" }).max(6, { error: "Selecione até 6 para as folgas por semana" }),
     penaltyValue: penaltyValueSchema,
@@ -69,9 +69,9 @@ export type PlanEnriched = Plan & {
 };
 
 const planMemberSchema = baseResourceSchema.extend({
-    planId: z.string({ error: "ID do plano é obrigatório" }),
-    userId: z.string({ error: "ID do usuário é obrigatório" }),
-    joinedAt: z.string({ error: "Data de entrada no plano é obrigatória" }).transform((str) => parseDateTime(str)),
+    planId: z.guid({ error: "ID do plano é obrigatório" }),
+    userId: z.guid({ error: "ID do usuário é obrigatório" }),
+    joinedAt: z.string().min(3, { error: "Data de entrada no plano é obrigatória" }).transform((str) => parseDateTime(str)),
     status: planMemberStatusSchema,
 });
 export type PlanMember = z.infer<typeof planMemberSchema>;
