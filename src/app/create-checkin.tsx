@@ -1,6 +1,7 @@
 import { CreateCheckin, createCheckinSchema } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import Constants from 'expo-constants';
+//import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -31,18 +32,22 @@ export default function CreateCheckinScreen() {
     const planRepository = createPlanRepository();
     const checkinRepository = createCheckinRepository();
 
-  const pickImage = async () => {
+  const openCamera = async () => {
       toastInfoMessage("TODO: Pick Gallery Photo");
-    /*const result = await ImagePicker.launchImageLibraryAsync({
+    /*const result = await ImagePicker.launchCameraAsync({
+        cameraType: ImagePicker.CameraType.back,
       mediaTypes: ["images"],
       allowsEditing: true,
       quality: 1,
     });
 
-    if (!result.canceled) {
-      toastInfoMessage(result.assets[0].uri);
-        //setCheckin({...checkin, photoUrl: result.assets[0].uri});
-    }*/
+    if (result.canceled) {
+        toastInfoMessage("Nenhuma foto capturada");
+        return;
+    }
+    
+    toastInfoMessage(result.assets[0].uri);*/
+      //setCheckin({...checkin, photoUrl: result.assets[0].uri});
   };
 
     useEffect(() => {
@@ -121,7 +126,7 @@ export default function CreateCheckinScreen() {
                                 style={{ width: 80, height: 80, borderRadius: 20 }}
                             />
                         </View>
-                        <Button action={pickImage}>Escolher uma foto</Button>
+                        <Button action={openCamera}>Escolher uma foto</Button>
                     </Card>
 
                     <Card className="flex flex-col items-start justify-center w-full gap-1">
