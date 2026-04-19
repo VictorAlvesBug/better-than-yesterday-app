@@ -1,13 +1,19 @@
-import { BaseResource } from "./common.type";
+import { z } from "zod";
+import { baseResourceSchema } from "./common.type";
 
-export type Habit = BaseResource & {
-  name: string;
-};
+const habitSchema = baseResourceSchema.extend({
+  name: z.string({ error: "Nome do hábito é obrigatório" }),
+});
+export type Habit = z.infer<typeof habitSchema>;
 
 export type HabitEnriched = Habit & {
   planCount: number;
 };
 
-export type CreateHabit = Omit<Habit, 'id' | 'createdAt'>;
+export const createHabitSchema = habitSchema.omit({ id: true, createdAt: true })
+export type CreateHabit = z.infer<typeof createHabitSchema>;
 
-export type HabitWithJustAdded = Habit & { justAdded?: boolean };
+export const habitWithJustAddedSchema = habitSchema.extend({
+  justAdded: z.boolean({ error: "justAdded deve ser um booleano" }).optional(),
+});
+export type HabitWithJustAdded = z.infer<typeof habitWithJustAddedSchema>;

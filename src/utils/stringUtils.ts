@@ -39,14 +39,61 @@ export function getAbbreviatedName(name: string): string {
 }
 
 export function generateId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  
-  // Fallback for older environments
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+
+    // Fallback for older environments
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+export const formatEachAndJoin = <TItem>(
+    items: TItem[],
+    formatter: (str: TItem) => string
+) => joinWithCommasAndOr(
+    items, {
+    transform: formatter,
+});
+
+export const joinWithCommasAndOr = <TItem>(
+    items: TItem[],
+    options?: {
+        transform?: (str: TItem) => string
+        separator?: string,
+        lastSeparator?: string
+    }
+) => join(
+    items, {
+    ...options,
+    transform: (str: TItem) => `'${String(str)}'`,
+    lastSeparator: ' ou '
+});
+
+export function join<TItem>(
+    items: TItem[],
+    options?: {
+        transform?: (str: TItem) => string
+        separator?: string,
+        lastSeparator?: string
+    }
+): string {
+    const transform = options?.transform ?? ((item: TItem) => String(item));
+    const separator = options?.separator ?? ', ';
+    const lastSeparator = options?.lastSeparator ?? separator;
+
+    const strings = items.map(transform);
+
+    if (strings.length === 0)
+        return '';
+
+    if (strings.length === 1)
+        return strings[0];
+
+    const last = strings.splice(-1)[0];
+    const rest = strings.join(separator)
+    return `${rest}${lastSeparator}${last}`;
 }

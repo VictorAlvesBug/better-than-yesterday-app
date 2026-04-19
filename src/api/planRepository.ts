@@ -122,7 +122,7 @@ export default function createPlanRepository() {
     };
 
     const leave = async (deletePlanMember: CreateOrDeletePlanMember): Promise<void> => {
-        await api.delete('planMembers', { planId: deletePlanMember.planId, userId: deletePlanMember.userId });
+        await api.delete('planMembers', deletePlanMember);
     };
 
     return {

@@ -1,4 +1,5 @@
-import { BaseResource } from "./common.type";
+import { z } from "zod";
+import { baseResourceSchema } from "./common.type";
 
 export type AuthUser = {
     name: string | null;
@@ -9,15 +10,17 @@ export type AuthUser = {
     givenName: string | null;
 }
 
-export type User = BaseResource & {
-    email: string;
-    name: string;
-    photo: string;
-    nickname: string;
-    phoneNumber: string;
-    pixKey: string;
-}
+const userSchema = baseResourceSchema.extend({
+    email: z.email({ error: "E-mail é obrigatório e deve ser válido" }),
+    name: z.string({ error: "Nome é obrigatório" }),
+    photo: z.string({ error: "Foto é obrigatória" }),
+    nickname: z.string({ error: "Nickname é obrigatório" }),
+    phoneNumber: z.string({ error: "Número de telefone é obrigatório" }),
+    pixKey: z.string({ error: "Chave PIX é obrigatória" }),
+});
+export type User = z.infer<typeof userSchema>;
 
-export type CreateUser = Omit<User, 'id' | 'createdAt'>;
+export const createUserSchema = userSchema.omit({ id: true, createdAt: true });
+export type CreateUser = z.infer<typeof createUserSchema>;
 
 //export type UpdateUser = Omit<User, 'email'>;

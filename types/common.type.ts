@@ -1,9 +1,11 @@
-import { DateTime } from "@/src/utils/dateUtils";
+import { parseDateTime } from "@/src/utils/dateUtils";
+import { z } from "zod";
 
-export type BaseResource = {
-  id: string;
-  createdAt: DateTime;
-}
+export const baseResourceSchema = z.object({
+  id: z.guid({ error: "ID deve ser um UUID válido" }),
+  createdAt: z.string({ error: "Data de criação é obrigatória"}).transform((str) => parseDateTime(str)),
+});
+export type BaseResource = z.infer<typeof baseResourceSchema>;
 
 export type TextSize =
   | "text-xs"   // 12px
