@@ -1,7 +1,7 @@
 import { CreateCheckin, createCheckinSchema } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import Constants from 'expo-constants';
-//import * as ImagePicker from "expo-image-picker";
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -34,7 +34,7 @@ export default function CreateCheckinScreen() {
 
   const openCamera = async () => {
       toastInfoMessage("TODO: Pick Gallery Photo");
-    /*const result = await ImagePicker.launchCameraAsync({
+    const result = await ImagePicker.launchCameraAsync({
         cameraType: ImagePicker.CameraType.back,
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -46,8 +46,8 @@ export default function CreateCheckinScreen() {
         return;
     }
     
-    toastInfoMessage(result.assets[0].uri);*/
-      //setCheckin({...checkin, photoUrl: result.assets[0].uri});
+    toastInfoMessage(result.assets[0].uri);
+    //setCheckin({...checkin, photoUrl: result.assets[0].uri});
   };
 
     useEffect(() => {

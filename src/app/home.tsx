@@ -1,18 +1,21 @@
 import Memory from '@/src/api/memory';
 import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
+import { getColor } from '@/types/color.type';
 import React, { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../context/auth';
 import CreateUserScreen from './create-user';
 import LoginScreen from './login';
 import ManagePlansScreen from './manage-plans';
+import NotFoundScreen from './not-found';
 import PlanTrackerScreen from './plan-tracker';
 
-type RedirectionScreen = 'initial' | 'login' | 'create-user' | 'plan-tracker' | 'manage-plans';
+type RedirectionScreen = 'loading' | 'not-found' | 'login' | 'create-user' | 'plan-tracker' | 'manage-plans';
 
 export default function HomeScreen() {
     const { isSignedIn, authUser } = useAuth();
-    const [redirectionScreen, setRedirectionScreen] = React.useState<RedirectionScreen>('initial');
+    const [redirectionScreen, setRedirectionScreen] = React.useState<RedirectionScreen>('loading');
     const userRepository = createUserRepository();
     const planRepository = createPlanRepository();
 
@@ -20,7 +23,7 @@ export default function HomeScreen() {
         if (!isSignedIn || !authUser)
             return;
 
-        const fetchUser = async () => {
+        const fetchData = async () => {
             const dbUser = await userRepository.get({ email: authUser.email }).catch(() => {
                 setRedirectionScreen('create-user');
                 return;
@@ -50,10 +53,25 @@ export default function HomeScreen() {
             setRedirectionScreen('plan-tracker');
         };
 
-        fetchUser();
-    }, [authUser, isSignedIn, planRepository, userRepository]);
+        fetchData();
+    }, []);
+
+    setTimeout(() => {
+        setRedirectionScreen(prev => {
+            if (prev === 'loading')
+                return 'not-found';
+
+            else return prev;
+        });
+    }, 2000)
+
+    console.log({ redirectionScreen });
 
     switch (redirectionScreen) {
+        case 'loading':
+            return <View className="flex flex-row items-center justify-center h-full">
+                <ActivityIndicator size="large" color={getColor("gray-6")} />
+            </View>
         case 'login':
             return <LoginScreen />;
         case 'create-user':
@@ -62,8 +80,8 @@ export default function HomeScreen() {
             return <PlanTrackerScreen />;
         case 'manage-plans':
             return <ManagePlansScreen />;
-        case 'initial':
+        case 'not-found':
         default:
-            return null;
+            return <NotFoundScreen />;
     }
 }
