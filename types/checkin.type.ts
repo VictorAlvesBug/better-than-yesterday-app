@@ -23,6 +23,7 @@ export type CheckinReviewEnriched = CheckinReview & {
 };
 
 const checkinSchema = baseResourceSchema.extend({
+  id: z.guid({ error: "ID do checkin é obrigatório" }),
   kind: z.literal('checkin'),
   planId: z.guid({ error: "ID do plano deve ser um UUID válido" }),
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
@@ -40,6 +41,7 @@ export type CheckinEnriched = Checkin & {
 };
 
 export const createCheckinSchema = checkinSchema.omit({
+  id: true,
   kind: true,
   createdAt: true,
   status: true,

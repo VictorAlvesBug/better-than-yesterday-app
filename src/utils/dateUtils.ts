@@ -41,7 +41,7 @@ const defaultDateComponents: DateComponents = {
   minute: '00',
 }
 
-function getDateComponents(param: AllTypes = new Date()): DateComponents{
+export function getDateComponents(param: AllTypes = new Date()): DateComponents{
   if (isDayjs(param))
     return {
       ...defaultDateComponents,

@@ -8,10 +8,10 @@ import {
     Image,
     Text, View
 } from 'react-native';
-import RNFS from "react-native-fs";
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
 import createPlanRepository from '../api/planRepository';
+import createS3Repository from '../api/s3Repository';
 import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import Card from '../components/card';
@@ -21,8 +21,7 @@ import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import useNavigation from '../hooks/useNavigation';
-import { formatDateRelativeToToday, getDateOnly, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
-import { generateId } from '../utils/stringUtils';
+import { formatDateRelativeToToday, getDateComponents, getDateOnly, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
 export default function CreateCheckinScreen() {
@@ -30,7 +29,6 @@ export default function CreateCheckinScreen() {
     const [loading, setLoading] = useState(true);
 
     const [checkin, setCheckin] = useState<CreateCheckin>({
-        id: generateId(),
         userId: '',
         planId: '',
         date: getDateOnly(),
@@ -38,8 +36,13 @@ export default function CreateCheckinScreen() {
         title: ''
     });
 
+    const [file, setFile] = useState([]);
+    const [currentFile, setCurrentFile] = useState('');
+
+
     const planRepository = createPlanRepository();
     const checkinRepository = createCheckinRepository();
+    const s3Repository = createS3Repository();
 
     const openCamera = async (): Promise<string> => {
         const result = await ImagePicker.launchCameraAsync({
@@ -56,17 +59,19 @@ export default function CreateCheckinScreen() {
         // TODO: Refactor to persist image only when checkin is created. Use Amazon S3
 
         const asset = result.assets[0];
+        
+        const { year, month, day} = getDateComponents(checkin.date);
 
-        /*const hash = getHash({
-            userId: checkin.userId,
-            planId: checkin.planId,
-            date: checkin.date
-        })*/
-        const destPath = `${RNFS.DocumentDirectoryPath}/checkins/${checkin.id}.jpg`;
-        RNFS.copyFile(asset.uri, destPath);
+        const params = {
+                bucket: 'checkin-213615929868-sa-east-1-an',
+                filePath: asset.uri.replace('file://', ''),
+                fileName: `${checkin.userId}/${checkin.planId}/${year}/${month}/${day}.jpg`,
+                fileType: 'image/jpeg'
+        }
 
-        //return `data:${asset.mimeType ?? "image/jpeg"};base64,${asset.base64}`;
-        return destPath;
+        await s3Repository.uploadFile(params);
+
+        return asset.uri;
     };
 
     const handleOpenCamera = async () => {
@@ -82,6 +87,9 @@ export default function CreateCheckinScreen() {
 
             toastErrorMessage('Ocorreu um erro');
         }
+    };
+
+    const handleUploadImage = async () => {
     };
 
     useEffect(() => {
@@ -164,6 +172,7 @@ export default function CreateCheckinScreen() {
                         <Button action={handleOpenCamera}
                         className='absolute right-7 bottom-7'>Alterar foto</Button>
                     </Card>
+                    <Button action={handleUploadImage}>Persistir foto</Button>
 
                     <Card className="flex flex-col items-start justify-center w-full gap-1">
                         <Label>Título</Label>

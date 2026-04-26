@@ -2,6 +2,7 @@
 import { getDateTime } from '@/src/utils/dateUtils';
 import { Checkin, CheckinEnriched, CheckinReview, CreateCheckin } from '@/types/checkin.type';
 import { api } from '../utils/apiUtils';
+import { generateId } from '../utils/stringUtils';
 import createPlanRepository from './planRepository';
 import createUserRepository from './userRepository';
 
@@ -51,8 +52,8 @@ export default function createCheckinRepository() {
     const create = async (createCheckin: CreateCheckin): Promise<CheckinEnriched> => {
         const checkin = {
             ...createCheckin,
+            id: generateId(),
             kind: 'checkin',
-            //id: generateId(),
             createdAt: getDateTime(),
             status: 'pending',
             reviews: [],
