@@ -41,7 +41,6 @@ export type CheckinEnriched = Checkin & {
 
 export const createCheckinSchema = checkinSchema.omit({
   kind: true,
-  id: true,
   createdAt: true,
   status: true,
   reviews: true

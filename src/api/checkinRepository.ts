@@ -1,6 +1,5 @@
 
 import { getDateTime } from '@/src/utils/dateUtils';
-import { generateId } from '@/src/utils/stringUtils';
 import { Checkin, CheckinEnriched, CheckinReview, CreateCheckin } from '@/types/checkin.type';
 import { api } from '../utils/apiUtils';
 import createPlanRepository from './planRepository';
@@ -53,7 +52,7 @@ export default function createCheckinRepository() {
         const checkin = {
             ...createCheckin,
             kind: 'checkin',
-            id: generateId(),
+            //id: generateId(),
             createdAt: getDateTime(),
             status: 'pending',
             reviews: [],
