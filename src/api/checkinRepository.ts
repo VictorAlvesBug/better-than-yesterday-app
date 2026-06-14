@@ -1,8 +1,6 @@
 
-import { getDateTime } from '@/src/utils/dateUtils';
 import { Checkin, CheckinEnriched, CheckinReview, CreateCheckin } from '@/types/checkin.type';
 import { api } from '../utils/apiUtils';
-import { generateId } from '../utils/stringUtils';
 import createPlanRepository from './planRepository';
 import createUserRepository from './userRepository';
 
@@ -27,11 +25,13 @@ export default function createCheckinRepository() {
     }
 
     const list = async (filter?: Partial<Checkin>): Promise<CheckinEnriched[]> => {
+        console.log("CheckinRepository.list - filter:", filter);
         const checkins = await api.list('checkins', filter);
         return manyWithEnrichment(checkins);
     };
 
     const get = async (filter?: Partial<Checkin>): Promise<CheckinEnriched> => {
+        console.log("CheckinRepository.get - filter:", filter);
         const checkin = await api.get('checkins', filter);
 
         if (!checkin)
@@ -41,6 +41,7 @@ export default function createCheckinRepository() {
     };
 
     const getById = async (id: string): Promise<CheckinEnriched> => {
+        console.log("CheckinRepository.getById - id:", id);
         const checkin = await api.get('checkins', { id });
 
         if (!checkin)
@@ -50,27 +51,23 @@ export default function createCheckinRepository() {
     };
 
     const create = async (createCheckin: CreateCheckin): Promise<CheckinEnriched> => {
-        const checkin = {
-            ...createCheckin,
-            id: generateId(),
-            kind: 'checkin',
-            createdAt: getDateTime(),
-            status: 'pending',
-            reviews: [],
-        } satisfies Checkin;
+        console.log("CheckinRepository.create - createCheckin:", createCheckin);
 
-        const checkinCreated = await api.create('checkins', checkin);
+        const checkinCreated = await api.createWithBody('checkins', createCheckin);
         return oneWithEnrichment(checkinCreated);
     };
 
     const saveReview = async (checkinId: string, checkinReview: CheckinReview): Promise<CheckinEnriched> => {
+        console.log("CheckinRepository.saveReview - checkinId:", checkinId);
+        console.log("CheckinRepository.saveReview - checkinReview:", checkinReview);
 
         const checkin = await getById(checkinId) satisfies Checkin;
 
         checkin.reviews.push(checkinReview)
 
-        await api.delete('checkins', {id: checkin.id});
-        const checkinUpdated = await api.create('checkins', checkin);
+        await api.deleteWithFilter('checkins', {id: checkin.id});
+        // TODO: Ajustar para ficar aderente ao contrato da API, que ainda não foi desenvolvido neste momento
+        const checkinUpdated = await api.createWithBody('checkins', checkin);
         return oneWithEnrichment(checkinUpdated);
     };
 
