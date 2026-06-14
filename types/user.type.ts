@@ -1,3 +1,4 @@
+import { zodEnumWithValidation } from "@/src/utils/zodUtils";
 import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
 
@@ -10,13 +11,17 @@ export type AuthUser = {
     givenName: string | null;
 }
 
+export const pixKeyTypeSchema = zodEnumWithValidation(['TaxIdentification', 'Email', 'PhoneNumber', 'EVP'] as const, "Tipo de Chave Pix");
+export type PixKeyType = z.infer<typeof pixKeyTypeSchema>;
+
 const userSchema = baseResourceSchema.extend({
     email: z.email({ error: "E-mail é obrigatório e deve ser válido" }),
     name: z.string().min(3, { error: "Nome é obrigatório" }),
-    photo: z.string().min(3, { error: "Foto é obrigatória" }),
+    photoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
     nickname: z.string().min(3, { error: "Nickname é obrigatório" }),
     phoneNumber: z.string().min(8, { error: "Número de telefone é obrigatório" }),
     pixKey: z.string().min(3, { error: "Chave PIX é obrigatória" }),
+    pixKeyType: pixKeyTypeSchema,
 });
 export type User = z.infer<typeof userSchema>;
 

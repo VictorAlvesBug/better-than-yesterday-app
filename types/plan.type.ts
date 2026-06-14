@@ -7,13 +7,13 @@ import { baseResourceSchema } from "./common.type";
 import { User } from "./user.type";
 
 
-const planTypeSchema = zodEnumWithValidation(['private', 'public'] as const, "Tipo do plano");
+const planTypeSchema = zodEnumWithValidation(['Private', 'Public'] as const, "Tipo do plano");
 export type PlanType = z.infer<typeof planTypeSchema>;
 
-const planStatusSchema = zodEnumWithValidation(['not-started', 'running', 'finished', 'cancelled'] as const, "Status do plano");
+const planStatusSchema = zodEnumWithValidation(['NotStarted', 'Running', 'Finished', 'Cancelled'] as const, "Status do plano");
 export type PlanStatus = z.infer<typeof planStatusSchema>;
 
-const planMemberStatusSchema = zodEnumWithValidation(['active', 'blocked'] as const, "Status do membro do plano");
+const planMemberStatusSchema = zodEnumWithValidation(['Active', 'Blocked'] as const, "Status do membro do plano");
 export type PlanMemberStatus = z.infer<typeof planMemberStatusSchema>;
 
 
@@ -51,12 +51,12 @@ const planSchema = baseResourceSchema.extend({
     type: planTypeSchema,
     daysOffPerWeek: z.number("Folgas por semana é obrigatório").min(0, { error: "Selecione um número positivo para as folgas por semana" }).max(6, { error: "Selecione até 6 para as folgas por semana" }),
     penaltyValue: penaltyValueSchema,
-    isCancelled: z.boolean({ error: "isCancelled deve ser um booleano" }).optional(),
+    status: planStatusSchema,
 })
 
 export type Plan = z.infer<typeof planSchema>;
 
-export const createPlanSchema = planSchema.omit({ id: true, createdAt: true, isCancelled: true })
+export const createPlanSchema = planSchema.omit({ id: true, createdAt: true, status: true })
 export type CreatePlan = z.infer<typeof createPlanSchema>;
 
 //export type UpdatePlan = Partial<Omit<Plan, 'createdAt' | 'ownerId'>>;
@@ -81,14 +81,24 @@ export type PlanMemberEnriched = PlanMember & {
     plan: PlanEnriched;
 }
 
-export const createOrDeletePlanMemberSchema = planMemberSchema.omit({
+export const managePlanMemberSchema = planMemberSchema.omit({
     id: true,
     createdAt: true,
     joinedAt: true,
     status: true,
 })
-export type CreateOrDeletePlanMember = z.infer<typeof createOrDeletePlanMemberSchema>;
+export type ManagePlanMember = z.infer<typeof managePlanMemberSchema>;
 
 export type PlanToJoin = PlanEnriched & {
     joined: boolean;
+}
+
+export type PlanWithMembers = {
+    plan: PlanEnriched;
+    users: User[];
+}
+
+export type UserWithPlans = {
+    user: User;
+    plans: PlanEnriched[];
 }

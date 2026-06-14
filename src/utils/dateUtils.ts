@@ -15,15 +15,17 @@ export type Time = string & { __brand: 'Time' };
 export type DateTime = string & { __brand: 'DateTime' };
 export type DateToFront = string & { __brand: 'DateToFront' };
 export type DateTimeToFront = string & { __brand: 'DateTimeToFront' };
+export type DateTimeFromBack = string & { __brand: 'DateTimeFromBack' };
 
-type AllTypes = 
+type AllTypes =
   | Dayjs
   | Date
   | DateOnly
   | Time
   | DateTime
   | DateToFront
-  | DateTimeToFront;
+  | DateTimeToFront
+  | DateTimeFromBack;
 
 type DateComponents = {
   year: string;
@@ -41,7 +43,7 @@ const defaultDateComponents: DateComponents = {
   minute: '00',
 }
 
-function getDateComponents(param: AllTypes = new Date()): DateComponents{
+export function getDateComponents(param: AllTypes = new Date()): DateComponents {
   if (isDayjs(param))
     return {
       ...defaultDateComponents,
@@ -62,7 +64,7 @@ function getDateComponents(param: AllTypes = new Date()): DateComponents{
       minute: String(param.getMinutes()).padStart(2, '0'),
     }
 
-  if (isDateOnly(param)){
+  if (isDateOnly(param)) {
     const [year, month, day] = param.split('-');
     return {
       ...defaultDateComponents,
@@ -72,7 +74,7 @@ function getDateComponents(param: AllTypes = new Date()): DateComponents{
     }
   }
 
-  if (isTime(param)){
+  if (isTime(param)) {
     const [hour, minute] = param.split(':');
     return {
       ...defaultDateComponents,
@@ -81,7 +83,7 @@ function getDateComponents(param: AllTypes = new Date()): DateComponents{
     }
   }
 
-  if (isDateTime(param)){
+  if (isDateTime(param)) {
     const [datePart, timePart] = param.split(' ');
     const [year, month, day] = datePart.split('-');
     const [hour, minute] = timePart.split(':');
@@ -95,7 +97,7 @@ function getDateComponents(param: AllTypes = new Date()): DateComponents{
     }
   }
 
-  if (isDateToFront(param)){
+  if (isDateToFront(param)) {
     const [day, month, year] = param.split('/');
     return {
       ...defaultDateComponents,
@@ -105,10 +107,24 @@ function getDateComponents(param: AllTypes = new Date()): DateComponents{
     }
   }
 
-  if (isDateTimeToFront(param)){
+  if (isDateTimeToFront(param)) {
     const [datePart, timePart] = param.split(' ');
     const [day, month, year] = datePart.split('/');
     const [hour, minute] = timePart.split(':');
+    return {
+      ...defaultDateComponents,
+      year,
+      month,
+      day,
+      hour,
+      minute
+    }
+  }
+
+  if (isDateTimeFromBack(param)) {
+    const [datePart, timePart] = param.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hour, minute, _] = timePart.split(':');
     return {
       ...defaultDateComponents,
       year,
@@ -123,10 +139,10 @@ function getDateComponents(param: AllTypes = new Date()): DateComponents{
   return _exhaustive;
 }
 
-function dateComponentsAsNumber(dateComponents: DateComponents): NumberProperties<DateComponents>{
+function dateComponentsAsNumber(dateComponents: DateComponents): NumberProperties<DateComponents> {
   return Object.fromEntries(
     Object.entries(dateComponents)
-    .map(([key, value]) => [key, Number(value)])
+      .map(([key, value]) => [key, Number(value)])
   ) as NumberProperties<DateComponents>;
 }
 
@@ -159,33 +175,44 @@ export function isDateTimeToFront(dateTimeToFront: string): dateTimeToFront is D
   return pattern.test(dateTimeToFront);
 }
 
+export function isDateTimeFromBack(dateTimeFromBack: string): dateTimeFromBack is DateTimeFromBack {
+  const pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/g;
+  return pattern.test(dateTimeFromBack);
+}
+
 export function assertDateOnly(dateOnly: string): asserts dateOnly is DateOnly {
-  if (!isDateOnly(dateOnly)){
+  if (!isDateOnly(dateOnly)) {
     throw new Error(`Formato de '${dateOnly}' inválido`);
   }
 }
 
 export function assertTime(time: string): asserts time is Time {
-  if (!isTime(time)){
+  if (!isTime(time)) {
     throw new Error(`Formato de '${time}' inválido`);
   }
 }
 
 export function assertDateTime(dateTime: string): asserts dateTime is DateTime {
-  if (!isDateTime(dateTime)){
+  if (!isDateTime(dateTime)) {
     throw new Error(`Formato de '${dateTime}' inválido`);
   }
 }
 
 export function assertDateToFront(dateToFront: string): asserts dateToFront is DateToFront {
-  if (!isDateToFront(dateToFront)){
+  if (!isDateToFront(dateToFront)) {
     throw new Error(`Formato de '${dateToFront}' inválido`);
   }
 }
 
 export function assertDateTimeToFront(dateTimeToFront: string): asserts dateTimeToFront is DateTimeToFront {
-  if (!isDateTimeToFront(dateTimeToFront)){
+  if (!isDateTimeToFront(dateTimeToFront)) {
     throw new Error(`Formato de '${dateTimeToFront}' inválido`);
+  }
+}
+
+export function assertDateTimeFromBack(dateTimeFromBack: string): asserts dateTimeFromBack is DateTimeFromBack {
+  if (!isDateTimeFromBack(dateTimeFromBack)) {
+    throw new Error(`Formato de '${dateTimeFromBack}' inválido`);
   }
 }
 
@@ -211,6 +238,11 @@ export function parseDateToFront(value: string): DateToFront {
 
 export function parseDateTimeToFront(value: string): DateTimeToFront {
   assertDateTimeToFront(value);
+  return value;
+}
+
+export function parseDateTimeFromBack(value: string): DateTimeFromBack {
+  assertDateTimeFromBack(value);
   return value;
 }
 
@@ -303,19 +335,19 @@ export function formatDateRelativeToToday(param: AllTypes) {
 
 export function getDate(param: AllTypes = new Date()) {
   const {
-      year,
-      month,
-      day,
+    year,
+    month,
+    day,
   } = dateComponentsAsNumber(getDateComponents(param));
-  
+
   return new Date(year, month - 1, day);
 }
 
 export function getDateOnly(param: AllTypes = new Date()) {
   const {
-      year,
-      month,
-      day,
+    year,
+    month,
+    day,
   } = getDateComponents(param);
 
   const dateOnly = `${year}-${month}-${day}`;
@@ -327,8 +359,8 @@ export function getDateOnly(param: AllTypes = new Date()) {
 
 export function getTime(param: AllTypes = new Date()) {
   const {
-      hour,
-      minute
+    hour,
+    minute
   } = getDateComponents(param);
 
   const time = `${hour}:${minute}`;
@@ -340,11 +372,11 @@ export function getTime(param: AllTypes = new Date()) {
 
 export function getDateTime(param: AllTypes = new Date()) {
   const {
-      year,
-      month,
-      day,
-      hour,
-      minute
+    year,
+    month,
+    day,
+    hour,
+    minute
   } = getDateComponents(param);
 
   const dateTime = `${year}-${month}-${day} ${hour}:${minute}`;
@@ -364,9 +396,9 @@ export function getDifferenceInDays(param1: AllTypes, param2: AllTypes) {
 
 export function getDateToFront(param: AllTypes = new Date()) {
   const {
-      year,
-      month,
-      day,
+    year,
+    month,
+    day,
   } = getDateComponents(param);
 
   const dateToFront = `${day}/${month}/${year}`;
@@ -378,11 +410,11 @@ export function getDateToFront(param: AllTypes = new Date()) {
 
 export function getDateTimeToFront(param: AllTypes = new Date()) {
   const {
-      year,
-      month,
-      day,
-      hour,
-      minute
+    year,
+    month,
+    day,
+    hour,
+    minute
   } = getDateComponents(param);
 
   const dateTimeToFront = `${day}/${month}/${year} ${hour}:${minute}`;
@@ -390,6 +422,22 @@ export function getDateTimeToFront(param: AllTypes = new Date()) {
   assertDateTimeToFront(dateTimeToFront);
 
   return dateTimeToFront;
+}
+
+export function getDateTimeFromBack(param: AllTypes = new Date()) {
+  const {
+    year,
+    month,
+    day,
+    hour,
+    minute
+  } = getDateComponents(param);
+
+  const dateTimeFromBack = `${day}-${month}-${year}T${hour}:${minute}:00`;
+
+  assertDateTimeFromBack(dateTimeFromBack);
+
+  return dateTimeFromBack;
 }
 
 export function getDateWithOffset(daysOffset: number, param: AllTypes = new Date()) {

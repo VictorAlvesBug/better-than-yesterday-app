@@ -1,8 +1,6 @@
 
 import { CreateHabit, Habit, HabitEnriched } from '@/types/habit.type';
 import { api } from '../utils/apiUtils';
-import { getDateTime } from '../utils/dateUtils';
-import { generateId } from '../utils/stringUtils';
 
 export default function createHabitRepository() {
     //const planRepository = createPlanRepository();
@@ -21,11 +19,13 @@ export default function createHabitRepository() {
     }
 
     const list = async (filter?: Partial<Habit>): Promise<HabitEnriched[]> => {
+        console.log("HabitRepository.list - filter:", filter);
         const habits = await api.list('habits', filter);
         return manyWithEnrichment(habits);
     };
 
     const getById = async (id: string): Promise<HabitEnriched> => {
+        console.log("HabitRepository.getById - id:", id);
         const habit = await api.get('habits', { id });
 
         if (!habit) 
@@ -35,13 +35,8 @@ export default function createHabitRepository() {
     };
 
     const create = async (createHabit: CreateHabit): Promise<HabitEnriched> => {
-        const habit = {
-            ...createHabit,
-            id: generateId(),
-            createdAt: getDateTime()
-        } satisfies Habit;
-
-        const habitCreated = await api.create('habits', habit);
+        console.log("HabitRepository.create - createHabit:", createHabit);
+        const habitCreated = await api.createWithBody('habits', createHabit);
         return oneWithEnrichment(habitCreated);
     };
 

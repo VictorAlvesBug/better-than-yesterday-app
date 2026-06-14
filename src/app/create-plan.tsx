@@ -62,13 +62,13 @@ export default function CreatePlanScreen() {
   }
 
   const radioButtonOptions: RadioButtonOption[] = [{
-    value: 'private',
+    value: 'Private',
     icon: { name: 'lock-closed-outline', size: 20 },
     title: 'Privado',
     complement: 'Apenas para amigos e família'
   },
   {
-    value: 'public',
+    value: 'Public',
     icon: { name: 'globe-outline', size: 20 },
     title: 'Público',
     complement: 'Qualquer pessoa pode participar'
@@ -89,7 +89,7 @@ export default function CreatePlanScreen() {
           endsAt: getDateOnlyWithOffset(8),
           daysOffPerWeek: daysPerWeek,
           penaltyValue: 10,
-          type: 'private',
+          type: 'Private',
         });
 
         setLoading(false);
@@ -99,10 +99,13 @@ export default function CreatePlanScreen() {
     fetchData();
   }, [habitRepository, Memory]);
 
-  if (loading || !plan)
-    return <ActivityIndicator size="large" color={getColor("gray-6")} />
+  //if (!plan)
+  //  return <ActivityIndicator size="large" color={getColor("gray-6")} />
 
   const createPlan = async () => {
+    if (loading || !plan)
+      return;
+
     const habit = habitList.find(h => h.id === plan.habitId);
 
     if (!habit) {
@@ -110,16 +113,19 @@ export default function CreatePlanScreen() {
       return;
     }
 
-    habit.justAdded && await habitRepository.create({
-      name: habit.name,
-    });
+    if (habit.justAdded){
+      const newHabit = await habitRepository.create({
+        name: habit.name,
+      });
+      plan.habitId = newHabit.id;
+    }
 
     plan.ownerId = await Memory.get('userId') || '';
 
 
     plan.daysOffPerWeek = 7 - daysPerWeek;
 
-    if(!checkIfIsValidAndToast(createPlanSchema, plan)){
+    if (!checkIfIsValidAndToast(createPlanSchema, plan)) {
       return;
     }
 
@@ -138,6 +144,10 @@ export default function CreatePlanScreen() {
     navigation.back();
   };
 
+  if (!plan){
+    return;
+  }
+
   return (
     <>
       <GradientView
@@ -151,108 +161,114 @@ export default function CreatePlanScreen() {
         </Text>
       </GradientView>
       <KeyboardableView>
-        <View
-          className="flex-1 w-full gap-6 px-4 py-3"
-          style={{ backgroundColor: getColor("gray-e") }}
-        >
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Hábitos</Label>
-            <SearchableSelect<Habit>
-              label="Selecione o Hábito"
-              placeholder="Escolha um hábito..."
-              value={plan.habitId}
-              formatOptionLabel={habit => habit.name}
-              options={habitList}
-              onChange={selectedHabit => {
-                setPlan({ ...plan, habitId: selectedHabit.id });
-                setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.id === selectedHabit.id)))
-              }}
-              createOption={createHabit}
-            />
-          </Card>
+        {loading ? (
+          <ActivityIndicator size="large" color={getColor("gray-6")} />
+        ) :
+          (
+            <View
+              className="flex-1 w-full gap-6 px-4 py-3"
+              style={{ backgroundColor: getColor("gray-e") }}
+            >
+              <Card className="flex flex-col items-start justify-center w-full gap-1">
+                <Label>Hábitos</Label>
+                <SearchableSelect<Habit>
+                  label="Selecione o Hábito"
+                  placeholder="Escolha um hábito..."
+                  value={plan.habitId}
+                  formatOptionLabel={habit => habit.name}
+                  options={habitList}
+                  onChange={selectedHabit => {
+                    setPlan({ ...plan, habitId: selectedHabit.id });
+                    setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.id === selectedHabit.id)))
+                  }}
+                  createOption={createHabit}
+                />
+              </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Descrição (opcional)</Label>
-            <Input
-              placeholder="Ex: Treinar ao menos 45 minutos..."
-              value={plan.description}
-              onChange={(value) => setPlan({ ...plan, description: value })}
-            />
-          </Card>
+              <Card className="flex flex-col items-start justify-center w-full gap-1">
+                <Label>Descrição (opcional)</Label>
+                <Input
+                  placeholder="Ex: Treinar ao menos 45 minutos..."
+                  value={plan.description}
+                  onChange={(value) => setPlan({ ...plan, description: value })}
+                />
+              </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Período do Plano</Label>
-            <DateRangeSelect
-              startValueLabel="Data de Início"
-              startValue={getDateToFront(plan.startsAt)}
-              setStartValue={startsAt => setPlan({ ...plan, startsAt: getDateOnly(startsAt) })}
-              formatStartDescription={formatDateRelativeToToday}
-              minValue={getDateToFrontWithOffset(+1)}
-              endValueLabel="Data de Término"
-              endValue={getDateToFront(plan.endsAt)}
-              setEndValue={endsAt => setPlan({ ...plan, endsAt: getDateOnly(endsAt) })}
-              formatEndDescription={formatDateRelativeToToday}
-            />
-          </Card>
+              <Card className="flex flex-col items-start justify-center w-full gap-1">
+                <Label>Período do Plano</Label>
+                <DateRangeSelect
+                  startValueLabel="Data de Início"
+                  startValue={getDateToFront(plan.startsAt)}
+                  setStartValue={startsAt => setPlan({ ...plan, startsAt: getDateOnly(startsAt) })}
+                  formatStartDescription={formatDateRelativeToToday}
+                  minValue={getDateToFrontWithOffset(+1)}
+                  endValueLabel="Data de Término"
+                  endValue={getDateToFront(plan.endsAt)}
+                  setEndValue={endsAt => setPlan({ ...plan, endsAt: getDateOnly(endsAt) })}
+                  formatEndDescription={formatDateRelativeToToday}
+                />
+              </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Quantas vezes por semana?</Label>
-            <AmountSelect
-              value={daysPerWeek}
-              setValue={value => setDaysPerWeek(value)}
-              minValue={1}
-              maxValue={7}
-              selectedIcon={{
-                type: 'octicons',
-                name: 'check-circle-fill',
-                color: 'violet'
-              }}
-              nonSelectedIcon={{
-                type: 'font-awesome-6',
-                name: 'umbrella-beach'
-              }}
-              className='w-full'
-            />
-          </Card>
+              <Card className="flex flex-col items-start justify-center w-full gap-1">
+                <Label>Quantas vezes por semana?</Label>
+                <AmountSelect
+                  value={daysPerWeek}
+                  setValue={value => setDaysPerWeek(value)}
+                  minValue={1}
+                  maxValue={7}
+                  selectedIcon={{
+                    type: 'octicons',
+                    name: 'check-circle-fill',
+                    color: 'violet'
+                  }}
+                  nonSelectedIcon={{
+                    type: 'font-awesome-6',
+                    name: 'umbrella-beach'
+                  }}
+                  className='w-full'
+                />
+              </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Multa por Descumprimento</Label>
-            <SearchableSelect<PenaltyOption>
-              label="Selecione o Valor"
-              value={plan.penaltyValue.toString()}
-              options={penaltyOptions}
-              formatOptionLabel={penaltyValue => penaltyValue.label}
-              onChange={selectedPenaltyValue => {
-                setPlan({ ...plan, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
-              }}
-            />
-          </Card>
+              <Card className="flex flex-col items-start justify-center w-full gap-1">
+                <Label>Multa por Descumprimento</Label>
+                <SearchableSelect<PenaltyOption>
+                  label="Selecione o Valor"
+                  value={plan.penaltyValue.toString()}
+                  options={penaltyOptions}
+                  formatOptionLabel={penaltyValue => penaltyValue.label}
+                  onChange={selectedPenaltyValue => {
+                    setPlan({ ...plan, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
+                  }}
+                />
+              </Card>
 
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <Label>Tipo de Plano</Label>
-            <RadioButtonSelect
-              selectedValue={plan.type}
-              onChange={value => setPlan({ ...plan, type: value as PlanType })}
-              options={radioButtonOptions} />
-          </Card>
+              <Card className="flex flex-col items-start justify-center w-full gap-1">
+                <Label>Tipo de Plano</Label>
+                <RadioButtonSelect
+                  selectedValue={plan.type}
+                  onChange={value => setPlan({ ...plan, type: value as PlanType })}
+                  options={radioButtonOptions} />
+              </Card>
 
-          <Card className="flex flex-row items-center justify-between w-full gap-1">
-            <Label>Participar do Plano</Label>
-            <Switch
-              value={joinAfterCreated}
-              onValueChange={checked => setJoinAfterCreated(checked)}
-              trackColor={{ true: getColor('light-purple'), false: getColor('gray-9') }}
-              thumbColor={getColor(joinAfterCreated ? 'light-violet' : 'gray-d')}
-              ios_backgroundColor="#767577"
-            />
-          </Card>
+              <Card className="flex flex-row items-center justify-between w-full gap-1">
+                <Label>Participar do Plano</Label>
+                <Switch
+                  value={joinAfterCreated}
+                  onValueChange={checked => setJoinAfterCreated(checked)}
+                  trackColor={{ true: getColor('light-purple'), false: getColor('gray-9') }}
+                  thumbColor={getColor(joinAfterCreated ? 'light-violet' : 'gray-d')}
+                  ios_backgroundColor="#767577"
+                />
+              </Card>
 
-          <Button className='p-0 overflow-hidden' action={createPlan}>
-            <GradientView className="flex flex-col items-center justify-center w-full h-full">
-              <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Criar Plano</Text>
-            </GradientView>
-          </Button>
-        </View>
+              <Button className='p-0 overflow-hidden' action={createPlan}>
+                <GradientView className="flex flex-col items-center justify-center w-full h-full">
+                  <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Criar Plano</Text>
+                </GradientView>
+              </Button>
+            </View>
+          )}
+
       </KeyboardableView>
     </>
   );

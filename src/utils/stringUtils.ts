@@ -1,3 +1,5 @@
+import * as Crypto from "expo-crypto";
+
 export function toCapitalize(text: string) {
     if (text === null || text === undefined)
         throw new Error(`Texto inválido (${text})`);
@@ -49,6 +51,11 @@ export function generateId(): string {
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
+}
+
+export function getHash(content: object): Promise<string> {
+    const json = JSON.stringify(content);
+    return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, json);
 }
 
 export const formatEachAndJoin = <TItem>(

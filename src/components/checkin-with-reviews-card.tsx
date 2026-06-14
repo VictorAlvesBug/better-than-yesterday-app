@@ -30,7 +30,7 @@ export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
 
     const review: CheckinReview = {
       reviewerId: userId,
-      status: 'validated' // TODO: Validate string to 'validated' or 'rejected'
+      status: 'Validated' // TODO: Validate string to 'Validated' or 'Rejected'
     }
 
     checkinRepository.saveReview(id, review);
@@ -41,7 +41,7 @@ export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
     
     const review: CheckinReview = {
       reviewerId: userId,
-      status: 'rejected' // TODO: Validate string to 'validated' or 'rejected'
+      status: 'Rejected' // TODO: Validate string to 'Validated' or 'Rejected'
     }
 
     checkinRepository.saveReview(id, review);
@@ -73,12 +73,12 @@ export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
 
       <Text className="px-6 text-md">{title}</Text>
 
-      {(reviews.length > 0 || status === 'pending')
+      {(reviews.length > 0 || status === 'Pending')
         && <View style={{ backgroundColor: getColor("gray-d"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}
 
       {reviews.length > 0 && renderReviews(reviews)}
 
-      {status === 'pending' && renderReviewButtons(reviewAsValidated, reviewAsRejected)}
+      {status === 'Pending' && renderReviewButtons(reviewAsValidated, reviewAsRejected)}
     </View>
   );
 }
@@ -86,19 +86,19 @@ export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
 function renderStatus(status: CheckinStatus) {
   const defaultClasses = 'px-3 py-1 font-semibold rounded-full text-sm';
 
-  if (status === 'pending')
+  if (status === 'Pending')
     return (
       <Text style={{ backgroundColor: getColor("light-warning"), color: getColor("warning") }} className={`${defaultClasses}`}>
         Pendente
       </Text>
     );
-  if (status === 'validated')
+  if (status === 'Validated')
     return (
       <Text style={{ backgroundColor: getColor("light-success"), color: getColor("success") }} className={`${defaultClasses}`}>
         Validado
       </Text>
     );
-  if (status === 'rejected')
+  if (status === 'Rejected')
     return (
       <Text style={{ backgroundColor: getColor("light-danger"), color: getColor("danger") }} className={`${defaultClasses}`}>
         Rejeitado
@@ -108,10 +108,10 @@ function renderStatus(status: CheckinStatus) {
 
 function renderReviews(reviews: CheckinReview[]) {
   const validationReviews = reviews.filter(
-    (review) => review.status === 'validated',
+    (review) => review.status === 'Validated',
   );
   const rejectionReviews = reviews.filter(
-    (review) => review.status === 'rejected',
+    (review) => review.status === 'Rejected',
   );
 
   const validationText =

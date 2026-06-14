@@ -1,11 +1,11 @@
 import { ColorName, getColor } from '@/types/color.type'
-import { PlanStatus, PlanToJoin } from '@/types/plan.type'
+import { PlanToJoin } from '@/types/plan.type'
 import React, { useState } from 'react'
-import { Text, View } from 'react-native'
+import { ActivityIndicator, Text, View } from 'react-native'
 import Memory from '../api/memory'
 import createPlanRepository from '../api/planRepository'
 import useEffectAsync from '../hooks/useEffectAsync'
-import { formatDateRelativeToToday, getDateOnly, getDateToFront, getDifferenceInDays } from '../utils/dateUtils'
+import { formatDateRelativeToToday, getDateToFront, getDifferenceInDays } from '../utils/dateUtils'
 import { formatIntegerCompact, formatMoney } from '../utils/numberUtils'
 import { getAbbreviatedName } from '../utils/stringUtils'
 import { toastInfoMessage } from '../utils/toastUtils'
@@ -26,10 +26,13 @@ export default function PlanCard({
 }: PlanCardProps) {
     const planRepository = createPlanRepository();
     const [userId, setUserId] = useState<string>('');
+    const [loading, setLoading] = useState(true);
 
     useEffectAsync(async () => {
         const userId = await Memory.get('userId') || '';
+        console.log('Rendering PlanCard - userId:', userId);
         setUserId(userId);
+        setLoading(false);
     }, []);
 
     const role = getButtonRole(plan);
@@ -44,186 +47,191 @@ export default function PlanCard({
 
     return (
         <View className="flex flex-col items-start justify-center w-full gap-2 py-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
-            {/* Header */}
-            <View className="flex flex-row items-center justify-center flex-1 gap-3 px-4 py-1">
-                <Icon name="goal" size={16} />
-                <View className='flex flex-col items-start justify-center flex-1'>
-                    <Text
-                        className="text-base font-semibold"
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                    >
-                        {plan.habitName}
-                    </Text>
-                    {
-                        plan.description &&
-                        <Text
-                            className={`text-sm`}
-                            numberOfLines={1}
-                            ellipsizeMode="tail">
-                            {plan.description}
-                        </Text>
-                    }
-                </View>
-                {
-                    plan.ownerName &&
-                    <Text
-                        style={{ backgroundColor: getColor("light-violet"), color: getColor("white") }}
-                        className={`px-2 py-0.5 font-bold rounded-full text-xs`}
-                        numberOfLines={1}
-                        ellipsizeMode="tail">
-                        {getAbbreviatedName(plan.ownerName)}
-                    </Text>
-                }
-            </View>
-
-            <View style={{ backgroundColor: getColor("gray-7"), width: "95%", height: 0.5 }} className="mx-auto"></View>
-
-            {/* Content */}
-            <View className='flex flex-col items-start justify-center gap-4 px-6'>
-                <View className="flex flex-row items-center justify-between w-full">
-                    <View className="flex flex-row items-center justify-center gap-3">
-                        <Icon name="calendar-clear-outline" size={14} />
-                        <View className='flex flex-col items-start justify-center'>
+            {loading && (
+                <ActivityIndicator size="large" color={getColor("gray-6")} />
+            )}
+            {!loading && (
+                <>
+                    {/* Header */}
+                    <View className="flex flex-row items-center justify-center flex-1 gap-3 px-4 py-1">
+                        <Icon name="goal" size={16} />
+                        <View className='flex flex-col items-start justify-center flex-1'>
                             <Text
                                 className="text-base font-semibold"
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                             >
-                                Início:
+                                {plan.habitName}
                             </Text>
+                            {
+                                plan.description &&
+                                <Text
+                                    className={`text-sm`}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail">
+                                    {plan.description}
+                                </Text>
+                            }
+                        </View>
+                        {
+                            plan.ownerName &&
                             <Text
-                                className={`text-sm`}
+                                style={{ backgroundColor: getColor("light-violet"), color: getColor("white") }}
+                                className={`px-2 py-0.5 font-bold rounded-full text-xs`}
                                 numberOfLines={1}
                                 ellipsizeMode="tail">
-                                {`${getDateToFront(plan.startsAt)} (${formatDateRelativeToToday(plan.startsAt).toLocaleLowerCase()})`}
+                                {getAbbreviatedName(plan.ownerName)}
                             </Text>
+                        }
+                    </View>
+
+                    <View style={{ backgroundColor: getColor("gray-7"), width: "95%", height: 0.5 }} className="mx-auto"></View>
+
+                    {/* Content */}
+                    <View className='flex flex-col items-start justify-center gap-4 px-6'>
+                        <View className="flex flex-row items-center justify-between w-full">
+                            <View className="flex flex-row items-center justify-center gap-3">
+                                <Icon name="calendar-clear-outline" size={14} />
+                                <View className='flex flex-col items-start justify-center'>
+                                    <Text
+                                        className="text-base font-semibold"
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail"
+                                    >
+                                        Início:
+                                    </Text>
+                                    <Text
+                                        className={`text-sm`}
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail">
+                                        {`${getDateToFront(plan.startsAt)} (${formatDateRelativeToToday(plan.startsAt).toLocaleLowerCase()})`}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View className='flex flex-col items-start justify-center'>
+                                <Text
+                                    className="text-base font-semibold"
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
+                                >
+                                    Duração:
+                                </Text>
+                                <Text
+                                    className={`text-sm`}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail">
+                                    {getDifferenceInDays(plan.startsAt, plan.endsAt)} dias
+                                </Text>
+                            </View>
+                        </View>
+                        <View className="flex flex-row items-center justify-between w-full">
+                            <View className="flex flex-row items-center justify-center gap-3">
+                                <Icon name="money" size={14} />
+                                <View className='flex flex-col items-start justify-center'>
+                                    <Text
+                                        className="text-base font-semibold"
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail"
+                                    >
+                                        Penalidade por falha:
+                                    </Text>
+                                    <Text
+                                        className={`text-sm`}
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail">
+                                        {formatMoney(plan.penaltyValue)}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View className="flex flex-row items-center justify-center gap-1">
+                                <Icon name="people" size={16} />
+                                <View className='flex flex-col items-start justify-center'>
+                                    <Text
+                                        className={`text-sm font-bold`}
+                                        style={{ color: getColor('gray-7') }}
+                                        numberOfLines={1}
+                                        ellipsizeMode="tail">
+                                        {formatIntegerCompact(plan.memberCount)}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <View className='flex flex-row'>
+                            <AmountSelect
+                                value={7 - plan.daysOffPerWeek}
+                                minValue={1}
+                                maxValue={7}
+                                selectedIcon={{
+                                    type: 'octicons',
+                                    name: 'check-circle-fill',
+                                    color: 'gray-7',
+                                    size: 16
+                                }}
+                                nonSelectedIcon={{
+                                    type: 'font-awesome-6',
+                                    name: 'umbrella-beach',
+                                    color: 'gray-7',
+                                    size: 16
+                                }}
+                                className='flex-1'
+                            />
                         </View>
                     </View>
 
-                    <View className='flex flex-col items-start justify-center'>
-                        <Text
-                            className="text-base font-semibold"
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                        >
-                            Duração:
-                        </Text>
-                        <Text
-                            className={`text-sm`}
-                            numberOfLines={1}
-                            ellipsizeMode="tail">
-                            {getDifferenceInDays(plan.startsAt, plan.endsAt)} dias
-                        </Text>
+                    {/* Footer */}
+                    <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
+                        <Button
+                            color={buttonInfo.baseColor}
+                            action={buttonInfo.action}
+                            className="flex flex-row flex-1 h-10 py-2 rounded-xl">
+                            {buttonInfo.text}
+                        </Button>
                     </View>
-                </View>
-                <View className="flex flex-row items-center justify-between w-full">
-                    <View className="flex flex-row items-center justify-center gap-3">
-                        <Icon name="money" size={14} />
-                        <View className='flex flex-col items-start justify-center'>
-                            <Text
-                                className="text-base font-semibold"
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                Penalidade por falha:
-                            </Text>
-                            <Text
-                                className={`text-sm`}
-                                numberOfLines={1}
-                                ellipsizeMode="tail">
-                                {formatMoney(plan.penaltyValue)}
-                            </Text>
-                        </View>
-                    </View>
-
-                    <View className="flex flex-row items-center justify-center gap-1">
-                        <Icon name="people" size={16} />
-                        <View className='flex flex-col items-start justify-center'>
-                            <Text
-                                className={`text-sm font-bold`}
-                                style={{ color: getColor('gray-7') }}
-                                numberOfLines={1}
-                                ellipsizeMode="tail">
-                                {formatIntegerCompact(plan.memberCount)}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-
-                <View className='flex flex-row'>
-                    <AmountSelect
-                        value={7 - plan.daysOffPerWeek}
-                        minValue={1}
-                        maxValue={7}
-                        selectedIcon={{
-                            type: 'octicons',
-                            name: 'check-circle-fill',
-                            color: 'gray-7',
-                            size: 16
-                        }}
-                        nonSelectedIcon={{
-                            type: 'font-awesome-6',
-                            name: 'umbrella-beach',
-                            color: 'gray-7',
-                            size: 16
-                        }}
-                        className='flex-1'
-                    />
-                </View>
-            </View>
-
-            {/* Footer */}
-            <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
-                <Button
-                    color={buttonInfo.baseColor}
-                    action={buttonInfo.action}
-                    className="flex flex-row flex-1 h-10 py-2 rounded-xl">
-                    {buttonInfo.text}
-                </Button>
-            </View>
-        </View>
+                </>
+            )}
+        </View >
     )
 }
 
 function getButtonRole(plan: PlanToJoin): ButtonRole {
-    const planStatus = getPlanStatus(plan);
-
-    switch (planStatus) {
-        case 'finished':
+    switch (plan.status) {
+        case 'Finished':
             return 'peek';
 
-        case 'not-started':
+        case 'NotStarted':
             if (plan.joined)
                 return 'leave';
             return 'join'
 
-        case 'running':
+        case 'Running':
             if (plan.joined)
                 return 'leave';
             return 'peek'
 
-        case 'cancelled':
+        case 'Cancelled':
             throw new Error('Planos cancelados não devem ser exibidos nessa tela');
 
         default:
-            const _exhaustive: never = planStatus;
+            const _exhaustive: never = plan.status;
             return _exhaustive;
     }
 }
 
-function getPlanStatus(plan: PlanToJoin): PlanStatus {
+/*function getPlanStatus(plan: PlanToJoin): PlanStatus {
     if (plan.isCancelled)
-        return 'cancelled';
+        return 'Cancelled';
 
     if (getDateOnly() < plan.startsAt)
-        return 'not-started';
+        return 'NotStarted';
 
     if (getDateOnly() < plan.endsAt)
-        return 'running';
+        return 'Running';
 
-    return 'finished';
-}
+    return 'Finished';
+}*/
 
 type GetActionOptions = {
     role: ButtonRole;
@@ -259,7 +267,7 @@ function getButtonInfo({ role, planId, userId, planRepository, callback }: GetAc
                 baseColor: 'danger',
                 lightColor: 'light-danger',
                 action: async () => {
-                    await planRepository.leave({planId, userId});
+                    await planRepository.leave({ planId, userId });
                     callback && await callback(planId, false);
                 },
             };

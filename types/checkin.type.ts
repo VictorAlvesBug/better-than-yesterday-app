@@ -3,10 +3,10 @@ import { zodEnumWithValidation, zodExtractWithValidation } from "@/src/utils/zod
 import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
 
-const checkinStatusSchema = zodEnumWithValidation(['pending', 'validated', 'rejected'] as const, "Status do check-in");
+const checkinStatusSchema = zodEnumWithValidation(['Pending', 'Validated', 'Rejected'] as const, "Status do check-in");
 export type CheckinStatus = z.infer<typeof checkinStatusSchema>;
 
-const reviewStatusOptions = ['validated', 'rejected'] as const satisfies CheckinStatus[];
+const reviewStatusOptions = ['Validated', 'Rejected'] as const satisfies CheckinStatus[];
 const reviewStatusSchema = zodExtractWithValidation(checkinStatusSchema, reviewStatusOptions, "Status da revisão");
 
 export type ReviewStatus = z.infer<typeof reviewStatusSchema>;
@@ -23,6 +23,7 @@ export type CheckinReviewEnriched = CheckinReview & {
 };
 
 const checkinSchema = baseResourceSchema.extend({
+  id: z.guid({ error: "ID do checkin é obrigatório" }),
   kind: z.literal('checkin'),
   planId: z.guid({ error: "ID do plano deve ser um UUID válido" }),
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
@@ -40,8 +41,8 @@ export type CheckinEnriched = Checkin & {
 };
 
 export const createCheckinSchema = checkinSchema.omit({
-  kind: true,
   id: true,
+  kind: true,
   createdAt: true,
   status: true,
   reviews: true

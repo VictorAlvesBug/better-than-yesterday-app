@@ -11,6 +11,7 @@ import {
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
 import createPlanRepository from '../api/planRepository';
+import createS3Repository from '../api/s3Repository';
 import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import Card from '../components/card';
@@ -20,35 +21,76 @@ import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import useNavigation from '../hooks/useNavigation';
-import { formatDateRelativeToToday, getDateOnly, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
-import { checkIfIsValidAndToast, toastErrorMessage, toastInfoMessage, toastSuccessMessage } from '../utils/toastUtils';
+import { formatDateRelativeToToday, getDateComponents, getDateOnly, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
+import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
 export default function CreateCheckinScreen() {
     const navigation = useNavigation();
     const [loading, setLoading] = useState(true);
 
-    const [checkin, setCheckin] = useState<CreateCheckin | null>(null);
+    const [checkin, setCheckin] = useState<CreateCheckin>({
+        userId: '',
+        planId: '',
+        date: getDateOnly(),
+        photoUrl: '',
+        title: ''
+    });
+
+    const [file, setFile] = useState([]);
+    const [currentFile, setCurrentFile] = useState('');
+
 
     const planRepository = createPlanRepository();
     const checkinRepository = createCheckinRepository();
+    const s3Repository = createS3Repository();
 
-  const openCamera = async () => {
-      toastInfoMessage("TODO: Pick Gallery Photo");
-    const result = await ImagePicker.launchCameraAsync({
-        cameraType: ImagePicker.CameraType.back,
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      quality: 1,
-    });
+    const openCamera = async (): Promise<string> => {
+        const result = await ImagePicker.launchCameraAsync({
+            cameraType: ImagePicker.CameraType.back,
+            mediaTypes: ["images"],
+            quality: 1,
+            //base64: true
+        });
 
-    if (result.canceled) {
-        toastInfoMessage("Nenhuma foto capturada");
-        return;
-    }
-    
-    toastInfoMessage(result.assets[0].uri);
-    //setCheckin({...checkin, photoUrl: result.assets[0].uri});
-  };
+        if (result.canceled) {
+            throw new Error("Nenhuma foto capturada");
+        }
+
+        // TODO: Refactor to persist image only when checkin is created. Use Amazon S3
+
+        const asset = result.assets[0];
+        
+        const { year, month, day} = getDateComponents(checkin.date);
+
+        const params = {
+                bucket: 'checkin-213615929868-sa-east-1-an',
+                filePath: asset.uri.replace('file://', ''),
+                fileName: `${checkin.userId}/${checkin.planId}/${year}/${month}/${day}.jpg`,
+                fileType: 'image/jpeg'
+        }
+
+        await s3Repository.uploadFile(params);
+
+        return asset.uri;
+    };
+
+    const handleOpenCamera = async () => {
+        try {
+            const url = await openCamera();
+            setCheckin({ ...checkin, photoUrl: url });
+        } catch (err) {
+            if (err instanceof Error) {
+                toastErrorMessage(err.message)
+                if (!checkin.photoUrl) navigation.back();
+                return;
+            }
+
+            toastErrorMessage('Ocorreu um erro');
+        }
+    };
+
+    const handleUploadImage = async () => {
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -57,27 +99,27 @@ export default function CreateCheckinScreen() {
                 const userId = await Memory.get('userId') || '';
                 const planId = await Memory.get('planId') || '';
 
-                const planMembers = await planRepository.listPlanMembers({
-                    userId,
-                    planId
-                });
+                const planMembers = await planRepository.getPlanMemberDetails(
+                    planId,
+                    userId
+                );
 
-                if (planMembers.length === 0) {
+                if (!planMembers) {
                     toastErrorMessage('Você não faz parte deste plano');
+                    navigation.back();
                     return;
                 }
 
-                if (planMembers.some(planMember => planMember.status === 'blocked')) {
+                if (planMembers.status === 'Blocked') {
                     toastErrorMessage('Você está bloqueado. Pague a multa para continuar participando');
+                    navigation.back();
                     return;
                 }
 
                 setCheckin({
+                    ...checkin,
                     userId,
                     planId,
-                    date: getDateOnly(),
-                    photoUrl: '',
-                    title: ''
                 });
 
                 setLoading(false);
@@ -85,9 +127,10 @@ export default function CreateCheckinScreen() {
         };
 
         fetchData();
+        //handleOpenCamera();
     }, [Memory]);
 
-    if (loading || !checkin)
+    if (loading)
         return <ActivityIndicator size="large" color={getColor("gray-6")} />
 
     const createCheckin = async () => {
@@ -117,17 +160,19 @@ export default function CreateCheckinScreen() {
                     className="flex-1 w-full gap-6 px-4 py-3"
                     style={{ backgroundColor: getColor("gray-e") }}
                 >
-                    <Card className="flex flex-row items-center justify-center w-full gap-3">
-                        <View className="flex flex-col items-start justify-center gap-1 w-fit">
+                    <Card className="relative flex flex-row items-center justify-center w-full">
+                        <View className="flex flex-col items-start justify-center w-full">
                             <Image
                                 source={{
                                     uri: checkin.photoUrl,
                                 }}
-                                style={{ width: 80, height: 80, borderRadius: 20 }}
+                                style={{ width: '100%', aspectRatio: 4/3, borderRadius: 16 }}
                             />
                         </View>
-                        <Button action={openCamera}>Escolher uma foto</Button>
+                        <Button action={handleOpenCamera}
+                        className='absolute right-7 bottom-7'>Alterar foto</Button>
                     </Card>
+                    <Button action={handleUploadImage}>Persistir foto</Button>
 
                     <Card className="flex flex-col items-start justify-center w-full gap-1">
                         <Label>Título</Label>

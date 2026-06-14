@@ -55,14 +55,14 @@ export default function PlanTrackerScreen() {
 
   const readingMembers = useMemo(() => {
     return planMembers
-      .filter((member) => member.planId === READING_PLAN_ID && member.status === 'active')
-      .map((member) => {
-        const user = users.find((u) => u.id === member.userId);
+      .filter((planMember) => planMember.planId === READING_PLAN_ID && planMember.status === 'Active')
+      .map((planMember) => {
+        const user = users.find((u) => u.id === planMember.userId);
         return {
-          id: member.id,
-          userId: member.userId,
+          id: planMember.id,
+          userId: planMember.userId,
           nickname: user?.nickname ?? 'Membro',
-          status: member.status,
+          status: planMember.status,
         };
       });
   }, [planMembers, users]);

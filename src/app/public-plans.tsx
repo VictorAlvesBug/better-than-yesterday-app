@@ -28,14 +28,13 @@ export default function PublicPlansScreen() {
     useEffectAsync(async () => {
         const userId = await Memory.get('userId') || '';// TODO: Always logout user if userId was not found
 
-        const joinedPlanIds = (await planRepository.listPlanMembers({ userId, status: 'active' }))
-            .map(joinedPlan => joinedPlan.id);
+        const { plans } = (await planRepository.getUserWithPlansByUserId(userId));
 
-        const publicPlans = (await planRepository.list({ type: 'public' }))
+        const publicPlans = (await planRepository.list({ type: 'Public' }))
             .map(publicPlan => {
                 return {
                     ...publicPlan,
-                    joined: joinedPlanIds.includes(publicPlan.id)
+                    joined: plans.some(plan => plan.id === publicPlan.id)
                 } satisfies PlanToJoin;
             });
 
@@ -61,7 +60,7 @@ export default function PublicPlansScreen() {
                     className="flex flex-row items-center justify-center w-full"
                 >
                     <BackButton />
-                    <Text style={{ color: getColor("white") }} className="flex-1 text-lg font-bold text-left">
+                    <Text style={{ color: getColor("white") }} className="flex-1 text-xl font-bold text-left">
                         Planos Populares
                     </Text>
                     <Pressable

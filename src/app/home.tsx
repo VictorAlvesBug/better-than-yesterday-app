@@ -59,7 +59,7 @@ export default function HomeScreen() {
     setTimeout(() => {
         setRedirectionScreen(prev => {
             if (prev === 'loading')
-                return 'not-found';
+                return isSignedIn ? 'not-found' : 'login';
 
             else return prev;
         });

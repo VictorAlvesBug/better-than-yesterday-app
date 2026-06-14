@@ -1,15 +1,15 @@
 
 import { CreateUser, User } from '@/types/user.type';
 import { api } from '../utils/apiUtils';
-import { getDateTime } from '../utils/dateUtils';
-import { generateId } from '../utils/stringUtils';
 
 export default function createUserRepository() {
     const list = async (filter?: Partial<User>): Promise<User[]> => {
+        console.log("UserRepository.list - filter:", filter);
         return await api.list('users', filter);
     };
 
     const getById = async (id: string): Promise<User> => {
+        console.log("UserRepository.getById - id:", id);
         const user = await api.get('users', { id });
 
         if (!user)
@@ -19,6 +19,7 @@ export default function createUserRepository() {
     }
 
     const get = async (filter?: Partial<User>): Promise<User> => {
+        console.log("UserRepository.get - filter:", filter);
         const user = await api.get('users', filter);
 
         if (!user)
@@ -28,13 +29,10 @@ export default function createUserRepository() {
     }
 
     const create = async (createUser: CreateUser): Promise<User> => {
-        const user = {
-            ...createUser,
-            id: generateId(),
-            createdAt: getDateTime(),
-        } satisfies User;
+        createUser.phoneNumber = createUser.phoneNumber.replace(/\D/g, '');
+        console.log("UserRepository.create - createUser:", createUser);
         
-        return await api.create('users', user);
+        return await api.createWithBody('users', createUser);
     }
 
     return {

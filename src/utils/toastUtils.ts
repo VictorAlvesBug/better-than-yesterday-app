@@ -1,5 +1,7 @@
-import Toast, { ToastType } from "react-native-toast-message";
+import Toast from "react-native-toast-message";
 import { z } from "zod";
+
+type ToastType = 'info' | 'success' | 'error';
 
 export function checkIfIsValidAndToast<
     TSchema extends z.ZodType
@@ -20,21 +22,41 @@ export function checkIfIsValidAndToast<
 }
 
 export function toastErrorMessage(message: string) {
+    console.error(`ToastErrorMessage | Message: ${message}`);
     toastMessage('error', message, "Ops");
 }
 
 export function toastSuccessMessage(message: string) {
+    console.log(`ToastSuccessMessage | Message: ${message}`);
     toastMessage('success', message, "Sucesso");
 }
 
 export function toastInfoMessage(message: string) {
+    console.warn(`ToastInfoMessage | Message: ${message}`);
     toastMessage('info', message, "Informação");
 }
 
 function toastMessage(type: ToastType, message: string, title: string) {
+    const consoleFunc = getConsoleFunc(type);
+
+    consoleFunc && 
+        consoleFunc(`ToastMessage | Title: ${title} | Message: ${message}`);
     Toast.show({
         type,
         text1: title,
         text2: message
     });
+}
+
+function getConsoleFunc(type: ToastType) {
+    switch (type) {
+        case 'error':
+            return console.error;
+        case 'success':
+            return console.log;
+        case 'info':
+            return console.warn;
+        default:
+            const _exhaustive: never = type;
+    }
 }
