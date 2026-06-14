@@ -53,19 +53,19 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
 }: SearchableSelectProps<TBaseOption>) {
   const inputRef = useRef<TextInput | null>(null);
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [searchText, setSearchText] = useState('');
 
   const selectedOption = options.find((option) => getIdFromOption(option) === value);
 
   const filteredOptions = useMemo(() => {
-    if (!search.trim()) return options;
-    const s = search.toLowerCase();
+    if (!searchText.trim()) return options;
+    const s = searchText.toLowerCase();
     return options.filter((option) => formatOptionLabel(option).toLowerCase().includes(s));
-  }, [options, search, formatOptionLabel]);
+  }, [options, searchText, formatOptionLabel]);
 
   const onClose = () => {
     setOpen(false);
-    setSearch('');
+    setSearchText('');
   };
 
   useEffect(() => {
@@ -132,8 +132,9 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
                   ref={inputRef}
                   className="flex-1 outline-none"
                   placeholder="Buscar..."
-                  value={search}
-                  onChange={setSearch}
+                  value={searchText}
+                  onChange={setSearchText}
+                  maxLength={25}
                   icon={{ name: "search", size: 20, position: "left" }}
                 />
               </View>
@@ -189,7 +190,7 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
                   );
                 }}
                 ListEmptyComponent={
-                  createOption === undefined ? (
+                  createOption === undefined || !searchText ? (
                     <Text
                       className="py-4 text-sm text-center"
                       style={{ color: getColor('gray-7') }}
@@ -199,12 +200,12 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
                   ) : (
                     <Button
                       action={() => {
-                        const newOption = createOption(search);
+                        const newOption = createOption(searchText);
                         onChange(newOption);
                         onClose();
                       }}
                     >
-                      {`Criar "${search}"`}
+                      {`Criar "${searchText}"`}
                     </Button>
                   )
                 }

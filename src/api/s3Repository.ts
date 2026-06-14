@@ -1,5 +1,5 @@
 
-import { API_URL } from '@/src/utils/constants';
+import { JSON_API_URL } from '@/src/utils/constants';
 import AWS from 'aws-sdk';
 import axios from 'axios';
 import { toastErrorMessage } from '../utils/toastUtils';
@@ -19,7 +19,7 @@ type SettingsType = {
 export default function createS3Repository() {
 
     const init = async () => {
-        const response = await axios.get<SettingsType>(`${API_URL}/settings`);
+        const response = await axios.get<SettingsType>(`${JSON_API_URL}/settings`);
 
         AWS.config.update({
             accessKeyId: response.data.awsAccessKeyId,
@@ -31,6 +31,7 @@ export default function createS3Repository() {
     init();
 
     const uploadFile = async (props: UploadFileProps) => {
+        console.log("S3Repository.uploadFile - props:", props);
         try {
             const s3 = new AWS.S3();
 

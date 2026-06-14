@@ -3,7 +3,7 @@ import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { CreateUser, createUserSchema, User } from '@/types/user.type';
+import { CreateUser, createUserSchema, PixKeyType, pixKeyTypeSchema, User } from '@/types/user.type';
 import Constants from 'expo-constants';
 import React, { useEffect, useState } from 'react';
 import {
@@ -18,6 +18,7 @@ import Icon from '../components/icon';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
+import SearchableSelect from '../components/searchable-select';
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
 import { checkIfIsValidAndToast } from '../utils/toastUtils';
@@ -42,9 +43,10 @@ export default function CreateUserScreen() {
           email: authUser.email,
           name: authUser.name ?? '',
           nickname: authUser.name ?? '',
-          photo: authUser.photo ?? '',
+          photoUrl: authUser.photo ?? '',
           phoneNumber: '',
           pixKey: authUser.email,
+          pixKeyType: 'Email' as PixKeyType,
         });
 
         return;
@@ -55,9 +57,10 @@ export default function CreateUserScreen() {
           email: authUser.email,
           name: authUser.name ?? '',
           nickname: authUser.name ?? '',
-          photo: authUser.photo ?? '',
+          photoUrl: authUser.photo ?? '',
           phoneNumber: '',
           pixKey: authUser.email,
+          pixKeyType: 'Email' as PixKeyType,
         });
 
         return;
@@ -120,19 +123,19 @@ export default function CreateUserScreen() {
             <View className="flex flex-col items-start justify-center gap-1 w-fit">
               <Image
                 source={{
-                  uri: user.photo,
+                  uri: user.photoUrl,
                 }}
                 style={{ width: 80, height: 80, borderRadius: 9999 }}
               />
             </View>
 
             <View className="flex flex-col items-start justify-center flex-1 gap-1">
-              <Label>Nome</Label>
+              <Label>Nickname</Label>
               <Input
                 inputType='nickname'
-                value={user.name}
+                value={user.nickname}
                 onChange={(value) => {
-                  onChangeHandler('name', value);
+                  onChangeHandler('nickname', value);
                 }}
               />
             </View>
@@ -155,6 +158,19 @@ export default function CreateUserScreen() {
               value={user.phoneNumber}
               onChange={(value) => {
                 onChangeHandler('phoneNumber', value);
+              }}
+            />
+          </Card>
+
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <SearchableSelect<PixKeyType>
+              label="Selecione o Tipo de Chave Pix"
+              placeholder="Escolha um tipo de chave..."
+              value={user.pixKeyType}
+              formatOptionLabel={keyType => keyType}
+              options={Object.values(pixKeyTypeSchema.enum)}
+              onChange={selectedKeyType => {
+                onChangeHandler('pixKeyType', selectedKeyType);
               }}
             />
           </Card>

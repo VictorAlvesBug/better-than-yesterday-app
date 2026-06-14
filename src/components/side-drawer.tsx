@@ -48,7 +48,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const [user, setUser] = useState<User | null>(null);
   const [plans, setPlans] = useState<PlanEnriched[]>([]);
 
-  const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'not-started' status from filter
+  const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'NotStarted' status from filter
   const finishedPlans = plans.filter(plan => plan.endsAt < getDateOnly());
 
   useEffect(() => {
@@ -98,14 +98,14 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
           <Image
-            source={{ uri: user.photo }}
+            source={{ uri: user.photoUrl }} // TODO: Corrigir exibição da foto
             resizeMode="cover"
             className="w-12 h-12 rounded-full"
           />
           <View className="flex flex-col items-start justify-center flex-1">
             <Text className="font-semibold text-white">{user.name}</Text>
             <Text className="font-thin text-white">
-              Ranking: #{formatInteger(42)}
+              Ranking: #{formatInteger(42) /* TODO: Buscar posição do Ranking da API */}
             </Text>
           </View>
           <Pressable

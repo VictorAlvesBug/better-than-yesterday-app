@@ -99,18 +99,18 @@ export default function CreateCheckinScreen() {
                 const userId = await Memory.get('userId') || '';
                 const planId = await Memory.get('planId') || '';
 
-                const planMembers = await planRepository.listPlanMembers({
-                    userId,
-                    planId
-                });
+                const planMembers = await planRepository.getPlanMemberDetails(
+                    planId,
+                    userId
+                );
 
-                if (planMembers.length === 0) {
+                if (!planMembers) {
                     toastErrorMessage('Você não faz parte deste plano');
                     navigation.back();
                     return;
                 }
 
-                if (planMembers.some(planMember => planMember.status === 'blocked')) {
+                if (planMembers.status === 'Blocked') {
                     toastErrorMessage('Você está bloqueado. Pague a multa para continuar participando');
                     navigation.back();
                     return;

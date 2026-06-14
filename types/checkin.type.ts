@@ -3,10 +3,10 @@ import { zodEnumWithValidation, zodExtractWithValidation } from "@/src/utils/zod
 import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
 
-const checkinStatusSchema = zodEnumWithValidation(['pending', 'validated', 'rejected'] as const, "Status do check-in");
+const checkinStatusSchema = zodEnumWithValidation(['Pending', 'Validated', 'Rejected'] as const, "Status do check-in");
 export type CheckinStatus = z.infer<typeof checkinStatusSchema>;
 
-const reviewStatusOptions = ['validated', 'rejected'] as const satisfies CheckinStatus[];
+const reviewStatusOptions = ['Validated', 'Rejected'] as const satisfies CheckinStatus[];
 const reviewStatusSchema = zodExtractWithValidation(checkinStatusSchema, reviewStatusOptions, "Status da revisão");
 
 export type ReviewStatus = z.infer<typeof reviewStatusSchema>;

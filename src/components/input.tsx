@@ -26,6 +26,7 @@ type InputProps = {
   typeable?: boolean;
   grayBackground?: boolean;
   inputType?: InputType;
+  maxLength?: number;
   icon?: IconProps;
 };
 
@@ -39,6 +40,7 @@ export default function Input({
   inputType = 'default',
   typeable = true,
   grayBackground = false,
+  maxLength,
 }: InputProps) {
 
   const {
@@ -67,6 +69,7 @@ export default function Input({
           value={value || ""}
           multiline={false}
           onChangeText={onChange}
+          maxLength={maxLength}
           {...getKeyboardTypeProps(inputType, onChange)}
         />
       {

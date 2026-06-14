@@ -22,14 +22,17 @@ export function checkIfIsValidAndToast<
 }
 
 export function toastErrorMessage(message: string) {
+    console.error(`ToastErrorMessage | Message: ${message}`);
     toastMessage('error', message, "Ops");
 }
 
 export function toastSuccessMessage(message: string) {
+    console.log(`ToastSuccessMessage | Message: ${message}`);
     toastMessage('success', message, "Sucesso");
 }
 
 export function toastInfoMessage(message: string) {
+    console.warn(`ToastInfoMessage | Message: ${message}`);
     toastMessage('info', message, "Informação");
 }
 
