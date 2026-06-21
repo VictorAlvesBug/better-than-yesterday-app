@@ -62,16 +62,13 @@ export default function CreateCheckinScreen() {
         
         const { year, month, day} = getDateComponents(checkin.date);
 
-        const params = {
-                bucket: 'checkin-213615929868-sa-east-1-an',
-                filePath: asset.uri.replace('file://', ''),
+        const photoUrl = await s3Repository.uploadFile({
+                filePath: asset.uri,
                 fileName: `${checkin.userId}/${checkin.planId}/${year}/${month}/${day}.jpg`,
                 fileType: 'image/jpeg'
-        }
+        });
 
-        await s3Repository.uploadFile(params);
-
-        return asset.uri;
+        return photoUrl;
     };
 
     const handleOpenCamera = async () => {

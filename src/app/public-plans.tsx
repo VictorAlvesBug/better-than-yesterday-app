@@ -26,19 +26,25 @@ export default function PublicPlansScreen() {
     }
 
     useEffectAsync(async () => {
-        const userId = await Memory.get('userId') || '';// TODO: Always logout user if userId was not found
+        const userId = await Memory.get('userId');// TODO: Always logout user if userId was not found
 
-        const { plans } = (await planRepository.getUserWithPlansByUserId(userId));
+        if(!userId) {
+            return;
+        }
 
-        const publicPlans = (await planRepository.list({ type: 'Public' }))
-            .map(publicPlan => {
-                return {
-                    ...publicPlan,
-                    joined: plans.some(plan => plan.id === publicPlan.id)
-                } satisfies PlanToJoin;
-            });
+        // TODO: Implementar lazy loading de plans, isso deve resolver o problema do header estourado
 
-        setPlans(publicPlans);
+        const userWithPlansPromise = planRepository.getUserWithPlansByUserId(userId);
+
+        const publicPlansPromise = planRepository.list({ type: 'Public' });
+        const [userWithPlans, publicPlans] = await Promise.all([userWithPlansPromise, publicPlansPromise]);
+
+        setPlans(publicPlans.map(publicPlan => {
+            return {
+                ...publicPlan,
+                joined: userWithPlans.plans.some(plan => plan.id === publicPlan.id)
+            } satisfies PlanToJoin;
+        }));
         setLoading(false);
     }, [planRepository]);
 

@@ -36,6 +36,8 @@ export default function PlanCard({
     }, []);
 
     const role = getButtonRole(plan);
+    
+    if (role === 'peek') console.log(plan);
 
     const buttonInfo = getButtonInfo({
         role,
@@ -48,7 +50,7 @@ export default function PlanCard({
     return (
         <View className="flex flex-col items-start justify-center w-full gap-2 py-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
             {loading && (
-                <ActivityIndicator size="large" color={getColor("gray-6")} />
+                <ActivityIndicator size="small" color={getColor("gray-6")} />
             )}
             {!loading && (
                 <>

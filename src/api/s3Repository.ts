@@ -1,51 +1,46 @@
 
-import { JSON_API_URL } from '@/src/utils/constants';
-import AWS from 'aws-sdk';
-import axios from 'axios';
+import { backendApi } from '@/src/utils/apiUtils';
 import { toastErrorMessage } from '../utils/toastUtils';
 
 type UploadFileProps = {
-    bucket: string;
     filePath: string;
     fileName: string;
     fileType: string;
 }
 
-type SettingsType = {
-    awsAccessKeyId: string;
-    awsSecretAccessKey: string;
-}
-
 export default function createS3Repository() {
-
-    const init = async () => {
-        const response = await axios.get<SettingsType>(`${JSON_API_URL}/settings`);
-
-        AWS.config.update({
-            accessKeyId: response.data.awsAccessKeyId,
-            secretAccessKey: response.data.awsSecretAccessKey,
-            region: "sa-east"
-        })
-    };
-
-    init();
-
-    const uploadFile = async (props: UploadFileProps) => {
+    const uploadFile = async (props: UploadFileProps): Promise<string> => {
         console.log("S3Repository.uploadFile - props:", props);
         try {
-            const s3 = new AWS.S3();
+            const { uploadUrl, fileUrl } = await backendApi.getPresignedUploadUrl(
+                props.fileName,
+                props.fileType
+            );
 
-            return s3.upload({
-                Bucket: props.bucket,
-                Key: props.fileName,
-                Body: props.filePath
-            }).promise();
+            const fileUri = props.filePath.startsWith('file://')
+                ? props.filePath
+                : `file://${props.filePath}`;
 
+            const fileResponse = await fetch(fileUri);
+            const fileBlob = await fileResponse.blob();
+
+            const uploadResponse = await fetch(uploadUrl, {
+                method: 'PUT',
+                body: fileBlob,
+                headers: {
+                    'Content-Type': props.fileType,
+                },
+            });
+
+            if (!uploadResponse.ok)
+                throw new Error(`Upload failed with status ${uploadResponse.status}`);
+
+            return fileUrl;
         }
         catch (err) {
-            toastErrorMessage("Erro ao recuperar URL Pré-assinada")
+            toastErrorMessage("Erro ao enviar foto para o servidor");
             console.error(err);
-            return '';
+            throw err;
         }
     };
 
