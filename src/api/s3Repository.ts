@@ -1,6 +1,6 @@
 
 import { backendApi } from '@/src/utils/apiUtils';
-import { toastErrorMessage } from '../utils/toastUtils';
+import * as FileSystem from 'expo-file-system/legacy';
 
 type UploadFileProps = {
     filePath: string;
@@ -10,39 +10,29 @@ type UploadFileProps = {
 
 export default function createS3Repository() {
     const uploadFile = async (props: UploadFileProps): Promise<string> => {
-        console.log("S3Repository.uploadFile - props:", props);
-        try {
-            const { uploadUrl, fileUrl } = await backendApi.getPresignedUploadUrl(
-                props.fileName,
-                props.fileType
-            );
+        const { uploadUrl, fileUrl } = await backendApi.getPresignedUploadUrl(
+            props.fileName,
+            props.fileType
+        );
 
-            const fileUri = props.filePath.startsWith('file://')
-                ? props.filePath
-                : `file://${props.filePath}`;
+        const fileUri = props.filePath.startsWith('file://')
+            ? props.filePath
+            : `file://${props.filePath}`;
 
-                console.log("S3Repository.uploadFile - fileUri:", fileUri);
-            const fileResponse = await fetch(fileUri);
-            const fileBlob = await fileResponse.blob();
+        const uploadResult = await FileSystem.uploadAsync(uploadUrl, fileUri, {
+            httpMethod: 'PUT',
+            uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+            headers: {
+                'Content-Type': props.fileType,
+            },
+        });
 
-            const uploadResponse = await fetch(uploadUrl, {
-                method: 'PUT',
-                body: fileBlob,
-                headers: {
-                    'Content-Type': props.fileType,
-                },
-            });
-
-            if (!uploadResponse.ok)
-                throw new Error(`Upload failed with status ${uploadResponse.status}`);
-
-            return fileUrl;
+        if (uploadResult.status < 200 || uploadResult.status >= 300) {
+            console.error('S3 upload failed:', uploadResult.status, uploadResult.body);
+            throw new Error(`Upload failed with status ${uploadResult.status}: ${uploadResult.body}`);
         }
-        catch (err) {
-            toastErrorMessage("Erro ao enviar foto para o servidor");
-            console.error(err);
-            throw err;
-        }
+
+        return fileUrl;
     };
 
     return {

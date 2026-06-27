@@ -59,13 +59,14 @@ export default function CreateCheckinScreen() {
         // TODO: Refactor to persist image only when checkin is created. Use Amazon S3
 
         const asset = result.assets[0];
-        
+        const fileType = asset.mimeType ?? 'image/jpeg';
+
         const { year, month, day} = getDateComponents(checkin.date);
 
         const photoUrl = await s3Repository.uploadFile({
                 filePath: asset.uri,
-                fileName: `${checkin.userId}/${checkin.planId}/${year}/${month}/${day}.jpg`,
-                fileType: 'image/jpeg'
+                fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/${asset.fileName ?? 'photo.jpg'}`,
+                fileType,
         });
 
         return photoUrl;
@@ -76,17 +77,18 @@ export default function CreateCheckinScreen() {
             const url = await openCamera();
             setCheckin({ ...checkin, photoUrl: url });
         } catch (err) {
+            console.error(err);
             if (err instanceof Error) {
-                toastErrorMessage(err.message)
+                const message = err.message.startsWith('Upload failed')
+                    ? 'Erro ao enviar foto para o servidor'
+                    : err.message;
+                toastErrorMessage(message);
                 if (!checkin.photoUrl) navigation.back();
                 return;
             }
 
             toastErrorMessage('Ocorreu um erro');
         }
-    };
-
-    const handleUploadImage = async () => {
     };
 
     useEffect(() => {
@@ -167,10 +169,8 @@ export default function CreateCheckinScreen() {
                             />
                         </View>
                         <Button action={handleOpenCamera}
-                        className='absolute right-7 bottom-7'>Alterar foto</Button>
+                        className='absolute right-7 bottom-7'>Escolher foto</Button>
                     </Card>
-                    <Button action={handleUploadImage}>Persistir foto</Button>
-
                     <Card className="flex flex-col items-start justify-center w-full gap-1">
                         <Label>Título</Label>
                         <Input
