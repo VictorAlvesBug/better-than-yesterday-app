@@ -1,420 +1,214 @@
-
-/*type MethodType = "GET" | "POST" | "PUT" | "DELETE";
-
-type ResourceName = 'users' | 'habits' | 'plans';
-
-type Path<TResourceName extends ResourceName> = `/${TResourceName}${string}`;
-
-type EndpointProps<
-    TResourceName extends ResourceName,
-    TMethod extends MethodType,
-    TResponse = never,
-    TBody = never
-> = {
-    method: TMethod;
-    path: Path<TResourceName>;
-    __response?: TResponse;
-    __body?: TBody;
-};
-
-type Endpoint<TResourceName extends ResourceName> = {
-    [s in string]: EndpointProps<TResourceName, MethodType, unknown, unknown>
-};
-
-type ResponseOf<T> = T extends EndpointProps<any, any, infer TResponse, any>
-    ? TResponse
-    : never;
-
-type BodyOf<T> = T extends EndpointProps<any, any, any, infer TBody>
-    ? TBody
-    : never;
-
-type EndpointCollection<
-    TResourceName extends ResourceName,
-    TEndpoint extends Endpoint<TResourceName>
-> = {
-        [E in keyof TEndpoint]: EndpointProps<TResourceName, TEndpoint[E]['method'], unknown, unknown>;
-    };
-
-type EndpointCollectionCreator<
-    TResourceName extends ResourceName,
-    TEndpoint extends Endpoint<TResourceName>
-> = (resourceName: TResourceName) => TEndpoint;//EndpointCollection<TResourceName, TEndpoint>;
-
-type HttpClient = <TResponse>(
-    method: MethodType,
-    path: string,
-    body?: unknown
-) => Promise<TResponse>;
-
-type Params = Record<string, string | number>;
-
-type ArgsFor<TEndpoint> =
-    BodyOf<TEndpoint> extends never
-    ? { 
-        params?: Params; 
-        body?: never;
-    }
-    : { 
-        params?: Params; 
-        body?: BodyOf<TEndpoint>; 
-    };
-
-type CreateResourceReturnType<
-    TResourceName extends ResourceName,
-    TEndpoint extends Endpoint<TResourceName>
-> = {
-        [EC in keyof TEndpoint]: 
-            (args?: ArgsFor<TEndpoint[EC]>) => Promise<ResponseOf<TEndpoint[EC]>>;
-    };
-
-const request: HttpClient = async <TResponse>(
-    method: MethodType,
-    path: string,
-    body?: unknown
-): Promise<TResponse> => {
-    const response = await axios.request<TResponse>({
-        method,
-        url: `${API_URL}${path}`,
-        headers: { "Content-Type": "application/json" },
-        data: body,
-    });
-
-    return response.data;
-};
-
-function createResource<
-    TResourceName extends ResourceName,
-    TEndpoint extends Endpoint<TResourceName>
->(
-    resourceName: TResourceName,
-    endpointCollectionCreator: EndpointCollectionCreator<TResourceName, TEndpoint>
-): CreateResourceReturnType<
-    TResourceName,
-    EndpointCollection<TResourceName, TEndpoint>
-> {
-    const endpointCollection = endpointCollectionCreator(resourceName);
-
-    const fillPath = (path: string, params: Params = {}) => {
-        return path.replace(/:([a-zA-Z0-9_]+)/g, (_, key) => String(params[key]));
-    }
-
-    return Object.fromEntries(
-        Object.entries(endpointCollection).map(([name, props]) => [
-                name,
-                (args?: { params?: Params; body?: unknown }) =>
-                    request<ResponseOf<typeof props>>(
-                        props.method,
-                        fillPath(props.path, args?.params),
-                        args?.body
-                    ),
-            ])
-    ) as CreateResourceReturnType<TResourceName, TEndpoint>;
-}
-
-type UserEndpoints<TResourceName extends 'users'> = {
-    getById: EndpointProps<TResourceName, 'GET', User>;
-    listAll: EndpointProps<TResourceName, 'GET', User[]>;
-    create: EndpointProps<TResourceName, 'POST', User, CreateUser>;
-    update: EndpointProps<TResourceName, 'PUT', User, UpdateUser>;
-}
-
-function createUserEndpointCollection<TResourceName extends 'users'>(
-    resourceName: TResourceName
-): UserEndpoints<TResourceName> {
-    return {
-        getById: { method: 'GET', path: `/${resourceName}/:id` },
-        listAll: { method: 'GET', path: `/${resourceName}` },
-        create: { method: 'POST', path: `/${resourceName}` },
-        update: { method: 'PUT', path: `/${resourceName}` }
-    } as const satisfies Endpoint<TResourceName>;
-}
-
-function createDefaultEndpointCollection<TResourceName extends ResourceName>(
-    resourceName: TResourceName
-) {
-    return {
-        getById: { method: 'GET', path: `/${resourceName}/:id` },
-        listAll: { method: 'GET', path: `/${resourceName}` },
-        create: { method: 'POST', path: `/${resourceName}` },
-    } as const satisfies Endpoint<TResourceName>;
-}
-
-type Api = {
-    [RN in ResourceName]: CreateResourceReturnType<RN, Endpoint<RN>>
-}
-
-// TODO improve types to validate when resource names doesn't match
-const api: Api = {
-    users: createResource('users', createUserEndpointCollection),
-    habits: createResource('habits', createDefaultEndpointCollection),
-    plans: createResource('plans', createDefaultEndpointCollection),
-} satisfies Api;
-
-await api.users.listAll();
-await api.users.getById({ params: { id: "123" } });
-await api.habits.create({ body: { title: "Hello" } });*/
-
 import { API_URL } from '@/src/utils/constants';
-import { Checkin, CreateCheckin } from "@/types/checkin.type";
-import { CreateHabit, Habit } from "@/types/habit.type";
-import { CreatePlan, ManagePlanMember, Plan, PlanMember } from "@/types/plan.type";
-import { CreateUser, User } from "@/types/user.type";
-import axios from "axios";
+import axios from 'axios';
 import { toastErrorMessage } from './toastUtils';
+import {
+  ApiCheckIn,
+  ApiHabit,
+  ApiPlan,
+  ApiPlanMemberDetails,
+  ApiPlanWithMembers,
+  ApiUser,
+  ApiUserWithPlans,
+  CreateCheckInPayload,
+  CreateHabitPayload,
+  CreatePlanPayload,
+  CreateUserPayload,
+  ListCheckInsFilter,
+  ListHabitsFilter,
+  ListPlansFilter,
+  ListUsersFilter,
+  PresignedUploadUrl,
+  ReviewCheckInPayload,
+} from './apiMappers';
 
-export const isSuccessfulStatusCode = (statusCode: number) =>
-    statusCode >= 200 && statusCode <= 299;
-
-    const resolveStatus = (status: number) => {
-        switch (status) {
-            case 0: return 'Failure';
-            case 1: return 'Success';
-            case 2: return 'Rejected';
-            default: return 'Unknown status';
-        }
-    }
-
-export const logError = (error: unknown) => {
-        if (!axios.isAxiosError(error)) {
-            console.error('Unexpected error:', error);
-            return;
-        }
-        
-        const statusCode = error.response?.status;
-        const strResponseData = JSON.stringify(error.response?.data ?? {});
-        console.error(`API Error - StatusCode: ${statusCode} - Response Data: ${strResponseData}`);
-
-        if (error.response?.data) {
-            const status = resolveStatus(error.response.data.status);
-            const reason = error.response.data.reason ?? 'No reason provided';
-            toastErrorMessage(`${status}: ${reason}`);
-        }
-    }
+export type {
+  ListPlansFilter,
+  ListCheckInsFilter,
+  ListUsersFilter,
+  ListHabitsFilter,
+} from './apiMappers';
 
 export type ApiResponse<T> = {
-    data: T;
-    status: number;
-    reason?: string;
-    rejectionType: number;
+  data: T;
+  status: number;
+  reason?: string;
+  rejectionType: number;
+};
+
+export const isSuccessfulStatusCode = (statusCode: number) =>
+  statusCode >= 200 && statusCode <= 299;
+
+const resolveStatus = (status: number) => {
+  switch (status) {
+    case 0: return 'Failure';
+    case 1: return 'Success';
+    case 2: return 'Rejected';
+    default: return 'Unknown status';
+  }
+};
+
+export const logError = (error: unknown) => {
+  if (!axios.isAxiosError(error)) {
+    console.error('Unexpected error:', error);
+    return;
+  }
+
+  const statusCode = error.response?.status;
+  const strResponseData = JSON.stringify(error.response?.data ?? {});
+  console.error(`API Error - StatusCode: ${statusCode} - Response Data: ${strResponseData}`);
+
+  if (error.response?.data) {
+    const status = resolveStatus(error.response.data.status);
+    const reason = error.response.data.reason ?? 'No reason provided';
+    toastErrorMessage(`${status}: ${reason}`);
+  }
+};
+
+function buildQueryString(params: Record<string, string | undefined>): string {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '')
+      searchParams.append(key, value);
+  });
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : '';
 }
 
-type ResourceName = 'users' | 'habits' | 'plans' | 'planMembers' | 'checkins';
+async function getData<T>(url: string): Promise<T> {
+  try {
+    const response = await axios.get<ApiResponse<T>>(url);
+    if (isSuccessfulStatusCode(response.status))
+      return response.data.data;
 
-type ResourceForEntity<TResourceName extends ResourceName> =
-    TResourceName extends 'users' ? User :
-    TResourceName extends 'habits' ? Habit :
-    TResourceName extends 'plans' ? Plan :
-    TResourceName extends 'planMembers' ? PlanMember :
-    TResourceName extends 'checkins' ? Checkin
-    : never;
-
-type ResourceForCreation<TResourceName extends ResourceName> =
-    TResourceName extends 'users' ? CreateUser :
-    TResourceName extends 'habits' ? CreateHabit :
-    TResourceName extends 'plans' ? CreatePlan :
-    TResourceName extends 'planMembers' ? ManagePlanMember :
-    TResourceName extends 'checkins' ? CreateCheckin
-    : never;
-
-function createApi() {
-    const getPath = <TResourceName extends ResourceName>
-        (
-            filter?: Partial<ResourceForEntity<TResourceName>> | undefined
-        ) => {
-        if (!filter)
-            return '';
-
-        const filterItems = Object.entries(filter).map(([fieldName, fieldValue]) =>
-            `${fieldName}=${fieldValue}`);
-
-        return `?${filterItems.join('&')}`;
-
-        /*
-        const params = new URLSearchParams();
- 
-        Object.entries(filter).forEach(([fieldName, fieldValue]) => {
-            if (fieldValue === undefined || fieldValue === null) return;
- 
-            params.append(fieldName, String(fieldValue));
-        });
- 
-        const queryString = params.toString();
- 
-        return queryString ? `?${queryString}` : '';
-        */
-    };
-
-    const get = async <TResourceName extends ResourceName>
-        (
-            resourceName: TResourceName,
-            filter?: Partial<ResourceForEntity<TResourceName>> | undefined
-        ): Promise<ResourceForEntity<TResourceName> | undefined> => {
-        try {
-            const path = getPath(filter);
-            const fullUrl = `${API_URL}/${resourceName}${path}`;
-            console.log({ fullUrl });
-            const response = await axios.get<ApiResponse<ResourceForEntity<TResourceName>[]>>(fullUrl);
-            console.log({ response });
-
-            if (isSuccessfulStatusCode(response.status))
-                return response.data.data.length > 0 ? response.data.data[0] : undefined;
-
-            throw new Error(`Erro ao buscar item do recurso '${resourceName}' com parâmetro: '${path}'`);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };
-
-    const list = async <TResourceName extends ResourceName>
-        (
-            resourceName: TResourceName,
-            filter?: Partial<ResourceForEntity<TResourceName>> | undefined
-        ): Promise<ResourceForEntity<TResourceName>[]> => {
-        try {
-            const path = getPath(filter);
-            const fullUrl = `${API_URL}/${resourceName}${path ?? ''}`;
-            console.log({ fullUrl });
-            const response = await axios.get<ApiResponse<ResourceForEntity<TResourceName>[]>>(fullUrl);
-            console.log({ response });
-
-            if (isSuccessfulStatusCode(response.status))
-                return response.data.data;
-
-            throw new Error(`Erro ao listar itens do recurso '${resourceName}' com parâmetro: '${path}'`);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };
-
-    const createWithBody = async <TResourceName extends ResourceName>
-        (
-            resourceName: TResourceName,
-            body: ResourceForCreation<TResourceName>
-        ): Promise<ResourceForEntity<TResourceName>> => {
-        try {
-            const fullUrl = `${API_URL}/${resourceName}`;
-            console.log({ fullUrl, body });
-            const response = await axios.post<ApiResponse<ResourceForEntity<TResourceName>>>(fullUrl, body);
-            console.log({ response });
-
-            if (isSuccessfulStatusCode(response.status))
-                return response.data.data;
-
-            throw new Error(`Erro ao salvar item do recurso '${resourceName}' com payload: '${JSON.stringify(body)}'`);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };
-
-    const createWithPath = async <TResourceName extends ResourceName>
-        (
-            resourceName: TResourceName,
-            path: string
-        ): Promise<ResourceForEntity<TResourceName>> => {
-        try {
-            const fullUrl = `${API_URL}/${resourceName}/${path ?? ''}`;
-            console.log({ fullUrl });
-            const response = await axios.post<ApiResponse<ResourceForEntity<TResourceName>>>(fullUrl);
-            console.log({ response });
-
-            if (isSuccessfulStatusCode(response.status))
-                return response.data.data;
-
-            throw new Error(`Erro ao salvar item do recurso '${resourceName}' com path: '${path}'`);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };
-
-    /*const update = async <TResourceName extends ResourceName>
-    (
-        resourceName: TResourceName, 
-        body: ResourceFor<TResourceName>
-    ): Promise<ResourceFor<TResourceName>> => {
-        try {
-            const path = getPath({id: body.id});
-            const response = await axios.post(`${API_URL}/${resourceName}${path ?? ''}`, body);
-            
-            if (isSuccessfulStatusCode(response.status))
-                return body;
-            
-            throw new Error(`Erro ao atualizar recurso '${resourceName}' com payload: '${JSON.stringify(body)}'`);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };*/
-
-    const deleteWithFilter = async <TResourceName extends ResourceName>
-        (
-            resourceName: TResourceName,
-            filter?: Partial<ResourceForEntity<TResourceName>> | undefined
-        ): Promise<void> => {
-        try {
-            const path = getPath(filter);
-            const fullUrl = `${API_URL}/${resourceName}${path ?? ''}`;
-            console.log({ fullUrl });
-            const responseGet = await axios.get<ApiResponse<ResourceForEntity<TResourceName>[]>>(fullUrl);
-            console.log({ responseGet });
-            if (!isSuccessfulStatusCode(responseGet.status))
-                throw new Error(`Erro ao recuperar itens do recurso '${resourceName}' para deletar, com parâmetro: '${path}'`);
-
-            const tasks = responseGet.data.data.map(async item => {
-                const responseDelete = await axios.delete(`${API_URL}/${resourceName}/${item.id}`);
-
-                if (!isSuccessfulStatusCode(responseDelete.status))
-                    throw new Error(`Erro ao deletar itens do recurso '${resourceName}' com parâmetro: '?${item.id}'`);
-            })
-
-            await Promise.all(tasks);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };
-
-    const deleteWithPath = async <TResourceName extends ResourceName>
-        (
-            resourceName: TResourceName,
-            path: string
-        ): Promise<void> => {
-        try {
-            const fullUrl = `${API_URL}/${resourceName}${path ?? ''}`;
-            console.log({ fullUrl });
-            const responseGet = await axios.get<ApiResponse<ResourceForEntity<TResourceName>[]>>(fullUrl);
-            console.log({ responseGet });
-            if (!isSuccessfulStatusCode(responseGet.status))
-                throw new Error(`Erro ao recuperar itens do recurso '${resourceName}' para deletar, com parâmetro: '${path}'`);
-
-            const tasks = responseGet.data.data.map(async item => {
-                const responseDelete = await axios.delete(`${API_URL}/${resourceName}/${item.id}`);
-
-                if (!isSuccessfulStatusCode(responseDelete.status))
-                    throw new Error(`Erro ao deletar itens do recurso '${resourceName}' com parâmetro: '?${item.id}'`);
-            })
-
-            await Promise.all(tasks);
-        } catch (error) {
-            logError(error);
-            throw error;
-        }
-    };
-
-
-    return {
-        get,
-        list,
-        createWithBody,
-        createWithPath,
-        //update,
-        deleteWithFilter,
-        deleteWithPath,
-    }
+    throw new Error(`GET ${url} failed with status ${response.status}`);
+  } catch (error) {
+    logError(error);
+    throw error;
+  }
 }
 
-export const api = createApi();
+async function getListData<T>(url: string): Promise<T[]> {
+  return getData<T[]>(url);
+}
+
+async function postData<TBody, TResult>(url: string, body?: TBody): Promise<TResult> {
+  try {
+    const response = await axios.post<ApiResponse<TResult>>(url, body);
+    if (isSuccessfulStatusCode(response.status))
+      return response.data.data;
+
+    throw new Error(`POST ${url} failed with status ${response.status}`);
+  } catch (error) {
+    logError(error);
+    throw error;
+  }
+}
+
+async function deleteRequest(url: string): Promise<void> {
+  try {
+    const response = await axios.delete(url);
+    if (isSuccessfulStatusCode(response.status))
+      return;
+
+    throw new Error(`DELETE ${url} failed with status ${response.status}`);
+  } catch (error) {
+    logError(error);
+    throw error;
+  }
+}
+
+async function deleteData<T>(url: string): Promise<T> {
+  try {
+    const response = await axios.delete<ApiResponse<T>>(url);
+    if (isSuccessfulStatusCode(response.status))
+      return response.data.data;
+
+    throw new Error(`DELETE ${url} failed with status ${response.status}`);
+  } catch (error) {
+    logError(error);
+    throw error;
+  }
+}
+
+export const backendApi = {
+  getUserById: (id: string) =>
+    getData<ApiUser>(`${API_URL}/Users/${id}`),
+
+  listUsers: (filter?: ListUsersFilter) =>
+    getListData<ApiUser>(`${API_URL}/Users${buildQueryString({ email: filter?.email })}`),
+
+  registerUser: (body: CreateUserPayload) =>
+    postData<CreateUserPayload, ApiUser>(`${API_URL}/Users`, body),
+
+  getHabitById: (id: string) =>
+    getData<ApiHabit>(`${API_URL}/Habits/${id}`),
+
+  listHabits: (filter?: ListHabitsFilter) =>
+    getListData<ApiHabit>(`${API_URL}/Habits${buildQueryString({ name: filter?.name })}`),
+
+  createHabit: (body: CreateHabitPayload) =>
+    postData<CreateHabitPayload, ApiHabit>(`${API_URL}/Habits`, body),
+
+  getPlanById: (id: string) =>
+    getData<ApiPlan>(`${API_URL}/Plans/${id}`),
+
+  listPlans: (filter?: ListPlansFilter) =>
+    getListData<ApiPlan>(`${API_URL}/Plans${buildQueryString({
+      ownerId: filter?.ownerId,
+      habitId: filter?.habitId,
+      status: filter?.status,
+      type: filter?.type,
+    })}`),
+
+  createPlan: (body: CreatePlanPayload) =>
+    postData<CreatePlanPayload, ApiPlan>(`${API_URL}/Plans`, body),
+
+  getPlanWithMembersByPlanId: (planId: string) =>
+    getData<ApiPlanWithMembers>(`${API_URL}/Plans/${planId}/Members`),
+
+  getUserWithPlansByUserId: (userId: string) =>
+    getData<ApiUserWithPlans>(`${API_URL}/Users/${userId}/Plans`),
+
+  getPlanMemberDetails: (planId: string, userId: string) =>
+    getData<ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}`),
+
+  joinPlan: (planId: string, userId: string) =>
+    postData<undefined, ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}`),
+
+  leavePlan: (planId: string, userId: string) =>
+    deleteRequest(`${API_URL}/Plans/${planId}/Members/${userId}`),
+
+  blockPlanMember: (planId: string, userId: string) =>
+    postData<undefined, ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}/Block`),
+
+  unblockPlanMember: (planId: string, userId: string) =>
+    deleteData<ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}/Block`),
+
+  getCheckInById: (id: string) =>
+    getData<ApiCheckIn>(`${API_URL}/CheckIns/${id}`),
+
+  listCheckIns: (filter?: ListCheckInsFilter) =>
+    getListData<ApiCheckIn>(`${API_URL}/CheckIns${buildQueryString({
+      planId: filter?.planId,
+      userId: filter?.userId,
+      date: filter?.date,
+      status: filter?.status,
+    })}`),
+
+  addCheckIn: (body: CreateCheckInPayload) =>
+    postData<CreateCheckInPayload, ApiCheckIn>(`${API_URL}/CheckIns`, body),
+
+  reviewCheckIn: (checkInId: string, body: ReviewCheckInPayload) =>
+    postData<ReviewCheckInPayload, ApiCheckIn>(`${API_URL}/CheckIns/${checkInId}/Reviews`, body),
+
+  removeReview: (checkInId: string, reviewerId: string) =>
+    deleteData<ApiCheckIn>(`${API_URL}/CheckIns/${checkInId}/Reviews/${reviewerId}`),
+
+  getPresignedUploadUrl: (fileName: string, contentType: string) =>
+    postData<{ fileName: string; contentType: string }, PresignedUploadUrl>(
+      `${API_URL}/Uploads/PresignedUrl`,
+      { fileName, contentType }
+    ),
+};

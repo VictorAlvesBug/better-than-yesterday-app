@@ -1,6 +1,6 @@
 import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
@@ -12,39 +12,54 @@ import ProfilePhoto from './profile-photo';
 const unavailablePhotoUrl =
   'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
 
-export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
-  const {
-  id,
-  userName,
-  date,
-  title,
-  photoUrl,
-  status,
-  reviews,
-} = checkin;
+type CheckinWithReviewsCardProps = {
+  checkin: CheckinEnriched;
+  onUpdate: (checkin: CheckinEnriched) => void;
+}
+
+export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWithReviewsCardProps) {
+  const { id, userName, date, title, photoUrl, status, reviews } = checkin;
+
+  const [userReview, setUserReview] = useState<CheckinReview | undefined>(reviews.find(review => review.reviewerId === userId));
+
+  const [userId, setUserId] = useState('');
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await Memory.get('userId') || '';
+      setUserId(userId);
+    }
+    fetchUserId();
+  }, []);
 
   const checkinRepository = createCheckinRepository();
 
-  const reviewAsValidated = async () => {
-    const userId = await Memory.get('userId') || '';
+  const removeReview = async () => {
+    const checkinUpdated = await checkinRepository.removeReview(id, userId);
+    onUpdate(checkinUpdated);
+    setUserReview(undefined);
+  }
 
+  const reviewAsValidated = async () => {
     const review: CheckinReview = {
       reviewerId: userId,
       status: 'Validated' // TODO: Validate string to 'Validated' or 'Rejected'
     }
 
-    checkinRepository.saveReview(id, review);
+    const checkinUpdated = await checkinRepository.saveReview(id, review);
+    setUserReview(review);
+    onUpdate(checkinUpdated);
   }
 
   const reviewAsRejected = async () => {
-    const userId = await Memory.get('userId') || '';
-    
     const review: CheckinReview = {
       reviewerId: userId,
       status: 'Rejected' // TODO: Validate string to 'Validated' or 'Rejected'
     }
 
-    checkinRepository.saveReview(id, review);
+    const checkinUpdated = await checkinRepository.saveReview(id, review);
+    setUserReview(review);
+    onUpdate(checkinUpdated);
   }
 
   return (
@@ -78,7 +93,7 @@ export default function CheckinWithReviewsCard(checkin: CheckinEnriched) {
 
       {reviews.length > 0 && renderReviews(reviews)}
 
-      {status === 'Pending' && renderReviewButtons(reviewAsValidated, reviewAsRejected)}
+      {status === 'Pending' && userId !== checkin.userId && renderReviewButtons(reviewAsValidated, reviewAsRejected, removeReview, userReview)}
     </View>
   );
 }
@@ -143,8 +158,23 @@ function renderReviews(reviews: CheckinReview[]) {
 
 function renderReviewButtons(
   reviewAsValidated: () => Promise<void>,
-  reviewAsRejected: () => Promise<void>
+  reviewAsRejected: () => Promise<void>,
+  removeReview: () => Promise<void>,
+  userReview: CheckinReview | undefined
 ) {
+  if (userReview !== undefined) {
+    return (
+      <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
+        <Pressable style={{ backgroundColor: userReview.status === 'Validated' ? getColor("light-success") : getColor("light-danger") }} onPress={removeReview} className="flex-1 py-2 rounded-xl">
+          <View className="flex flex-row items-center justify-center w-full gap-2">
+            <Icon type="font-awesome-5" name={userReview.status === 'Validated' ? "check-circle" : "flag"} size={14} color={userReview.status === 'Validated' ? "success" : "danger"} />
+            <Text style={{ color: userReview.status === 'Validated' ? getColor("success") : getColor("danger") }} className="font-bold">{userReview.status === 'Validated' ? "Validado" : "Rejeitado"} (Remover revisão)</Text>
+          </View>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
       <Pressable

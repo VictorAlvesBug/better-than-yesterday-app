@@ -91,7 +91,7 @@ export default function PlanTrackerScreen() {
 
       setPlan(dbPlan);
 
-      const checkins = await checkinRepository.list();
+      const checkins = await checkinRepository.list({ planId });
       setCheckins(checkins);
 
       setLoading(false);

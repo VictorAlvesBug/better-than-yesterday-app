@@ -103,7 +103,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             className="w-12 h-12 rounded-full"
           />
           <View className="flex flex-col items-start justify-center flex-1">
-            <Text className="font-semibold text-white">{user.name}</Text>
+            <Text className="font-semibold text-white">{user.nickname}</Text>
             <Text className="font-thin text-white">
               Ranking: #{formatInteger(42) /* TODO: Buscar posição do Ranking da API */}
             </Text>

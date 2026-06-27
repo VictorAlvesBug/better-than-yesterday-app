@@ -6,7 +6,6 @@ const hostUri =
 
 const host = hostUri?.split(':')[0];
 
-console.log('Host:', host);
+const defaultApiUrl = host ? `http://${host}:5018/api` : 'http://localhost:5018/api';
 
-export const JSON_API_URL = host ? `http://${host}:3000` : 'http://localhost:3000';
-export const API_URL = host ? `http://${host}:5018/api` : 'http://localhost:5018/api';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? defaultApiUrl;
