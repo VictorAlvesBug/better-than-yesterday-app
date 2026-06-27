@@ -21,6 +21,7 @@ export default function createS3Repository() {
                 ? props.filePath
                 : `file://${props.filePath}`;
 
+                console.log("S3Repository.uploadFile - fileUri:", fileUri);
             const fileResponse = await fetch(fileUri);
             const fileBlob = await fileResponse.blob();
 

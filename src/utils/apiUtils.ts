@@ -203,6 +203,9 @@ export const backendApi = {
   reviewCheckIn: (checkInId: string, body: ReviewCheckInPayload) =>
     postData<ReviewCheckInPayload, ApiCheckIn>(`${API_URL}/CheckIns/${checkInId}/Reviews`, body),
 
+  removeReview: (checkInId: string, reviewerId: string) =>
+    deleteData<ApiCheckIn>(`${API_URL}/CheckIns/${checkInId}/Reviews/${reviewerId}`),
+
   getPresignedUploadUrl: (fileName: string, contentType: string) =>
     postData<{ fileName: string; contentType: string }, PresignedUploadUrl>(
       `${API_URL}/Uploads/PresignedUrl`,

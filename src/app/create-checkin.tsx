@@ -136,7 +136,7 @@ export default function CreateCheckinScreen() {
         }
 
         await checkinRepository.create(checkin);
-        toastSuccessMessage('Plano criado com sucesso');
+        toastSuccessMessage('Check-in criado com sucesso');
         navigation.back();
     };
 

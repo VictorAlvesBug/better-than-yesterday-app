@@ -1,5 +1,5 @@
 import { getColor } from '@/types/color.type'
-import { PlanToJoin } from '@/types/plan.type'
+import { PlanStatus, PlanToJoin } from '@/types/plan.type'
 import Constants from 'expo-constants'
 import React, { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native'
@@ -25,6 +25,15 @@ export default function PublicPlansScreen() {
         }))
     }
 
+    const statusPriority = (status: PlanStatus) => {
+        switch (status) {
+            case 'NotStarted': return 0;
+            case 'Running': return 1;
+            case 'Finished': return 2;
+            case 'Cancelled': return 3;
+        }
+    }
+
     useEffectAsync(async () => {
         const userId = await Memory.get('userId');// TODO: Always logout user if userId was not found
 
@@ -39,12 +48,16 @@ export default function PublicPlansScreen() {
         const publicPlansPromise = planRepository.list({ type: 'Public' });
         const [userWithPlans, publicPlans] = await Promise.all([userWithPlansPromise, publicPlansPromise]);
 
-        setPlans(publicPlans.map(publicPlan => {
-            return {
-                ...publicPlan,
-                joined: userWithPlans.plans.some(plan => plan.id === publicPlan.id)
-            } satisfies PlanToJoin;
-        }));
+        setPlans(
+            publicPlans.filter(publicPlan => publicPlan.status !== 'Cancelled')
+                .sort((a, b) => statusPriority(a.status) - statusPriority(b.status))
+                .map(publicPlan => {
+                    return {
+                        ...publicPlan,
+                        joined: userWithPlans.plans.some(plan => plan.id === publicPlan.id)
+                    } satisfies PlanToJoin;
+                })
+        );
         setLoading(false);
     }, [planRepository]);
 

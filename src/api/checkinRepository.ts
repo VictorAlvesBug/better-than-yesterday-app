@@ -59,11 +59,19 @@ export default function createCheckinRepository() {
         return mapCheckInEnrichedFromApi(checkinUpdated);
     };
 
+    const removeReview = async (checkinId: string, reviewerId: string): Promise<CheckinEnriched> => {
+        console.log("CheckinRepository.removeReview - checkinId:", checkinId);
+        console.log("CheckinRepository.removeReview - reviewerId:", reviewerId);
+        const checkinUpdated = await backendApi.removeReview(checkinId, reviewerId);
+        return mapCheckInEnrichedFromApi(checkinUpdated);
+    };
+
     return {
         list,
         get,
         getById,
         create,
-        saveReview
+        saveReview,
+        removeReview
     }
 }

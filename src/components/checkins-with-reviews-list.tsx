@@ -18,6 +18,14 @@ export default function CheckinsWithReviewsList({
 
   const [checkins, setCheckins] = React.useState<CheckinEnriched[]>([]);
 
+  function handleUpdateCheckIn(updatedCheckIn: CheckinEnriched) {
+    setCheckins(currentCheckins =>
+      currentCheckins.map(checkin =>
+        checkin.id === updatedCheckIn.id ? updatedCheckIn : checkin
+      )
+    );
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       setCheckins(await checkinRepository.list());
@@ -32,7 +40,7 @@ export default function CheckinsWithReviewsList({
         <Text style={{color: getColor("gray-4")}} className="text-base">Nenhum Check-in aqui...</Text>
       )}
       {checkins.map((checkin) => (
-        <CheckinWithReviewsCard key={checkin.id} {...checkin} />
+        <CheckinWithReviewsCard key={checkin.id} checkin={checkin} onUpdate={handleUpdateCheckIn} />
       ))}
     </View>
   );
