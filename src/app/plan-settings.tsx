@@ -1,38 +1,44 @@
+import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
+import { PlanEnriched } from '@/types/plan.type';
 import Constants from 'expo-constants';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   LayoutChangeEvent,
   Pressable,
+  RefreshControl,
   ScrollView,
   Text,
   View,
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import BackButton from '../components/back-button';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
 import Ranking from '../components/ranking';
+import { useRepositories } from '../hooks/useRepositories';
 import {
   formatInteger,
   formatMoney,
   formatMoneyCompact,
   formatPercent,
 } from '../utils/numberUtils';
-
-const statusBarHeight = Constants.statusBarHeight;
+import { toastSuccessMessage } from '../utils/toastUtils';
 
 export default function PlanSettingsScreen() {
-  const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins'>(
-    'ranking',
-  );
+  const { plan: planRepository } = useRepositories();
+  const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins'>('ranking');
+  const [planId, setPlanId] = useState('');
+  const [plan, setPlan] = useState<PlanEnriched | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // ---- ANIMAÇÃO DAS ABAS ----
   const translateX = useRef(new Animated.Value(0)).current;
   const [tabsWidth, setTabsWidth] = useState(0);
-
-  // metade da largura do container das tabs
   const tabWidth = tabsWidth / 2 || 0;
 
   useEffect(() => {
@@ -45,67 +51,112 @@ export default function PlanSettingsScreen() {
   const handleTabsLayout = (e: LayoutChangeEvent) => {
     setTabsWidth(e.nativeEvent.layout.width);
   };
-  // ----------------------------
+
+  const fetchPlan = useCallback(async (showLoading = true) => {
+    if (showLoading)
+      setLoading(true);
+
+    try {
+      const storedPlanId = await Memory.get('planId') || '';
+      setPlanId(storedPlanId);
+
+      if (!storedPlanId)
+        return;
+
+      const dbPlan = await planRepository.getById(storedPlanId);
+      setPlan(dbPlan);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [planRepository]);
+
+  useEffect(() => {
+    fetchPlan();
+  }, [fetchPlan]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setRefreshKey((k) => k + 1);
+    fetchPlan(false);
+  }, [fetchPlan]);
+
+  const copyInviteLink = () => {
+    if (!planId)
+      return;
+
+    Clipboard.setString(`betterthanyesterdayapp://join/${planId}`);
+    toastSuccessMessage('Link de convite copiado!');
+  };
+
+  if (loading) {
+    return (
+      <View className="items-center justify-center flex-1" style={{ backgroundColor: getColor('gray-e') }}>
+        <ActivityIndicator size="large" color={getColor('gray-6')} />
+      </View>
+    );
+  }
 
   return (
-    <View
-      className="relative flex-1"
-      style={{ backgroundColor: getColor("gray-e") }}
-    >
+    <View className="relative flex-1" style={{ backgroundColor: getColor('gray-e') }}>
       <ScrollView
         style={{ flex: 1 }}
-        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }} // Espaço pro botão
+        contentContainerStyle={{ paddingBottom: 120 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={getColor('violet')}
+            colors={[getColor('violet')]}
+          />
+        }
       >
         <GradientView
-          style={{
-            paddingTop: Constants.statusBarHeight,
-          }}
+          style={{ paddingTop: Constants.statusBarHeight }}
           className="flex flex-col items-center justify-center w-full"
         >
-
           <View className="flex flex-row items-center justify-center w-full">
             <BackButton />
-            <Text style={{ color: getColor("white") }} className="flex-1 text-lg font-bold text-left">
-              Treino 5x na semana
+            <Text style={{ color: getColor('white') }} className="flex-1 text-lg font-bold text-left">
+              {plan?.description ?? plan?.habitName ?? 'Plano'}
             </Text>
-            <Pressable
-              className="flex items-center justify-center w-20 h-20"
-              onPress={() => { }}
-            >
+            <Pressable className="flex items-center justify-center w-20 h-20" onPress={copyInviteLink}>
               <Icon name="share-social" size={24} color="white" />
             </Pressable>
           </View>
 
-          <View style={{ backgroundColor: getColor("opaque") }} className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg">
-            <Text style={{ color: getColor("white") }} className="font-thin">Pool de Recompensas</Text>
-            <Text style={{ color: getColor("white") }} className="mb-1 text-3xl font-bold">
+          <View
+            style={{ backgroundColor: getColor('opaque') }}
+            className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg"
+          >
+            <Text style={{ color: getColor('white') }} className="font-thin">Pool de Recompensas</Text>
+            <Text style={{ color: getColor('white') }} className="mb-1 text-3xl font-bold">
               {formatMoney(252)}
             </Text>
             <View className="flex flex-row items-center w-full justify-evenly">
               <View className="flex flex-col items-center justify-center gap-1">
-                <Text style={{ color: getColor("white") }} className="text-xs font-thin">
+                <Text style={{ color: getColor('white') }} className="text-xs font-thin">
                   Total Multas
                 </Text>
-                <Text style={{ color: getColor("white") }} className="font-semibold">
+                <Text style={{ color: getColor('white') }} className="font-semibold">
                   {formatMoneyCompact(280)}
                 </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
-                <Text style={{ color: getColor("white") }} className="text-xs font-thin">
+                <Text style={{ color: getColor('white') }} className="text-xs font-thin">
                   Taxa Admin ({formatPercent(0.1)})
                 </Text>
-                <Text style={{ color: getColor("white") }} className="font-semibold">
+                <Text style={{ color: getColor('white') }} className="font-semibold">
                   {formatMoneyCompact(28)}
                 </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
-                <Text style={{ color: getColor("white") }} className="text-xs font-thin">
+                <Text style={{ color: getColor('white') }} className="text-xs font-thin">
                   Membros
                 </Text>
-                <Text style={{ color: getColor("white") }} className="font-semibold">
-                  {formatInteger(8)}
+                <Text style={{ color: getColor('white') }} className="font-semibold">
+                  {formatInteger(plan?.memberCount ?? 0)}
                 </Text>
               </View>
             </View>
@@ -113,12 +164,10 @@ export default function PlanSettingsScreen() {
         </GradientView>
 
         <View className="flex flex-col items-center justify-center gap-4 px-4 my-4">
-          {/* CONTAINER DAS TABS + FUNDO ANIMADO */}
           <View
             className="flex flex-row items-center justify-center w-full overflow-hidden bg-white shadow-md rounded-2xl h-14"
             onLayout={handleTabsLayout}
           >
-            {/* Pill animado de fundo */}
             {tabWidth > 0 && (
               <Animated.View
                 style={{
@@ -140,28 +189,21 @@ export default function PlanSettingsScreen() {
               </Animated.View>
             )}
 
-            {/* Aba Ranking */}
-            <Pressable
-              className="flex-1 h-full"
-              onPress={() => setCurrentTab('ranking')}
-            >
+            <Pressable className="flex-1 h-full" onPress={() => setCurrentTab('ranking')}>
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  style={{ color: getColor(currentTab === 'ranking' ? "white" : "gray-7") }} className={`font-semibold text-lg`}
+                  style={{ color: getColor(currentTab === 'ranking' ? 'white' : 'gray-7') }}
+                  className="font-semibold text-lg"
                 >
                   Ranking
                 </Text>
               </View>
             </Pressable>
-
-            {/* Aba Check-ins */}
-            <Pressable
-              className="flex-1 h-full"
-              onPress={() => setCurrentTab('checkins')}
-            >
+            <Pressable className="flex-1 h-full" onPress={() => setCurrentTab('checkins')}>
               <View className="items-center justify-center flex-1 mx-1 rounded-xl">
                 <Text
-                  style={{ color: getColor(currentTab === 'checkins' ? "white" : "gray-7") }} className={`font-semibold block text-lg`}
+                  style={{ color: getColor(currentTab === 'checkins' ? 'white' : 'gray-7') }}
+                  className="font-semibold text-lg"
                 >
                   Check-ins
                 </Text>
@@ -169,16 +211,12 @@ export default function PlanSettingsScreen() {
             </Pressable>
           </View>
 
-          <View
-            className={`flex flex-col items-center justify-center gap-4 w-full ${currentTab === 'ranking' ? 'block' : 'hidden'}`}
-          >
-            <Ranking planId={'abc'} />
-          </View>
-          <View
-            className={`flex flex-col items-center justify-center gap-4  w-full ${currentTab === 'checkins' ? 'block' : 'hidden'}`}
-          >
-            <CheckinsWithReviewsList planId={'abc'} />
-          </View>
+          {currentTab === 'ranking' && planId && (
+            <Ranking planId={planId} refreshKey={refreshKey} />
+          )}
+          {currentTab === 'checkins' && planId && (
+            <CheckinsWithReviewsList planId={planId} refreshKey={refreshKey} />
+          )}
         </View>
       </ScrollView>
     </View>

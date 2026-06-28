@@ -1,6 +1,4 @@
 import Memory from '@/src/api/memory';
-import createPlanRepository from '@/src/api/planRepository';
-import createUserRepository from '@/src/api/userRepository';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import { User } from '@/types/user.type';
@@ -9,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
+import { useRepositories } from '../hooks/useRepositories';
 import { getDateOnly } from '../utils/dateUtils';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
 import GradientView from './gradient-view';
@@ -41,45 +40,62 @@ type SideDrawerProps = {
 export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const { signOut } = useAuth();
   const navigation = useNavigation();
-  const userRepository = createUserRepository();
-  const planRepository = createPlanRepository();
+  const { plan: planRepository, ranking: rankingRepository, user: userRepository } = useRepositories();
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [plans, setPlans] = useState<PlanEnriched[]>([]);
+  const [rankingPosition, setRankingPosition] = useState<number | null>(null);
 
   const activePlans = plans.filter(plan => /*plan.startsAt <= getDateOnly() &&*/ plan.endsAt >= getDateOnly()); // TODO: Remove 'NotStarted' status from filter
   const finishedPlans = plans.filter(plan => plan.endsAt < getDateOnly());
 
   useEffect(() => {
+    if (!isOpen)
+      return;
+
     const fetchUser = async () => {
       const userId = await Memory.get('userId') || '';
+      const dbUser = await userRepository.getById(userId);
 
-      const user = await userRepository.getById(userId);
-
-      if (!userId || !user) {
+      if (!userId || !dbUser) {
         navigation.replace('/login');
         return;
       }
 
-      setUser(user)
+      setUser(dbUser);
     };
 
-    isOpen && fetchUser();
+    fetchUser();
   }, [navigation, userRepository, isOpen]);
 
   useEffect(() => {
-    if (!user)
+    if (!isOpen || !user)
       return;
 
+    setLoading(true);
+
     const fetchPlans = async () => {
-      const plans = await planRepository.listByUserId(user.id);
-      setPlans(plans);
+      const userPlans = await planRepository.listByUserId(user.id);
+      setPlans(userPlans);
+
+      const planId = await Memory.get('planId');
+      if (planId) {
+        try {
+          const ranking = await rankingRepository.getByPlanId(planId, user.id);
+          setRankingPosition(ranking.currentUser?.position ?? null);
+        } catch {
+          setRankingPosition(null);
+        }
+      } else {
+        setRankingPosition(null);
+      }
+
       setLoading(false);
     };
 
     fetchPlans();
-  }, [planRepository, user]);
+  }, [planRepository, rankingRepository, user, isOpen]);
 
   if (!user)
     return;
@@ -105,7 +121,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           <View className="flex flex-col items-start justify-center flex-1">
             <Text className="font-semibold text-white">{user.nickname}</Text>
             <Text className="font-thin text-white">
-              Ranking: #{formatInteger(42) /* TODO: Buscar posição do Ranking da API */}
+              {rankingPosition
+                ? `Ranking: #${formatInteger(rankingPosition)}`
+                : 'Ranking: —'}
             </Text>
           </View>
           <Pressable
@@ -175,15 +193,19 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               Gerenciar Planos
             </Text>
           </Pressable>
-          <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
+          <Pressable
+            onPress={() => { navigation.push('/settings'); onClose(); }}
+            className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
               <Icon name="settings-outline" size={16} color={"gray-3"} />
             </View>
             <Text style={{ color: getColor("gray-3") }} className="my-auto font-semibold">
               Configurações
             </Text>
-          </View>
-          <View className="flex flex-row items-center justify-start gap-3 px-8 py-3">
+          </Pressable>
+          <Pressable
+            onPress={() => { navigation.push('/about'); onClose(); }}
+            className="flex flex-row items-center justify-start gap-3 px-8 py-3">
             <View className="flex flex-row items-center justify-center w-5">
               <Icon
                 name="information-circle-outline"
@@ -192,7 +214,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               />
             </View>
             <Text style={{ color: getColor("gray-3") }} className="font-semibold">Sobre nós</Text>
-          </View>
+          </Pressable>
           <Pressable
             onPress={signOut}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3 mt-4"

@@ -18,49 +18,51 @@ type CheckinWithReviewsCardProps = {
 }
 
 export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWithReviewsCardProps) {
-  const { id, userName, date, title, photoUrl, status, reviews } = checkin;
-
-  const [userReview, setUserReview] = useState<CheckinReview | undefined>(reviews.find(review => review.reviewerId === userId));
+  const { id, userName, date, title, photoUrl, status, reviews, userId: checkinUserId } = checkin;
 
   const [userId, setUserId] = useState('');
+  const [userReview, setUserReview] = useState<CheckinReview | undefined>();
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const userId = await Memory.get('userId') || '';
-      setUserId(userId);
-    }
+      const storedUserId = await Memory.get('userId') || '';
+      setUserId(storedUserId);
+    };
     fetchUserId();
   }, []);
 
-  const checkinRepository = createCheckinRepository();
+  useEffect(() => {
+    if (!userId) {
+      setUserReview(undefined);
+      return;
+    }
 
-  const removeReview = async () => {
-    const checkinUpdated = await checkinRepository.removeReview(id, userId);
-    onUpdate(checkinUpdated);
-    setUserReview(undefined);
-  }
+    setUserReview(reviews.find(review => review.reviewerId === userId));
+  }, [userId, reviews]);
+
+  const checkinRepository = createCheckinRepository();
 
   const reviewAsValidated = async () => {
     const review: CheckinReview = {
       reviewerId: userId,
-      status: 'Validated' // TODO: Validate string to 'Validated' or 'Rejected'
-    }
+      status: 'Validated',
+    };
 
     const checkinUpdated = await checkinRepository.saveReview(id, review);
     setUserReview(review);
     onUpdate(checkinUpdated);
-  }
+  };
 
   const reviewAsRejected = async () => {
     const review: CheckinReview = {
       reviewerId: userId,
-      status: 'Rejected' // TODO: Validate string to 'Validated' or 'Rejected'
-    }
+      status: 'Rejected',
+    };
 
     const checkinUpdated = await checkinRepository.saveReview(id, review);
     setUserReview(review);
     onUpdate(checkinUpdated);
-  }
+  };
 
   return (
     <View className="flex flex-col items-start justify-center w-full gap-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
@@ -93,7 +95,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
 
       {reviews.length > 0 && renderReviews(reviews)}
 
-      {status === 'Pending' && userId !== checkin.userId && renderReviewButtons(reviewAsValidated, reviewAsRejected, removeReview, userReview)}
+      {status === 'Pending' && userId !== checkinUserId && renderReviewSection(userReview, reviewAsValidated, reviewAsRejected)}
     </View>
   );
 }
@@ -156,21 +158,27 @@ function renderReviews(reviews: CheckinReview[]) {
   );
 }
 
-function renderReviewButtons(
+function renderReviewSection(
+  userReview: CheckinReview | undefined,
   reviewAsValidated: () => Promise<void>,
   reviewAsRejected: () => Promise<void>,
-  removeReview: () => Promise<void>,
-  userReview: CheckinReview | undefined
 ) {
   if (userReview !== undefined) {
+    const isValidated = userReview.status === 'Validated';
     return (
-      <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
-        <Pressable style={{ backgroundColor: userReview.status === 'Validated' ? getColor("light-success") : getColor("light-danger") }} onPress={removeReview} className="flex-1 py-2 rounded-xl">
-          <View className="flex flex-row items-center justify-center w-full gap-2">
-            <Icon type="font-awesome-5" name={userReview.status === 'Validated' ? "check-circle" : "flag"} size={14} color={userReview.status === 'Validated' ? "success" : "danger"} />
-            <Text style={{ color: userReview.status === 'Validated' ? getColor("success") : getColor("danger") }} className="font-bold">{userReview.status === 'Validated' ? "Validado" : "Rejeitado"} (Remover revisão)</Text>
-          </View>
-        </Pressable>
+      <View className="flex flex-row items-center justify-center w-full gap-2 px-4 py-2">
+        <Icon
+          type="font-awesome-5"
+          name={isValidated ? 'check-circle' : 'flag'}
+          size={14}
+          color={isValidated ? 'success' : 'danger'}
+        />
+        <Text
+          style={{ color: getColor(isValidated ? 'success' : 'danger') }}
+          className="font-bold"
+        >
+          {isValidated ? 'Você já validou este check-in' : 'Você já rejeitou este check-in'}
+        </Text>
       </View>
     );
   }

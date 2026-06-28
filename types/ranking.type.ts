@@ -9,3 +9,10 @@ export type RankingItemEnriched = RankingItem & {
     userName: string;
     checkinCount: number;
 };
+
+export type PlanRanking = {
+    totalCheckinCount: number;
+    daysOffAvailable: number;
+    items: RankingItemEnriched[];
+    currentUser: RankingItemEnriched | null;
+};

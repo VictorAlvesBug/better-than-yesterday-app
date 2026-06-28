@@ -1,4 +1,5 @@
 import { Checkin, CheckinEnriched, CheckinReview, CheckinStatus, CreateCheckin } from '@/types/checkin.type';
+import { PlanRanking, RankingItemEnriched } from '@/types/ranking.type';
 import { CreateHabit, Habit, HabitEnriched } from '@/types/habit.type';
 import {
   CreatePlan,
@@ -91,6 +92,33 @@ export type ApiUserWithPlans = {
 export type PresignedUploadUrl = {
   uploadUrl: string;
   fileUrl: string;
+};
+
+export type ApiPlanRankingItem = {
+  position: number;
+  userId: string;
+  userName: string;
+  checkinCount: number;
+  penalty: number;
+  streak: number;
+};
+
+export type ApiPlanRanking = {
+  totalCheckinCount: number;
+  daysOffAvailable: number;
+  items: ApiPlanRankingItem[];
+  currentUser: ApiPlanRankingItem | null;
+};
+
+export type ApiUseDayOffResult = {
+  dayOff: {
+    id: string;
+    planId: string;
+    userId: string;
+    date: string;
+    createdAt: string;
+  };
+  daysOffAvailable: number;
 };
 
 export function mapUserFromApi(user: ApiUser): User {
@@ -200,6 +228,26 @@ export function mapHabitEnrichedFromApi(habit: ApiHabit): HabitEnriched {
   return {
     ...mapHabitFromApi(habit),
     planCount: 0,
+  };
+}
+
+function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriched {
+  return {
+    position: item.position,
+    userId: item.userId,
+    userName: item.userName,
+    checkinCount: item.checkinCount,
+    penalty: item.penalty,
+    streak: item.streak,
+  };
+}
+
+export function mapPlanRankingFromApi(ranking: ApiPlanRanking): PlanRanking {
+  return {
+    totalCheckinCount: ranking.totalCheckinCount,
+    daysOffAvailable: ranking.daysOffAvailable,
+    items: ranking.items.map(mapPlanRankingItemFromApi),
+    currentUser: ranking.currentUser ? mapPlanRankingItemFromApi(ranking.currentUser) : null,
   };
 }
 

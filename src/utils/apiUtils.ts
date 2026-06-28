@@ -6,7 +6,9 @@ import {
   ApiHabit,
   ApiPlan,
   ApiPlanMemberDetails,
+  ApiPlanRanking,
   ApiPlanWithMembers,
+  ApiUseDayOffResult,
   ApiUser,
   ApiUserWithPlans,
   CreateCheckInPayload,
@@ -211,4 +213,18 @@ export const backendApi = {
       `${API_URL}/Uploads/PresignedUrl`,
       { fileName, contentType }
     ),
+
+  getPlanRanking: (planId: string, userId?: string) =>
+    getData<ApiPlanRanking>(
+      `${API_URL}/Plans/${planId}/Ranking${buildQueryString({ userId })}`
+    ),
+
+  useDayOff: (planId: string, userId: string, date: string) =>
+    postData<{ date: string }, ApiUseDayOffResult>(
+      `${API_URL}/Plans/${planId}/Members/${userId}/DayOffs`,
+      { date }
+    ),
+
+  getDayOffAvailability: (planId: string, userId: string) =>
+    getData<number>(`${API_URL}/Plans/${planId}/Members/${userId}/DayOffs/Available`),
 };

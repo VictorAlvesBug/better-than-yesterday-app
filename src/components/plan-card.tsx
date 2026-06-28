@@ -5,10 +5,10 @@ import { ActivityIndicator, Text, View } from 'react-native'
 import Memory from '../api/memory'
 import createPlanRepository from '../api/planRepository'
 import useEffectAsync from '../hooks/useEffectAsync'
+import useNavigation from '../hooks/useNavigation'
 import { formatDateRelativeToToday, getDateToFront, getDifferenceInDays } from '../utils/dateUtils'
 import { formatIntegerCompact, formatMoney } from '../utils/numberUtils'
 import { getAbbreviatedName } from '../utils/stringUtils'
-import { toastInfoMessage } from '../utils/toastUtils'
 import AmountSelect from './amount-select'
 import { Button } from './button'
 import Icon from './icon'
@@ -25,6 +25,7 @@ export default function PlanCard({
     callback = () => Promise.resolve()
 }: PlanCardProps) {
     const planRepository = createPlanRepository();
+    const navigation = useNavigation();
     const [userId, setUserId] = useState<string>('');
     const [loading, setLoading] = useState(true);
 
@@ -42,7 +43,8 @@ export default function PlanCard({
         planId: plan.id,
         userId,
         callback,
-        planRepository
+        planRepository,
+        navigation,
     });
 
     const statusInfo = getStatusInfo(plan.status);
@@ -302,6 +304,7 @@ type GetActionOptions = {
     userId: string;
     planRepository: ReturnType<typeof createPlanRepository>;
     callback: PlanCardProps['callback'];
+    navigation: ReturnType<typeof useNavigation>;
 }
 
 type ButtonInfo = {
@@ -311,7 +314,7 @@ type ButtonInfo = {
     lightColor: ColorName
 }
 
-function getButtonInfo({ role, planId, userId, planRepository, callback }: GetActionOptions): ButtonInfo {
+function getButtonInfo({ role, planId, userId, planRepository, callback, navigation }: GetActionOptions): ButtonInfo {
     switch (role) {
         case 'join':
             return {
@@ -341,7 +344,7 @@ function getButtonInfo({ role, planId, userId, planRepository, callback }: GetAc
                 baseColor: 'info',
                 lightColor: 'light-info',
                 action: async () => {
-                    toastInfoMessage('TODO: See ranking without join')
+                    navigation.push(`/plan-peek?planId=${planId}`);
                 },
             };
 
