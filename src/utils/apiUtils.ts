@@ -1,6 +1,5 @@
 import { API_URL } from '@/src/utils/constants';
 import axios from 'axios';
-import { toastErrorMessage } from './toastUtils';
 import {
   ApiCheckIn,
   ApiHabit,
@@ -24,10 +23,7 @@ import {
 } from './apiMappers';
 
 export type {
-  ListPlansFilter,
-  ListCheckInsFilter,
-  ListUsersFilter,
-  ListHabitsFilter,
+  ListCheckInsFilter, ListHabitsFilter, ListPlansFilter, ListUsersFilter
 } from './apiMappers';
 
 export type ApiResponse<T> = {
@@ -42,28 +38,29 @@ export const isSuccessfulStatusCode = (statusCode: number) =>
 
 const resolveStatus = (status: number) => {
   switch (status) {
-    case 0: return 'Failure';
-    case 1: return 'Success';
-    case 2: return 'Rejected';
-    default: return 'Unknown status';
+    case 0: return 'Falha';
+    case 1: return 'Sucesso';
+    case 2: return 'Rejeitado';
+    default: return 'Status desconhecido';
   }
 };
 
-export const logError = (error: unknown) => {
+export const logErrorAndThrow = (error: unknown) => {
   if (!axios.isAxiosError(error)) {
     console.error('Unexpected error:', error);
-    return;
+    throw error;
   }
 
-  const statusCode = error.response?.status;
-  const strResponseData = JSON.stringify(error.response?.data ?? {});
-  console.error(`API Error - StatusCode: ${statusCode} - Response Data: ${strResponseData}`);
 
   if (error.response?.data) {
     const status = resolveStatus(error.response.data.status);
     const reason = error.response.data.reason ?? 'No reason provided';
-    toastErrorMessage(`${status}: ${reason}`);
+    throw new Error(`${status}: ${reason}`);
   }
+
+  const statusCode = error.response?.status;
+  const strResponseData = JSON.stringify(error.response?.data ?? {});
+  throw new Error(`API Error - StatusCode: ${statusCode} - Response Data: ${strResponseData}`);
 };
 
 function buildQueryString(params: Record<string, string | undefined>): string {
@@ -86,7 +83,7 @@ async function getData<T>(url: string): Promise<T> {
 
     throw new Error(`GET ${url} failed with status ${response.status}`);
   } catch (error) {
-    logError(error);
+    logErrorAndThrow(error);
     throw error;
   }
 }
@@ -103,7 +100,7 @@ async function postData<TBody, TResult>(url: string, body?: TBody): Promise<TRes
 
     throw new Error(`POST ${url} failed with status ${response.status}`);
   } catch (error) {
-    logError(error);
+    logErrorAndThrow(error);
     throw error;
   }
 }
@@ -116,7 +113,7 @@ async function deleteRequest(url: string): Promise<void> {
 
     throw new Error(`DELETE ${url} failed with status ${response.status}`);
   } catch (error) {
-    logError(error);
+    logErrorAndThrow(error);
     throw error;
   }
 }
@@ -129,7 +126,7 @@ async function deleteData<T>(url: string): Promise<T> {
 
     throw new Error(`DELETE ${url} failed with status ${response.status}`);
   } catch (error) {
-    logError(error);
+    logErrorAndThrow(error);
     throw error;
   }
 }

@@ -26,6 +26,7 @@ import {
   formatDateRelativeToToday,
   getDateComponents,
   getDateOnly,
+  getDateTime,
   getDateToFront,
   getDateToFrontWithOffset,
 } from '../utils/dateUtils';
@@ -38,10 +39,10 @@ export default function CreateCheckinScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [localPhotoUri, setLocalPhotoUri] = useState('');
 
-  const [checkin, setCheckin] = useState<CreateCheckin>({
+  const [selectedDate, setSelectedDate] = useState(getDateOnly());
+  const [checkin, setCheckin] = useState<Omit<CreateCheckin, 'date'>>({
     userId: '',
     planId: '',
-    date: getDateOnly(),
     photoUrl: '',
     title: '',
   });
@@ -125,16 +126,24 @@ export default function CreateCheckinScreen() {
     try {
       const assetUri = localPhotoUri;
       const fileType = 'image/jpeg';
-      const { year, month, day } = getDateComponents(checkin.date);
-      
+      const { year, month, day } = getDateComponents(selectedDate);
+      const now = new Date();
+      const submitDate = getDateTime(new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        now.getHours(),
+        now.getMinutes(),
+        now.getSeconds(),
+      ));
+
       const photoUrl = await s3Repository.uploadFile({
         filePath: assetUri,
         fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/${generateId()}.jpg`,
-        //fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/photo.jpg`, //TODO: Usar este quando terminar de testar com "MoveInTimeUseCase"
         fileType,
       });
 
-      const payload = { ...checkin, photoUrl };
+      const payload: CreateCheckin = { ...checkin, date: submitDate, photoUrl };
 
       if (!checkIfIsValidAndToast(createCheckinSchema, payload))
         return;
@@ -144,7 +153,11 @@ export default function CreateCheckinScreen() {
       navigation.back();
     } catch (err) {
       console.error(err);
-      toastErrorMessage('Erro ao criar check-in');
+      if (err instanceof Error) {
+        toastErrorMessage(err.message);
+      } else {
+        toastErrorMessage('Erro ao criar check-in');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -192,8 +205,8 @@ export default function CreateCheckinScreen() {
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Data</Label>
             <DateInput
-              value={getDateToFront(checkin.date)}
-              setValue={(value) => setCheckin({ ...checkin, date: getDateOnly(value) })}
+              value={getDateToFront(selectedDate)}
+              setValue={(value) => setSelectedDate(getDateOnly(value))}
               minValue={getDateToFrontWithOffset(-1)}
               maxValue={getDateToFront()}
               formatValueDescription={formatDateRelativeToToday}

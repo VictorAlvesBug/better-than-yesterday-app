@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
-import { formatRelativeDateOnly } from '../utils/dateUtils';
+import { formatRelativeDateTime } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
 import Icon from './icon';
 import ProfilePhoto from './profile-photo';
@@ -82,7 +82,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
             {userName}
           </Text>
           <Text style={{ color: getColor("gray-7") }} className="text-xs" numberOfLines={1}>
-            {formatRelativeDateOnly(date)}
+            {formatRelativeDateTime(date)}
           </Text>
         </View>
         {renderStatus(status)}

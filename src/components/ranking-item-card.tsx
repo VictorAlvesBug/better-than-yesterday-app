@@ -17,6 +17,7 @@ type RankingItemCardProps = {
   checkinCount: number;
   penalty: number;
   streak: number;
+  streakBonus: number;
   totalCount: number;
 };
 
@@ -26,9 +27,11 @@ export default function RankingItemCard({
   checkinCount,
   penalty,
   streak,
+  streakBonus,
   totalCount,
 }: RankingItemCardProps) {
   const checkinsPercent = checkinCount / totalCount;
+  const streakPercent = streakBonus / totalCount;
   return (
     <View className="flex flex-col items-center justify-between w-full gap-1 px-5 py-3 bg-white shadow-md rounded-2xl">
       <View className="flex flex-row items-center justify-between w-full gap-1">
@@ -52,7 +55,7 @@ export default function RankingItemCard({
                 {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
               </Text>
               <Text style={{color: getColor("gray-7")}} className="ml-3 text-xs" numberOfLines={1}>
-                {`Streak: ${formatInteger(streak)}`}
+                {`Streak: ${formatInteger(streak)}${streakBonus > 0 ? ` (+${formatInteger(streakBonus)})` : ''}`}
               </Text>
             </View>
           </View>
@@ -64,7 +67,8 @@ export default function RankingItemCard({
           </Text>
         </View>
       </View>
-      <View style={{backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 8, width: "100%"}}>
+      <View /*className="flex flex-row items-center justify-center"*/
+       style={{backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 8, width: "100%"}}>
         <GradientView
           style={{
             flex: 1,
@@ -72,6 +76,14 @@ export default function RankingItemCard({
             borderRadius: 9999,
             width: `${checkinsPercent * 100}%`,
           }} />
+          {/* <View
+            style={{
+              flex: 2,
+              height: '100%',
+              borderRadius: 9999,
+              width: `${streakPercent * 100}%`,
+              backgroundColor: getColor("violet"),
+            }} /> */}
       </View>
     </View>
   );

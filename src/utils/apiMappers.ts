@@ -14,7 +14,7 @@ import {
   UserWithPlans,
 } from '@/types/plan.type';
 import { CreateUser, PixKeyType, User } from '@/types/user.type';
-import { DateOnly, DateTime } from '@/src/utils/dateUtils';
+import { AllTypes, DateOnly, DateTime, getDateTime } from '@/src/utils/dateUtils';
 
 export type ApiHabit = {
   id: string;
@@ -101,6 +101,7 @@ export type ApiPlanRankingItem = {
   checkinCount: number;
   penalty: number;
   streak: number;
+  streakBonus: number;
 };
 
 export type ApiPlanRanking = {
@@ -160,7 +161,7 @@ export function mapCheckInFromApi(checkIn: ApiCheckIn): Checkin {
     kind: 'checkin',
     planId: checkIn.planId,
     userId: checkIn.userId,
-    date: checkIn.date as DateOnly,
+    date: getDateTime(checkIn.date as AllTypes) as DateTime,
     title: checkIn.title,
     photoUrl: checkIn.photoUrl,
     status: checkIn.status as CheckinStatus,
@@ -239,6 +240,7 @@ function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriche
     checkinCount: item.checkinCount,
     penalty: item.penalty,
     streak: item.streak,
+    streakBonus: item.streakBonus ?? 0,
   };
 }
 

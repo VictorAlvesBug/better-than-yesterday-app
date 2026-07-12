@@ -41,6 +41,10 @@ export default function PlanSettingsScreen() {
   const [tabsWidth, setTabsWidth] = useState(0);
   const tabWidth = tabsWidth / 2 || 0;
 
+  const fakeAdminFee = 0.1;//plan?.adminFee ?? 0;
+  const fakeTotalPenalties = 280;
+  const fakeTotalAdminFee = fakeTotalPenalties * fakeAdminFee;
+
   useEffect(() => {
     Animated.spring(translateX, {
       toValue: currentTab === 'ranking' ? 0 : tabWidth,
@@ -132,7 +136,7 @@ export default function PlanSettingsScreen() {
           >
             <Text style={{ color: getColor('white') }} className="font-thin">Pool de Recompensas</Text>
             <Text style={{ color: getColor('white') }} className="mb-1 text-3xl font-bold">
-              {formatMoney(252)}
+              {formatMoney(fakeTotalPenalties - fakeTotalAdminFee)}
             </Text>
             <View className="flex flex-row items-center w-full justify-evenly">
               <View className="flex flex-col items-center justify-center gap-1">
@@ -140,15 +144,15 @@ export default function PlanSettingsScreen() {
                   Total Multas
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatMoneyCompact(280)}
+                  {formatMoneyCompact(fakeTotalPenalties)}
                 </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
-                  Taxa Admin ({formatPercent(0.1)})
+                  Taxa Admin ({formatPercent(fakeAdminFee)})
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatMoneyCompact(28)}
+                  {formatMoneyCompact(fakeTotalAdminFee)}
                 </Text>
               </View>
               <View className="flex flex-col items-center justify-center gap-1">

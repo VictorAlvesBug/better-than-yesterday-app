@@ -1,4 +1,4 @@
-import { parseDateOnly } from "@/src/utils/dateUtils";
+import { parseDateOnly, parseDateTime } from "@/src/utils/dateUtils";
 import { zodEnumWithValidation, zodExtractWithValidation } from "@/src/utils/zodUtils";
 import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
@@ -27,7 +27,7 @@ const checkinSchema = baseResourceSchema.extend({
   kind: z.literal('checkin'),
   planId: z.guid({ error: "ID do plano deve ser um UUID válido" }),
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
-  date: z.string().transform((str) => parseDateOnly(str)),
+  date: z.string().transform((str) => parseDateTime(str)),
   title: z.string().min(3, { error: "Título é obrigatório" }),
   photoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
   status: checkinStatusSchema,

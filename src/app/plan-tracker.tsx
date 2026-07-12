@@ -147,6 +147,7 @@ export default function PlanTrackerScreen() {
   const daysSinceStart = getDifferenceInDays(new Date(), plan.startsAt);
   const totalDays = getDifferenceInDays(plan.startsAt, plan.endsAt);
   const streak = currentUser?.streak ?? 0;
+  const streakBonus = currentUser?.streakBonus ?? 0;
   const position = currentUser?.position ?? 0;
   const checkinCount = currentUser?.checkinCount ?? 0;
   const totalCheckinCount = ranking?.totalCheckinCount ?? 0;
@@ -212,12 +213,17 @@ export default function PlanTrackerScreen() {
               <View className="flex flex-row items-center justify-between flex-1 w-full gap-4">
                 <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
                   <View className="flex flex-row items-center justify-start gap-3">
-                    <Icon type="font-awesome-5" name="fire" size={16} color="warning" />
+                    <Icon type="font-awesome-5" name="fire" size={16} color="orange" />
                     <Text style={{ color: getColor('gray-7') }}>Sequência</Text>
                   </View>
-                  <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
-                    {formatInteger(streak)}
-                  </Text>
+                  <View className="flex flex-row items-center justify-start gap-1">
+                    <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
+                      {formatInteger(streak)}
+                    </Text>
+                    <Text className="text-md font-bold" style={{ color: getColor('orange') }}>
+                      {streakBonus > 0 ? ` +${formatInteger(streakBonus)}` : ''}
+                    </Text>
+                  </View>
                   <Text style={{ color: getColor('gray-7') }} className="text-xs font-semibold">
                     dias seguidos
                   </Text>
@@ -299,15 +305,15 @@ export default function PlanTrackerScreen() {
       </ScrollView>
 
       {isRunning && (
-      <Pressable
-        style={{ backgroundColor: getColor('violet') }}
-        onPress={() => navigation.push('/create-checkin')}
-        className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80"
-      >
-        <GradientView className="flex flex-col items-center justify-center w-full h-full">
-          <Icon name="camera" size={24} color="white" />
-        </GradientView>
-      </Pressable>
+        <Pressable
+          style={{ backgroundColor: getColor('violet') }}
+          onPress={() => navigation.push('/create-checkin')}
+          className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80"
+        >
+          <GradientView className="flex flex-col items-center justify-center w-full h-full">
+            <Icon name="camera" size={24} color="white" />
+          </GradientView>
+        </Pressable>
       )}
     </View>
   );

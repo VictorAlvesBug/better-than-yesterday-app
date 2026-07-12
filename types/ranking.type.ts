@@ -3,6 +3,7 @@ export type RankingItem = {
     userId: string;
     penalty: number;
     streak: number;
+    streakBonus: number;
 };
 
 export type RankingItemEnriched = RankingItem & {

@@ -41,7 +41,7 @@ export default function createCheckinRepository() {
 
         const checkinCreated = await backendApi.addCheckIn({
             ...createCheckin,
-            date: getDateOnly(createCheckin.date),
+            date: createCheckin.date,
         });
         return mapCheckInEnrichedFromApi(checkinCreated);
     };
