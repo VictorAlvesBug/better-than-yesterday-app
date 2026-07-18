@@ -113,19 +113,28 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
         <GradientView
           className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
         >
-          <Image
-            source={{ uri: user.photoUrl }} // TODO: Corrigir exibição da foto
-            resizeMode="cover"
-            className="w-12 h-12 rounded-full"
-          />
-          <View className="flex flex-col items-start justify-center flex-1">
-            <Text className="font-semibold text-white">{user.nickname}</Text>
-            <Text className="font-thin text-white">
-              {rankingPosition
-                ? `Ranking: #${formatInteger(rankingPosition)}`
-                : 'Ranking: —'}
-            </Text>
-          </View>
+          <Pressable
+            className="flex flex-row items-center justify-between flex-1 gap-3"
+            onPress={() => {
+              navigation.push('/settings');
+              onClose();
+            }}
+          >
+            <Image
+              source={{ uri: user.photoUrl || undefined }}
+              resizeMode="cover"
+              className="w-12 h-12 rounded-full"
+              style={{ backgroundColor: getColor('gray-d') }}
+            />
+            <View className="flex flex-col items-start justify-center flex-1">
+              <Text className="font-semibold text-white">{user.nickname}</Text>
+              <Text className="font-thin text-white">
+                {rankingPosition
+                  ? `Ranking: #${formatInteger(rankingPosition)}`
+                  : 'Ranking: —'}
+              </Text>
+            </View>
+          </Pressable>
           <Pressable
             className="flex flex-row items-center justify-center w-10 h-10"
             onPress={onClose}

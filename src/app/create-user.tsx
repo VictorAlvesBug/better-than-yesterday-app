@@ -1,15 +1,21 @@
 import Memory from '@/src/api/memory';
-import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
-import { CreateUser, createUserSchema, PixKeyType, pixKeyTypeSchema, User } from '@/types/user.type';
+import {
+  CreateUser,
+  createUserSchema,
+  PIX_KEY_TYPE_LABELS,
+  PixKeyType,
+  pixKeyTypeSchema,
+} from '@/types/user.type';
 import Constants from 'expo-constants';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Image,
   Pressable,
   Text,
+  TextInput,
   View
 } from 'react-native';
 import { Button } from '../components/button';
@@ -18,20 +24,24 @@ import Icon from '../components/icon';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
-import SearchableSelect from '../components/searchable-select';
+import Select from '../components/select';
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
-import { checkIfIsValidAndToast } from '../utils/toastUtils';
-
-
+import {
+  isLocalImageUri,
+  promptProfilePhotoPicker,
+  uploadProfilePhoto,
+} from '../utils/profilePhotoUtils';
+import { checkIfIsValidAndToast, toastErrorMessage } from '../utils/toastUtils';
 
 export default function CreateUserScreen() {
   const { isSignedIn, signOut, authUser } = useAuth();
   const navigation = useNavigation();
-  const userRepository = createUserRepository();
-  const planRepository = createPlanRepository();
+  const userRepository = useMemo(() => createUserRepository(), []);
+  const pixKeyInputRef = useRef<TextInput | null>(null);
 
   const [user, setUser] = useState<CreateUser | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!isSignedIn || !authUser)
@@ -68,27 +78,52 @@ export default function CreateUserScreen() {
     };
 
     fetchUser();
-  }, [authUser, isSignedIn, planRepository, navigation, userRepository]);
+  }, [authUser, isSignedIn, navigation, userRepository]);
 
   if (!authUser || !user)
     return null;
 
-  const onChangeHandler = (field: keyof User, value: string) => {
-    setUser(prev => ({ ...prev as User, [field]: value }));
+  const onChangeHandler = (field: keyof CreateUser, value: string) => {
+    setUser(prev => ({ ...prev as CreateUser, [field]: value }));
   }
 
-  const createUser = async () => {
-    //TODO: Validar campos informados...
+  const onPickPhoto = () => {
+    promptProfilePhotoPicker(({ localUri }) => {
+      onChangeHandler('photoUrl', localUri);
+    });
+  };
 
-    if(!checkIfIsValidAndToast(createUserSchema, user)){
+  const createUser = async () => {
+    if (!checkIfIsValidAndToast(createUserSchema, user)) {
       return;
     }
 
-    const createdUser = await userRepository.create(user);
+    try {
+      setSaving(true);
+      let photoUrl = user.photoUrl;
+      if (isLocalImageUri(photoUrl)) {
+        photoUrl = await uploadProfilePhoto(photoUrl, user.email);
+      }
 
-    await Memory.set('userId', createdUser.id);
-    navigation.replace('./manage-plans');
+      const createdUser = await userRepository.create({
+        ...user,
+        photoUrl,
+      });
+
+      await Memory.set('userId', createdUser.id);
+      navigation.replace('./manage-plans');
+    } catch (error) {
+      //toastErrorMessage(error instanceof Error ? error.message : 'Não foi possível cadastrar');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const predefinedPixKey = (keyType: PixKeyType) => {
+    if (keyType === 'Email') return user.email;
+    if (keyType === 'PhoneNumber') return user.phoneNumber;
+    return '';
+  }
 
   return (
     <>
@@ -114,20 +149,33 @@ export default function CreateUserScreen() {
       <KeyboardableView>
         <View
           style={{
-            flex: 1,
+            //flex: 1,
             backgroundColor: getColor("gray-e"),
+            borderWidth: 2,
+            borderColor: 'blue',
           }}
           className="flex-1 w-full gap-6 px-4 py-3"
         >
           <Card className="flex flex-row items-center justify-center w-full gap-3">
-            <View className="flex flex-col items-start justify-center gap-1 w-fit">
+            <Pressable
+              className="flex flex-col items-center justify-center gap-1 w-fit"
+              onPress={onPickPhoto}
+            >
               <Image
                 source={{
-                  uri: user.photoUrl,
+                  uri: user.photoUrl || undefined,
                 }}
-                style={{ width: 80, height: 80, borderRadius: 9999 }}
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: 9999,
+                  backgroundColor: getColor('gray-d'),
+                }}
               />
-            </View>
+              <Text style={{ color: getColor('violet') }} className="text-xs font-semibold">
+                Alterar foto
+              </Text>
+            </Pressable>
 
             <View className="flex flex-col items-start justify-center flex-1 gap-1">
               <Label>Nickname</Label>
@@ -151,6 +199,26 @@ export default function CreateUserScreen() {
             />
           </Card>
 
+          {/* <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Fake Field 2</Label>
+            <Input
+              inputType='default'
+              value={'Fake Field 1'}
+              typeable={false}
+              grayBackground
+            />
+          </Card>
+
+          <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Label>Fake Field 1</Label>
+            <Input
+              inputType='default'
+              value={'Fake Field 1'}
+              typeable={false}
+              grayBackground
+            />
+          </Card> */}
+
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Celular</Label>
             <Input
@@ -163,14 +231,19 @@ export default function CreateUserScreen() {
           </Card>
 
           <Card className="flex flex-col items-start justify-center w-full gap-1">
-            <SearchableSelect<PixKeyType>
+            <Select<PixKeyType>
               label="Selecione o Tipo de Chave Pix"
               placeholder="Escolha um tipo de chave..."
               value={user.pixKeyType}
-              formatOptionLabel={keyType => keyType}
+              formatOptionLabel={keyType => PIX_KEY_TYPE_LABELS[keyType]}
               options={Object.values(pixKeyTypeSchema.enum)}
               onChange={selectedKeyType => {
-                onChangeHandler('pixKeyType', selectedKeyType);
+                setUser(prev => ({
+                  ...prev as CreateUser,
+                  pixKeyType: selectedKeyType,
+                  pixKey: predefinedPixKey(selectedKeyType),
+                }));
+                pixKeyInputRef.current?.focus();
               }}
             />
           </Card>
@@ -178,7 +251,8 @@ export default function CreateUserScreen() {
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Chave Pix</Label>
             <Input
-              inputType='pix-key'
+              ref={pixKeyInputRef}
+              inputType={user.pixKeyType === 'PhoneNumber' ? 'phone-number' : 'pix-key'}
               value={user.pixKey}
               onChange={(value) => {
                 onChangeHandler('pixKey', value);
@@ -188,10 +262,12 @@ export default function CreateUserScreen() {
 
           <Button
             className='p-0 overflow-hidden'
-            action={createUser}>
+            action={saving ? async () => undefined : createUser}>
             <GradientView
               className="flex flex-col items-center justify-center w-full h-full">
-              <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Salvar</Text>
+              <Text style={{ color: getColor('white') }} className='text-lg font-bold'>
+                {saving ? 'Salvando...' : 'Salvar'}
+              </Text>
             </GradientView>
           </Button>
         </View>

@@ -2,7 +2,7 @@ import Memory from '@/src/api/memory';
 import createPlanRepository from '@/src/api/planRepository';
 import createUserRepository from '@/src/api/userRepository';
 import { getColor } from '@/types/color.type';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../context/auth';
 import CreateUserScreen from './create-user';
@@ -16,8 +16,8 @@ type RedirectionScreen = 'loading' | 'not-found' | 'login' | 'create-user' | 'pl
 export default function HomeScreen() {
     const { isSignedIn, authUser } = useAuth();
     const [redirectionScreen, setRedirectionScreen] = React.useState<RedirectionScreen>('loading');
-    const userRepository = createUserRepository();
-    const planRepository = createPlanRepository();
+    const userRepository = useMemo(() => createUserRepository(), []);
+    const planRepository = useMemo(() => createPlanRepository(), []);
 
     useEffect(() => {
         if (!isSignedIn || !authUser)

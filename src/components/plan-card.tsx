@@ -1,6 +1,6 @@
 import { ColorName, getColor } from '@/types/color.type'
 import { PlanToJoin } from '@/types/plan.type'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 import Memory from '../api/memory'
 import createPlanRepository from '../api/planRepository'
@@ -24,7 +24,7 @@ export default function PlanCard({
     plan,
     callback = () => Promise.resolve()
 }: PlanCardProps) {
-    const planRepository = createPlanRepository();
+    const planRepository = useMemo(() => createPlanRepository(), []);
     const navigation = useNavigation();
     const [userId, setUserId] = useState<string>('');
     const [loading, setLoading] = useState(true);

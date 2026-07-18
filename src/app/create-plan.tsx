@@ -6,7 +6,7 @@ import { getColor } from '@/types/color.type';
 import { Habit, HabitWithJustAdded } from '@/types/habit.type';
 import { CreatePlan, createPlanSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
 import Constants from 'expo-constants';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Switch,
@@ -22,7 +22,7 @@ import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
-import SearchableSelect from '../components/searchable-select';
+import Select from '../components/select';
 import useNavigation from '../hooks/useNavigation';
 import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
@@ -41,8 +41,8 @@ export default function CreatePlanScreen() {
 
   const [habitList, setHabitList] = useState<HabitWithJustAdded[]>([]);
 
-  const habitRepository = createHabitRepository();
-  const planRepository = createPlanRepository();
+  const habitRepository = useMemo(() => createHabitRepository(), []);
+  const planRepository = useMemo(() => createPlanRepository(), []);
 
   const penaltyOptions = penaltyValueOptions.map((penaltyValue): PenaltyOption => ({
     id: penaltyValue.toString(),
@@ -171,7 +171,8 @@ export default function CreatePlanScreen() {
             >
               <Card className="flex flex-col items-start justify-center w-full gap-1">
                 <Label>Hábitos</Label>
-                <SearchableSelect<Habit>
+                <Select<Habit>
+                  enableSearch={true}
                   label="Selecione o Hábito"
                   placeholder="Escolha um hábito..."
                   value={plan.habitId}
@@ -231,15 +232,15 @@ export default function CreatePlanScreen() {
 
               <Card className="flex flex-col items-start justify-center w-full gap-1">
                 <Label>Multa por Descumprimento</Label>
-                <SearchableSelect<PenaltyOption>
+                <Select<PenaltyOption>
                   label="Selecione o Valor"
-                  value={plan.penaltyValue.toString()}
-                  options={penaltyOptions}
-                  formatOptionLabel={penaltyValue => penaltyValue.label}
-                  onChange={selectedPenaltyValue => {
-                    setPlan({ ...plan, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
-                  }}
-                />
+                value={plan.penaltyValue.toString()}
+                formatOptionLabel={penaltyValue => penaltyValue.label}
+                options={penaltyOptions}
+                onChange={selectedPenaltyValue => {
+                  setPlan({ ...plan, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
+                }}
+              />
               </Card>
 
               <Card className="flex flex-col items-start justify-center w-full gap-1">

@@ -22,7 +22,7 @@ export function checkIfIsValidAndToast<
 }
 
 export function toastErrorMessage(message: string) {
-    console.error(`ToastErrorMessage | Message: ${message}`);
+    console.log(`ToastErrorMessage | Message: ${message}`);
     toastMessage('error', message, "Ops");
 }
 
@@ -32,15 +32,12 @@ export function toastSuccessMessage(message: string) {
 }
 
 export function toastInfoMessage(message: string) {
-    console.warn(`ToastInfoMessage | Message: ${message}`);
+    console.log(`ToastInfoMessage | Message: ${message}`);
     toastMessage('info', message, "Informação");
 }
 
 function toastMessage(type: ToastType, message: string, title: string) {
-    const consoleFunc = getConsoleFunc(type);
-
-    consoleFunc && 
-        consoleFunc(`ToastMessage | Title: ${title} | Message: ${message}`);
+    console.log(`ToastMessage | Title: ${title} | Message: ${message}`);
     Toast.show({
         type,
         text1: title,

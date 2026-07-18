@@ -1,6 +1,6 @@
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -43,7 +43,7 @@ export function parsePlanIdFromInviteInput(input: string): string | null {
 
 export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: JoinPlanModalProps) {
   const navigation = useNavigation();
-  const planRepository = createPlanRepository();
+  const planRepository = useMemo(() => createPlanRepository(), []);
 
   const [linkInput, setLinkInput] = useState('');
   const [plan, setPlan] = useState<PlanEnriched | null>(null);

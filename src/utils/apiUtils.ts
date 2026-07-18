@@ -20,6 +20,7 @@ import {
   ListUsersFilter,
   PresignedUploadUrl,
   ReviewCheckInPayload,
+  UpdateUserPayload,
 } from './apiMappers';
 
 export type {
@@ -47,7 +48,7 @@ const resolveStatus = (status: number) => {
 
 export const logErrorAndThrow = (error: unknown) => {
   if (!axios.isAxiosError(error)) {
-    console.error('Unexpected error:', error);
+    //console.error('Unexpected error:', error);
     throw error;
   }
 
@@ -105,6 +106,19 @@ async function postData<TBody, TResult>(url: string, body?: TBody): Promise<TRes
   }
 }
 
+async function putData<TBody, TResult>(url: string, body?: TBody): Promise<TResult> {
+  try {
+    const response = await axios.put<ApiResponse<TResult>>(url, body);
+    if (isSuccessfulStatusCode(response.status))
+      return response.data.data;
+
+    throw new Error(`PUT ${url} failed with status ${response.status}`);
+  } catch (error) {
+    logErrorAndThrow(error);
+    throw error;
+  }
+}
+
 async function deleteRequest(url: string): Promise<void> {
   try {
     const response = await axios.delete(url);
@@ -140,6 +154,9 @@ export const backendApi = {
 
   registerUser: (body: CreateUserPayload) =>
     postData<CreateUserPayload, ApiUser>(`${API_URL}/Users`, body),
+
+  updateUser: (body: UpdateUserPayload) =>
+    putData<UpdateUserPayload, ApiUser>(`${API_URL}/Users`, body),
 
   getHabitById: (id: string) =>
     getData<ApiHabit>(`${API_URL}/Habits/${id}`),

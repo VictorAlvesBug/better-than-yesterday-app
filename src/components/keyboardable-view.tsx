@@ -35,15 +35,20 @@ export default function KeyboardableView({ children, className }: KeyboardableVi
         }
     }, []);
 
-    const contentPaddingBottom = isKeyboardOpen ? keyboardHeight - 290 : 15;
+    const contentPaddingBottom = isKeyboardOpen ? keyboardHeight - 100 /*- 290*/ : 15;
+    console.log('keyboardHeight', keyboardHeight);
+    console.log('isKeyboardOpen', isKeyboardOpen);
+    console.log('contentPaddingBottom', contentPaddingBottom);
 
     return (
         <KeyboardAwareScrollView
             className={twMerge("flex-1", className)}
             style={{
-                flex: 1
+                flex: 1,
+                borderWidth: 2,
+                borderColor: 'red',
             }}
-            contentContainerStyle={{ paddingBottom: contentPaddingBottom }}
+            //contentContainerStyle={{ paddingBottom: contentPaddingBottom }}
             enableOnAndroid
             keyboardShouldPersistTaps='handled'
         >

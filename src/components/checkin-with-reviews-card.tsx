@@ -1,6 +1,6 @@
 import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
@@ -40,7 +40,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
     setUserReview(reviews.find(review => review.reviewerId === userId));
   }, [userId, reviews]);
 
-  const checkinRepository = createCheckinRepository();
+  const checkinRepository = useMemo(() => createCheckinRepository(), []);
 
   const reviewAsValidated = async () => {
     const review: CheckinReview = {

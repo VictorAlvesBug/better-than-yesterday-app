@@ -257,6 +257,16 @@ export type CreateCheckInPayload = CreateCheckin;
 export type CreatePlanPayload = CreatePlan;
 export type CreateUserPayload = CreateUser;
 export type CreateHabitPayload = CreateHabit;
+export type UpdateUserPayload = {
+  userId: string;
+  name?: string;
+  email?: string;
+  photoUrl?: string;
+  nickname?: string;
+  phoneNumber?: string;
+  pixKey?: string;
+  pixKeyType?: string;
+};
 
 export type ReviewCheckInPayload = {
   reviewerId: string;

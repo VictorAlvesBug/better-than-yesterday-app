@@ -2,7 +2,7 @@ import { CreateCheckin, createCheckinSchema } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -47,8 +47,8 @@ export default function CreateCheckinScreen() {
     title: '',
   });
 
-  const planRepository = createPlanRepository();
-  const checkinRepository = createCheckinRepository();
+  const planRepository = useMemo(() => createPlanRepository(), []);
+  const checkinRepository = useMemo(() => createCheckinRepository(), []);
   const s3Repository = createS3Repository();
 
   const openCamera = async (): Promise<string> => {

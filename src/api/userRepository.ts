@@ -1,5 +1,5 @@
 
-import { CreateUser, User } from '@/types/user.type';
+import { CreateUser, UpdateUser, User } from '@/types/user.type';
 import { mapUserFromApi } from '../utils/apiMappers';
 import { backendApi } from '../utils/apiUtils';
 
@@ -31,9 +31,33 @@ export default function createUserRepository() {
 
     const create = async (createUser: CreateUser): Promise<User> => {
         createUser.phoneNumber = createUser.phoneNumber.replace(/\D/g, '');
+        if (createUser.pixKeyType === 'PhoneNumber' || createUser.pixKeyType === 'TaxIdentification') {
+            createUser.pixKey = createUser.pixKey.replace(/\D/g, '');
+        }
         console.log("UserRepository.create - createUser:", createUser);
 
         return mapUserFromApi(await backendApi.registerUser(createUser));
+    }
+
+    const update = async (updateUser: UpdateUser & { name?: string; email?: string }): Promise<User> => {
+        const phoneNumber = updateUser.phoneNumber.replace(/\D/g, '');
+        let pixKey = updateUser.pixKey;
+        if (updateUser.pixKeyType === 'PhoneNumber' || updateUser.pixKeyType === 'TaxIdentification') {
+            pixKey = pixKey.replace(/\D/g, '');
+        }
+
+        console.log("UserRepository.update - updateUser:", updateUser);
+
+        return mapUserFromApi(await backendApi.updateUser({
+            userId: updateUser.id,
+            name: updateUser.name,
+            email: updateUser.email,
+            photoUrl: updateUser.photoUrl,
+            nickname: updateUser.nickname,
+            phoneNumber,
+            pixKey,
+            pixKeyType: updateUser.pixKeyType,
+        }));
     }
 
     return {
@@ -41,5 +65,6 @@ export default function createUserRepository() {
         getById,
         get,
         create,
+        update,
     }
 }

@@ -2,7 +2,7 @@ import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import Constants from 'expo-constants';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import createPlanRepository from '../api/planRepository';
 import BackButton from '../components/back-button';
@@ -11,7 +11,7 @@ import Ranking from '../components/ranking';
 
 export default function PlanPeekScreen() {
   const { planId } = useLocalSearchParams<{ planId: string }>();
-  const planRepository = createPlanRepository();
+  const planRepository = useMemo(() => createPlanRepository(), []);
   const [plan, setPlan] = useState<PlanEnriched | null>(null);
   const [loading, setLoading] = useState(true);
 
