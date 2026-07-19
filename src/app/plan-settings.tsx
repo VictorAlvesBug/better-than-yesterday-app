@@ -27,6 +27,7 @@ import {
   formatPercent,
 } from '../utils/numberUtils';
 import { toastSuccessMessage } from '../utils/toastUtils';
+import { DateOnly, getDate, getDateOnly, getDateToFront } from '../utils/dateUtils';
 
 export default function PlanSettingsScreen() {
   const { plan: planRepository } = useRepositories();
@@ -95,8 +96,16 @@ export default function PlanSettingsScreen() {
 
   if (loading) {
     return (
-      <View className="items-center justify-center flex-1" style={{ backgroundColor: getColor('gray-e') }}>
+      <View className="flex-1 justify-center items-center" style={{ backgroundColor: getColor('gray-e') }}>
         <ActivityIndicator size="large" color={getColor('gray-6')} />
+      </View>
+    );
+  }
+
+  if (!plan) {
+    return (
+      <View className="flex-1 justify-center items-center" style={{ backgroundColor: getColor('gray-e') }}>
+        <Text style={{ color: getColor('white') }} className="text-lg font-bold">Plano não encontrado</Text>
       </View>
     );
   }
@@ -118,14 +127,14 @@ export default function PlanSettingsScreen() {
       >
         <GradientView
           style={{ paddingTop: Constants.statusBarHeight }}
-          className="flex flex-col items-center justify-center w-full"
+          className="flex flex-col justify-center items-center w-full"
         >
-          <View className="flex flex-row items-center justify-center w-full">
+          <View className="flex flex-row justify-center items-center w-full">
             <BackButton />
             <Text style={{ color: getColor('white') }} className="flex-1 text-lg font-bold text-left">
-              {plan?.description ?? plan?.habitName ?? 'Plano'}
+              {plan.description ?? plan.habitName}
             </Text>
-            <Pressable className="flex items-center justify-center w-20 h-20" onPress={copyInviteLink}>
+            <Pressable className="flex justify-center items-center w-20 h-20" onPress={copyInviteLink}>
               <Icon name="share-social" size={24} color="white" />
             </Pressable>
           </View>
@@ -138,8 +147,9 @@ export default function PlanSettingsScreen() {
             <Text style={{ color: getColor('white') }} className="mb-1 text-3xl font-bold">
               {formatMoney(fakeTotalPenalties - fakeTotalAdminFee)}
             </Text>
-            <View className="flex flex-row items-center w-full justify-evenly">
-              <View className="flex flex-col items-center justify-center gap-1">
+
+            <View className="flex flex-row justify-evenly items-center w-full">
+              <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
                   Total Multas
                 </Text>
@@ -147,7 +157,7 @@ export default function PlanSettingsScreen() {
                   {formatMoneyCompact(fakeTotalPenalties)}
                 </Text>
               </View>
-              <View className="flex flex-col items-center justify-center gap-1">
+              <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
                   Taxa Admin ({formatPercent(fakeAdminFee)})
                 </Text>
@@ -155,21 +165,21 @@ export default function PlanSettingsScreen() {
                   {formatMoneyCompact(fakeTotalAdminFee)}
                 </Text>
               </View>
-              <View className="flex flex-col items-center justify-center gap-1">
+              <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
                   Membros
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatInteger(plan?.memberCount ?? 0)}
+                  {formatInteger(plan.memberCount)}
                 </Text>
               </View>
             </View>
           </View>
         </GradientView>
 
-        <View className="flex flex-col items-center justify-center gap-4 px-4 my-4">
+        <View className="flex flex-col gap-4 justify-center items-center px-4 my-4">
           <View
-            className="flex flex-row items-center justify-center w-full overflow-hidden bg-white shadow-md rounded-2xl h-14"
+            className="flex overflow-hidden flex-row justify-center items-center w-full h-14 bg-white rounded-2xl shadow-md"
             onLayout={handleTabsLayout}
           >
             {tabWidth > 0 && (
@@ -194,20 +204,20 @@ export default function PlanSettingsScreen() {
             )}
 
             <Pressable className="flex-1 h-full" onPress={() => setCurrentTab('ranking')}>
-              <View className="items-center justify-center flex-1 mx-1 rounded-xl">
+              <View className="flex-1 justify-center items-center mx-1 rounded-xl">
                 <Text
                   style={{ color: getColor(currentTab === 'ranking' ? 'white' : 'gray-7') }}
-                  className="font-semibold text-lg"
+                  className="text-lg font-semibold"
                 >
                   Ranking
                 </Text>
               </View>
             </Pressable>
             <Pressable className="flex-1 h-full" onPress={() => setCurrentTab('checkins')}>
-              <View className="items-center justify-center flex-1 mx-1 rounded-xl">
+              <View className="flex-1 justify-center items-center mx-1 rounded-xl">
                 <Text
                   style={{ color: getColor(currentTab === 'checkins' ? 'white' : 'gray-7') }}
-                  className="font-semibold text-lg"
+                  className="text-lg font-semibold"
                 >
                   Check-ins
                 </Text>

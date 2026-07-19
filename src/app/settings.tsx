@@ -97,10 +97,10 @@ export default function SettingsScreen() {
       setSaving(true);
       let photoUrl = user.photoUrl;
       if (isLocalImageUri(photoUrl)) {
-        photoUrl = await uploadProfilePhoto(photoUrl, user.id);
+        photoUrl = await uploadProfilePhoto(photoUrl, user.email);
       }
 
-      const updated = await userRepository.update({
+      await userRepository.update({
         id: user.id,
         name: user.name,
         email: user.email,
@@ -111,16 +111,6 @@ export default function SettingsScreen() {
         pixKeyType: user.pixKeyType,
       });
 
-      setUser({
-        id: updated.id,
-        name: updated.name,
-        email: updated.email,
-        nickname: updated.nickname,
-        phoneNumber: updated.phoneNumber,
-        photoUrl: updated.photoUrl,
-        pixKey: updated.pixKey,
-        pixKeyType: updated.pixKeyType,
-      });
       toastSuccessMessage('Dados atualizados com sucesso');
       navigation.back();
     } catch (error) {

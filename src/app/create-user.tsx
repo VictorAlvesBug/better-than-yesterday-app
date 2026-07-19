@@ -113,7 +113,7 @@ export default function CreateUserScreen() {
       await Memory.set('userId', createdUser.id);
       navigation.replace('./manage-plans');
     } catch (error) {
-      //toastErrorMessage(error instanceof Error ? error.message : 'Não foi possível cadastrar');
+      toastErrorMessage(error instanceof Error ? error.message : 'Não foi possível cadastrar');
     } finally {
       setSaving(false);
     }

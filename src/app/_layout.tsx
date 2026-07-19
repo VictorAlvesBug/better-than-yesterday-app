@@ -1,12 +1,19 @@
 import { AuthProvider } from '@/src/context/auth';
+import { getColor } from '@/types/color.type';
 import { Stack } from 'expo-router';
-import React from 'react';
-import Toast from "react-native-toast-message";
+import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
+import React, { useEffect } from 'react';
+import Toast from 'react-native-toast-message';
 
 export default function AppLayout() {
-  // TODO: Não alterar mais este arquivo
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(getColor('violet'));
+  }, []);
+
   return (
     <AuthProvider>
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,

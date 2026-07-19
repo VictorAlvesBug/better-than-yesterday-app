@@ -28,6 +28,10 @@
       "package": "com.bug.betterthanyesterdayapp",
       "userInterfaceStyle": "light"
     },
+    "androidNavigationBar": {
+      "backgroundColor": "#9810fa",
+      "barStyle": "light-content"
+    },
     "web": {
       "output": "server",
       "favicon": "./assets/images/favicon.png"

@@ -119,15 +119,28 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-        <Pressable className="flex-1" onPress={handleClose} />
-        <View className="px-4 pt-4 pb-8 bg-white rounded-t-3xl" style={{ maxHeight: '85%' }}>
-          <View className="flex flex-row items-center justify-between mb-4">
-            <Text style={{ color: getColor('black') }} className="text-lg font-bold">
+    <Modal visible={visible} animationType="fade" transparent onRequestClose={handleClose}>
+      <View
+        className="flex-1 items-center justify-center px-6"
+        style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
+      >
+        <Pressable className="absolute inset-0" onPress={handleClose} />
+        <View
+          className="relative w-full px-4 pt-4 pb-6 bg-white rounded-3xl"
+          style={{ maxHeight: '85%' }}
+        >
+          <View className="flex flex-row items-start justify-between mb-4">
+            <Text
+              style={{ color: getColor('black') }}
+              className="flex-1 pr-3 text-lg font-bold"
+            >
               Entrar com link de convite
             </Text>
-            <Pressable onPress={handleClose}>
+            <Pressable
+              onPress={handleClose}
+              hitSlop={10}
+              className="items-center justify-center w-8 h-8"
+            >
               <Icon name="close" size={24} color="gray-7" />
             </Pressable>
           </View>

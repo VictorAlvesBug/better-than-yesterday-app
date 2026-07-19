@@ -22,7 +22,7 @@ import Icon from '../components/icon';
 import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
 import useNavigation from '../hooks/useNavigation';
 import { useRepositories } from '../hooks/useRepositories';
-import { getDifferenceInDays } from '../utils/dateUtils';
+import { DateOnly, getDate, getDateOnly, getDateToFront, getDifferenceInDays } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
 import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
@@ -127,10 +127,21 @@ export default function PlanTrackerScreen() {
     );
   };
 
+  const resolvePeriodProgress = (startsAt: DateOnly, endsAt: DateOnly) => {
+    const nowDateOnly = getDateOnly(new Date());
+    const nowAtTime = getDate(nowDateOnly).getTime();
+    const startsAtTime = getDate(startsAt).getTime();
+    const endsAtTime = getDate(endsAt).getTime();
+    const diff = nowAtTime - startsAtTime;
+    const diffTotal = endsAtTime - startsAtTime;
+    const percentage = (diff / diffTotal) * 100;
+    return Math.max(0, Math.min(100, percentage));
+  };
+
   if (loading) {
     return (
       <View
-        className="items-center justify-center flex-1"
+        className="flex-1 justify-center items-center"
         style={{ marginTop: statusBarHeight, backgroundColor: getColor('gray-e') }}
       >
         <ActivityIndicator size="large" color={getColor('gray-6')} />
@@ -179,25 +190,25 @@ export default function PlanTrackerScreen() {
       >
         <GradientView
           style={{ paddingTop: Constants.statusBarHeight }}
-          className="flex flex-col items-center justify-center w-full"
+          className="flex flex-col justify-center items-center w-full"
         >
-          <View className="flex flex-row items-center justify-between w-full">
+          <View className="flex flex-row justify-between items-center w-full">
             <SideDrawerOpenButton setIsDrawerOpen={setIsDrawerOpen} />
 
-            <View className="flex flex-col items-center justify-center">
+            <View className="flex flex-col justify-center items-center">
               <Text style={{ color: getColor('white') }} className="text-xl font-bold text-center">
                 BTY
               </Text>
             </View>
 
             <Pressable
-              className="flex items-center justify-center w-20 h-20"
+              className="flex justify-center items-center w-20 h-20"
               onPress={() => navigation.push('/plan-settings')}
             >
               <Icon name="people" size={24} color="white" />
             </Pressable>
           </View>
-          <View className="flex flex-col items-start w-full gap-2 px-4 py-1 mb-8 justify-evenly">
+          <View className="flex flex-col gap-2 justify-evenly items-start px-4 py-1 mb-8 w-full">
             <Text style={{ color: getColor('white') }} className="text-2xl font-bold">
               {plan.description ?? plan.habitName}
             </Text>
@@ -207,20 +218,20 @@ export default function PlanTrackerScreen() {
           </View>
         </GradientView>
 
-        <View className="flex flex-col items-start justify-center gap-5 px-4 -mt-6">
+        <View className="flex flex-col gap-5 justify-center items-start px-4 -mt-6">
           {isRunning ? (
             <>
-              <View className="flex flex-row items-center justify-between flex-1 w-full gap-4">
-                <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
-                  <View className="flex flex-row items-center justify-start gap-3">
+              <View className="flex flex-row flex-1 gap-4 justify-between items-center w-full">
+                <Card className="flex flex-col flex-1 gap-1 justify-center items-start w-full">
+                  <View className="flex flex-row gap-3 justify-start items-center">
                     <Icon type="font-awesome-5" name="fire" size={16} color="orange" />
                     <Text style={{ color: getColor('gray-7') }}>Sequência</Text>
                   </View>
-                  <View className="flex flex-row items-center justify-start gap-1">
+                  <View className="flex flex-row gap-1 justify-start items-center">
                     <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
                       {formatInteger(streak)}
                     </Text>
-                    <Text className="text-md font-bold" style={{ color: getColor('orange') }}>
+                    <Text className="font-bold text-md" style={{ color: getColor('orange') }}>
                       {streakBonus > 0 ? ` +${formatInteger(streakBonus)}` : ''}
                     </Text>
                   </View>
@@ -228,8 +239,8 @@ export default function PlanTrackerScreen() {
                     dias seguidos
                   </Text>
                 </Card>
-                <Card className="flex flex-col items-start justify-center flex-1 w-full gap-1">
-                  <View className="flex flex-row items-center justify-start gap-3">
+                <Card className="flex flex-col flex-1 gap-1 justify-center items-start w-full">
+                  <View className="flex flex-row gap-3 justify-start items-center">
                     <Icon type="font-awesome-5" name="award" size={16} color="violet" />
                     <Text style={{ color: getColor('gray-7') }}>Posição</Text>
                   </View>
@@ -242,8 +253,8 @@ export default function PlanTrackerScreen() {
                 </Card>
               </View>
 
-              <Card className="flex flex-col items-start justify-center flex-1 w-full gap-3">
-                <View className="flex flex-row items-center justify-between w-full">
+              <Card className="flex flex-col flex-1 gap-3 justify-center items-start w-full">
+                <View className="flex flex-row justify-between items-center w-full">
                   <Text style={{ color: getColor('black') }} className="font-bold text-md">Progresso</Text>
                   <Text style={{ color: getColor('violet') }} className="font-bold text-md">
                     {formatInteger(checkinCount)}/{formatInteger(totalCheckinCount)} dias
@@ -259,7 +270,7 @@ export default function PlanTrackerScreen() {
                     }}
                   />
                 </View>
-                <View className="flex flex-row items-center justify-between w-full gap-2">
+                <View className="flex flex-row gap-2 justify-between items-center w-full">
                   <Icon name="calendar-clear-outline" size={16} />
                   <Text style={{ color: getColor('gray-7') }} className="flex-1">
                     {`Termina em ${formatInteger(Math.max(0, totalDays - daysSinceStart))} ${totalDays - daysSinceStart === 1 ? 'dia' : 'dias'}`}
@@ -268,10 +279,39 @@ export default function PlanTrackerScreen() {
                     {formatPercentCompact(totalDays > 0 ? daysSinceStart / totalDays : 0)}
                   </Text>
                 </View>
+
+            <View className="flex flex-row justify-between items-center w-full">
+              <View className="flex flex-col gap-1 justify-center items-start">
+                <Text style={{ color: getColor('gray-7') }} className="text-xs font-thin">
+                  Início
+                </Text>
+                <Text style={{ color: getColor('gray-7') }} className="font-semibold">
+                  {getDateToFront(plan.startsAt)}
+                </Text>
+              </View>
+              <View className="flex flex-col gap-1 justify-center items-end">
+                <Text style={{ color: getColor('gray-7') }} className="text-xs font-thin">
+                  Fim
+                </Text>
+                <Text style={{ color: getColor('gray-7') }} className="font-semibold">
+                  {getDateToFront(plan.endsAt)}
+                </Text>
+              </View>
+            </View>
+
+            <View className="flex flex-row justify-between items-center w-full">
+              <View className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor('gray-7') }} />
+              <View className="flex-1 h-[2px] flex flex-row justify-center items-center">
+                <View className="h-full" style={{ width: `${resolvePeriodProgress(plan.startsAt, plan.endsAt)}%`, backgroundColor: getColor('gray-7'), opacity: 1 }} />
+                <View className="flex-1 h-full" style={{ backgroundColor: getColor('gray-7'), opacity: 0.2 }} />
+              </View>
+              <View className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor('gray-7') }} />
+            </View>
               </Card>
+
             </>
           ) : (
-            <Card className="flex flex-col items-start justify-center w-full gap-1">
+            <Card className="flex flex-col gap-1 justify-center items-start w-full">
               <Text style={{ color: getColor('gray-7') }} className="text-sm font-semibold">
                 Status do plano
               </Text>
@@ -308,9 +348,9 @@ export default function PlanTrackerScreen() {
         <Pressable
           style={{ backgroundColor: getColor('violet') }}
           onPress={() => navigation.push('/create-checkin')}
-          className="absolute items-center justify-center w-16 h-16 overflow-hidden rounded-full shadow-xl bottom-4 right-4 active:opacity-80"
+          className="overflow-hidden absolute right-4 bottom-4 justify-center items-center w-16 h-16 rounded-full shadow-xl active:opacity-80"
         >
-          <GradientView className="flex flex-col items-center justify-center w-full h-full">
+          <GradientView className="flex flex-col justify-center items-center w-full h-full">
             <Icon name="camera" size={24} color="white" />
           </GradientView>
         </Pressable>
