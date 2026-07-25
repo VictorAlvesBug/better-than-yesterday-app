@@ -101,6 +101,7 @@ export type ApiPlanRankingItem = {
   userName: string;
   photoUrl?: string | null;
   checkinCount: number;
+  pendingCheckinCount: number;
   penalty: number;
   streak: number;
   streakBonus: number;
@@ -242,6 +243,7 @@ function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriche
     userName: item.userName,
     photoUrl: item.photoUrl ?? undefined,
     checkinCount: item.checkinCount,
+    pendingCheckinCount: item.pendingCheckinCount ?? 0,
     penalty: item.penalty,
     streak: item.streak,
     streakBonus: item.streakBonus ?? 0,

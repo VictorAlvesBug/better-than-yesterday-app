@@ -17,6 +17,7 @@ type RankingItemCardProps = {
   photoUrl?: string;
   isCurrentUser?: boolean;
   checkinCount: number;
+  pendingCheckinCount: number;
   penalty: number;
   streak: number;
   streakBonus: number;
@@ -29,12 +30,15 @@ export default function RankingItemCard({
   photoUrl,
   isCurrentUser = false,
   checkinCount,
+  pendingCheckinCount,
   penalty,
   streak,
   streakBonus,
   totalCount,
 }: RankingItemCardProps) {
-  const checkinsPercent = checkinCount / totalCount;
+  const validatedPercent = totalCount > 0 ? checkinCount / totalCount : 0;
+  const pendingPercent = totalCount > 0 ? pendingCheckinCount / totalCount : 0;
+
   return (
     <View className="flex flex-col items-center justify-between w-full gap-1 px-5 py-3 bg-white shadow-md rounded-2xl">
       <View className="flex flex-row items-center justify-between w-full gap-1">
@@ -53,12 +57,20 @@ export default function RankingItemCard({
             >
               {name}
             </Text>
-            <View className="flex flex-row items-center justify-center gap-1">
-              <Icon type="font-awesome-5" name="check-circle" size={12} color="success" />
+            <View className="flex flex-row flex-wrap items-center justify-start gap-x-3 gap-y-1">
+              <View className="flex flex-row items-center justify-center gap-1">
+                <Icon type="font-awesome-5" name="check-circle" size={12} color="success" />
+                <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
+                  {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
+                </Text>
+              </View>
+              <View className="flex flex-row items-center justify-center gap-1">
+                <Icon type="font-awesome-5" name="hourglass-half" size={12} color="warning" />
+                <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
+                  {`${formatInteger(pendingCheckinCount)}/${formatInteger(totalCount)}`}
+                </Text>
+              </View>
               <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
-                {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
-              </Text>
-              <Text style={{ color: getColor('gray-7') }} className="ml-3 text-xs" numberOfLines={1}>
                 {`Streak: ${formatInteger(streak)}${streakBonus > 0 ? ` (+${formatInteger(streakBonus)})` : ''}`}
               </Text>
             </View>
@@ -67,21 +79,37 @@ export default function RankingItemCard({
         <View className="flex flex-col items-end justify-center gap-1">
           {renderPenaltyStatus(penalty)}
           <Text style={{ color: getColor('gray-7') }} className="text-xs">
-            {formatPercent(checkinsPercent)}
+            {formatPercent(validatedPercent)}
           </Text>
         </View>
       </View>
       <View
-        style={{ backgroundColor: getColor('gray-e'), borderRadius: 9999, height: 8, width: '100%' }}
+        style={{
+          backgroundColor: getColor('gray-e'),
+          borderRadius: 9999,
+          height: 8,
+          width: '100%',
+          overflow: 'hidden',
+          flexDirection: 'row',
+        }}
       >
-        <GradientView
-          style={{
-            flex: 1,
-            height: '100%',
-            borderRadius: 9999,
-            width: `${checkinsPercent * 100}%`,
-          }}
-        />
+        {validatedPercent > 0 && (
+          <GradientView
+            style={{
+              height: '100%',
+              width: `${validatedPercent * 100}%`,
+            }}
+          />
+        )}
+        {pendingPercent > 0 && (
+          <View
+            style={{
+              height: '100%',
+              width: `${pendingPercent * 100}%`,
+              backgroundColor: getColor('warning'),
+            }}
+          />
+        )}
       </View>
     </View>
   );
