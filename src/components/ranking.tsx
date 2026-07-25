@@ -60,6 +60,8 @@ export default function Ranking({ planId, userId: userIdProp, refreshKey = 0 }: 
           key={item.userId}
           position={item.position}
           name={item.userName}
+          photoUrl={item.photoUrl}
+          isCurrentUser={item.userId === ranking.currentUser?.userId}
           checkinCount={item.checkinCount}
           penalty={item.penalty}
           streak={item.streak}

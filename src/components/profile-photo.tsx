@@ -1,30 +1,49 @@
 import { getColor } from '@/types/color.type';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { getInitials } from '../utils/stringUtils';
 
 type ProfilePhotoProps = {
   name: string;
+  photoUrl?: string;
   size?: 'small' | 'large';
 };
 
 export default function ProfilePhoto({
   name,
+  photoUrl,
   size = 'small',
 }: ProfilePhotoProps) {
+  const dimension = getSize(size);
+
+  if (photoUrl) {
+    return (
+      <Image
+        source={{ uri: photoUrl }}
+        style={{
+          width: dimension,
+          height: dimension,
+          borderRadius: dimension / 2,
+          backgroundColor: getColor('gray-d'),
+        }}
+        resizeMode="cover"
+      />
+    );
+  }
+
   return (
     <View
       style={{
-        backgroundColor: getColor("violet"),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: "100%",
-        aspectRatio: 1,
-        width: getSize(size)
-      }} 
+        backgroundColor: getColor('violet'),
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: dimension / 2,
+        width: dimension,
+        height: dimension,
+      }}
     >
-      <Text className="text-base text-white font-semibold">{getInitials(name)}</Text>
+      <Text className="text-base font-semibold text-white">{getInitials(name)}</Text>
     </View>
   );
 }

@@ -14,6 +14,8 @@ import ProfilePhoto from './profile-photo';
 type RankingItemCardProps = {
   position: number;
   name: string;
+  photoUrl?: string;
+  isCurrentUser?: boolean;
   checkinCount: number;
   penalty: number;
   streak: number;
@@ -24,6 +26,8 @@ type RankingItemCardProps = {
 export default function RankingItemCard({
   position,
   name,
+  photoUrl,
+  isCurrentUser = false,
   checkinCount,
   penalty,
   streak,
@@ -31,7 +35,6 @@ export default function RankingItemCard({
   totalCount,
 }: RankingItemCardProps) {
   const checkinsPercent = checkinCount / totalCount;
-  const streakPercent = streakBonus / totalCount;
   return (
     <View className="flex flex-col items-center justify-between w-full gap-1 px-5 py-3 bg-white shadow-md rounded-2xl">
       <View className="flex flex-row items-center justify-between w-full gap-1">
@@ -40,9 +43,10 @@ export default function RankingItemCard({
         </View>
 
         <View className="flex flex-row items-center justify-start flex-1 px-4">
-          <ProfilePhoto name={name} size="large" />
+          <ProfilePhoto name={name} photoUrl={photoUrl} size="large" />
           <View className="flex flex-col items-start justify-center flex-1 gap-1 px-4 py-2">
             <Text
+              style={{ color: getColor(isCurrentUser ? 'success' : 'black') }}
               className="w-full text-base font-semibold"
               numberOfLines={1}
               ellipsizeMode="tail"
@@ -50,11 +54,11 @@ export default function RankingItemCard({
               {name}
             </Text>
             <View className="flex flex-row items-center justify-center gap-1">
-              <Icon type="font-awesome-5" name="check-circle" size={12} color={"success"} />
-              <Text style={{color: getColor("gray-7")}} className="text-xs" numberOfLines={1}>
+              <Icon type="font-awesome-5" name="check-circle" size={12} color="success" />
+              <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
                 {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
               </Text>
-              <Text style={{color: getColor("gray-7")}} className="ml-3 text-xs" numberOfLines={1}>
+              <Text style={{ color: getColor('gray-7') }} className="ml-3 text-xs" numberOfLines={1}>
                 {`Streak: ${formatInteger(streak)}${streakBonus > 0 ? ` (+${formatInteger(streakBonus)})` : ''}`}
               </Text>
             </View>
@@ -62,28 +66,22 @@ export default function RankingItemCard({
         </View>
         <View className="flex flex-col items-end justify-center gap-1">
           {renderPenaltyStatus(penalty)}
-          <Text style={{color: getColor("gray-7")}} className="text-xs">
+          <Text style={{ color: getColor('gray-7') }} className="text-xs">
             {formatPercent(checkinsPercent)}
           </Text>
         </View>
       </View>
-      <View /*className="flex flex-row items-center justify-center"*/
-       style={{backgroundColor: getColor("gray-e"), borderRadius: 9999, height: 8, width: "100%"}}>
+      <View
+        style={{ backgroundColor: getColor('gray-e'), borderRadius: 9999, height: 8, width: '100%' }}
+      >
         <GradientView
           style={{
             flex: 1,
             height: '100%',
             borderRadius: 9999,
             width: `${checkinsPercent * 100}%`,
-          }} />
-          {/* <View
-            style={{
-              flex: 2,
-              height: '100%',
-              borderRadius: 9999,
-              width: `${streakPercent * 100}%`,
-              backgroundColor: getColor("violet"),
-            }} /> */}
+          }}
+        />
       </View>
     </View>
   );
@@ -97,23 +95,24 @@ function renderPosition(position: number) {
   };
   switch (position) {
     case 1:
-      return <Icon {...iconProps} color={"gold"} />;
+      return <Icon {...iconProps} color="gold" />;
     case 2:
-      return <Icon {...iconProps} color={"silver"} />;
+      return <Icon {...iconProps} color="silver" />;
     case 3:
-      return <Icon {...iconProps} color={"bronze"} />;
-    default:
+      return <Icon {...iconProps} color="bronze" />;
+    default: {
       const positionLength = position.toString().length;
       const textSize =
-        positionLength === 1 ? "text-2xl"
-          : positionLength === 2 ? "text-xl"
-            : positionLength === 3 ? "text-lg"
-              : "text-base"
+        positionLength === 1 ? 'text-2xl'
+          : positionLength === 2 ? 'text-xl'
+            : positionLength === 3 ? 'text-lg'
+              : 'text-base';
       return (
-        <Text style={{color: getColor("gray-9")}} className={`${textSize} font-bold`}>
+        <Text style={{ color: getColor('gray-9') }} className={`${textSize} font-bold`}>
           #{formatIntegerCompact(position)}
         </Text>
       );
+    }
   }
 }
 
@@ -122,18 +121,18 @@ function renderPenaltyStatus(penalty: number) {
     <View className="flex flex-row items-center justify-center gap-1">
       {penalty <= 0 ? (
         <>
-          <Icon type="font-awesome-5" name="check-circle" size={12} color={"success"} />
-          <Text style={{
-            color: getColor("success")
-          }}
-            className="text-sm font-bold">Perfeito!</Text>
+          <Icon type="font-awesome-5" name="check-circle" size={12} color="success" />
+          <Text
+            style={{ color: getColor('success') }}
+            className="text-sm font-bold"
+          >
+            Perfeito!
+          </Text>
         </>
       ) : (
         <>
-          <Icon name="trending-down-outline" size={14} color={"danger"} />
-          <Text style={{
-           color: getColor("danger")
-          }} className="text-sm font-bold">
+          <Icon name="trending-down-outline" size={14} color="danger" />
+          <Text style={{ color: getColor('danger') }} className="text-sm font-bold">
             {formatMoneyCompact(penalty)}
           </Text>
         </>

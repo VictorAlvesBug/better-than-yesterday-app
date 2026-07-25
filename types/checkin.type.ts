@@ -29,7 +29,7 @@ const checkinSchema = baseResourceSchema.extend({
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
   date: z.string().transform((str) => parseDateTime(str)),
   title: z.string().min(3, { error: "Título é obrigatório" }),
-  photoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
+  evidencePhotoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
   status: checkinStatusSchema,
   reviews: z.array(checkinReviewSchema),
 });
@@ -38,6 +38,7 @@ export type Checkin = z.infer<typeof checkinSchema>;
 export type CheckinEnriched = Checkin & {
   planName: string;
   userName: string;
+  userPhotoUrl?: string;
 };
 
 export const createCheckinSchema = checkinSchema.omit({

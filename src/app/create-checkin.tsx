@@ -43,7 +43,7 @@ export default function CreateCheckinScreen() {
   const [checkin, setCheckin] = useState<Omit<CreateCheckin, 'date'>>({
     userId: '',
     planId: '',
-    photoUrl: '',
+    evidencePhotoUrl: '',
     title: '',
   });
 
@@ -137,13 +137,13 @@ export default function CreateCheckinScreen() {
         now.getSeconds(),
       ));
 
-      const photoUrl = await s3Repository.uploadFile({
+      const evidencePhotoUrl = await s3Repository.uploadFile({
         filePath: assetUri,
         fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/${generateId()}.jpg`,
         fileType,
       });
 
-      const payload: CreateCheckin = { ...checkin, date: submitDate, photoUrl };
+      const payload: CreateCheckin = { ...checkin, date: submitDate, evidencePhotoUrl };
 
       if (!checkIfIsValidAndToast(createCheckinSchema, payload))
         return;

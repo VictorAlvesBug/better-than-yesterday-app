@@ -10,20 +10,21 @@ const unavailablePhotoUrl =
 
 export default function CheckinCard({
   userName,
+  userPhotoUrl,
   date,
   title,
-  photoUrl,
+  evidencePhotoUrl,
 }: CheckinEnriched) {
   return (
     <View className="flex flex-col items-start justify-center w-full gap-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
       <Image
-        source={{ uri: photoUrl || unavailablePhotoUrl }}
+        source={{ uri: evidencePhotoUrl || unavailablePhotoUrl }}
         style={{ width: '100%', aspectRatio: '16/9' }}
         resizeMode="cover"
       />
 
       <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
-        <ProfilePhoto name={userName} />
+        <ProfilePhoto name={userName} photoUrl={userPhotoUrl} />
         <View className="flex flex-col items-start justify-center flex-1 px-4 py-2">
           <Text
             className="w-full text-base font-semibold"

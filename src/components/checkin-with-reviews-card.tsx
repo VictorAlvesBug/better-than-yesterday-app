@@ -18,7 +18,7 @@ type CheckinWithReviewsCardProps = {
 }
 
 export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWithReviewsCardProps) {
-  const { id, userName, date, title, photoUrl, status, reviews, userId: checkinUserId } = checkin;
+  const { id, userName, userPhotoUrl, date, title, evidencePhotoUrl, status, reviews, userId: checkinUserId } = checkin;
 
   const [userId, setUserId] = useState('');
   const [userReview, setUserReview] = useState<CheckinReview | undefined>();
@@ -67,13 +67,13 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
   return (
     <View className="flex flex-col items-start justify-center w-full gap-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
       <Image
-        source={{ uri: photoUrl || unavailablePhotoUrl }}
+        source={{ uri: evidencePhotoUrl || unavailablePhotoUrl }}
         style={{ width: '100%', aspectRatio: '16/9' }}
         resizeMode="cover"
       />
 
       <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
-        <ProfilePhoto name={userName} />
+        <ProfilePhoto name={userName} photoUrl={userPhotoUrl} />
         <View className="flex flex-col items-start justify-center flex-1 px-4 py-2">
           <Text className="w-full text-base font-medium"
             numberOfLines={1}
@@ -90,7 +90,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
 
       <Text className="px-6 text-md">{title}</Text>
 
-      {(reviews.length > 0 || status === 'Pending')
+      {(userId !== checkinUserId && (reviews.length > 0 || status === 'Pending'))
         && <View style={{ backgroundColor: getColor("gray-d"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}
 
       {reviews.length > 0 && renderReviews(reviews)}

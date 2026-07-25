@@ -9,6 +9,7 @@ export type RankingItem = {
 export type RankingItemEnriched = RankingItem & {
     userName: string;
     checkinCount: number;
+    photoUrl?: string;
 };
 
 export type PlanRanking = {

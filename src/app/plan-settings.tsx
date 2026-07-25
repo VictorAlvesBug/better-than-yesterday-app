@@ -1,6 +1,7 @@
 import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
+import { PlanRanking } from '@/types/ranking.type';
 import Constants from 'expo-constants';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -15,9 +16,11 @@ import {
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import BackButton from '../components/back-button';
+import Card from '../components/card';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
+import Label from '../components/label';
 import Ranking from '../components/ranking';
 import { useRepositories } from '../hooks/useRepositories';
 import {
@@ -27,13 +30,16 @@ import {
   formatPercent,
 } from '../utils/numberUtils';
 import { toastSuccessMessage } from '../utils/toastUtils';
-import { DateOnly, getDate, getDateOnly, getDateToFront } from '../utils/dateUtils';
+import { getDateToFront } from '../utils/dateUtils';
+
+const ADMIN_FEE_RATE = 0.1;
 
 export default function PlanSettingsScreen() {
-  const { plan: planRepository } = useRepositories();
+  const { plan: planRepository, ranking: rankingRepository } = useRepositories();
   const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins'>('ranking');
   const [planId, setPlanId] = useState('');
   const [plan, setPlan] = useState<PlanEnriched | null>(null);
+  const [ranking, setRanking] = useState<PlanRanking | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -42,9 +48,9 @@ export default function PlanSettingsScreen() {
   const [tabsWidth, setTabsWidth] = useState(0);
   const tabWidth = tabsWidth / 2 || 0;
 
-  const fakeAdminFee = 0.1;//plan?.adminFee ?? 0;
-  const fakeTotalPenalties = 280;
-  const fakeTotalAdminFee = fakeTotalPenalties * fakeAdminFee;
+  const totalPenalties = ranking?.items.reduce((sum, item) => sum + item.penalty, 0) ?? 0;
+  const totalAdminFee = totalPenalties * ADMIN_FEE_RATE;
+  const rewardsPool = totalPenalties - totalAdminFee;
 
   useEffect(() => {
     Animated.spring(translateX, {
@@ -57,6 +63,12 @@ export default function PlanSettingsScreen() {
     setTabsWidth(e.nativeEvent.layout.width);
   };
 
+  const fetchRanking = useCallback(async (id: string) => {
+    const userId = (await Memory.get('userId')) ?? undefined;
+    const data = await rankingRepository.getByPlanId(id, userId);
+    setRanking(data);
+  }, [rankingRepository]);
+
   const fetchPlan = useCallback(async (showLoading = true) => {
     if (showLoading)
       setLoading(true);
@@ -68,13 +80,16 @@ export default function PlanSettingsScreen() {
       if (!storedPlanId)
         return;
 
-      const dbPlan = await planRepository.getById(storedPlanId);
+      const [dbPlan] = await Promise.all([
+        planRepository.getById(storedPlanId),
+        fetchRanking(storedPlanId),
+      ]);
       setPlan(dbPlan);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [planRepository]);
+  }, [planRepository, fetchRanking]);
 
   useEffect(() => {
     fetchPlan();
@@ -145,7 +160,7 @@ export default function PlanSettingsScreen() {
           >
             <Text style={{ color: getColor('white') }} className="font-thin">Pool de Recompensas</Text>
             <Text style={{ color: getColor('white') }} className="mb-1 text-3xl font-bold">
-              {formatMoney(fakeTotalPenalties - fakeTotalAdminFee)}
+              {formatMoney(rewardsPool)}
             </Text>
 
             <View className="flex flex-row justify-evenly items-center w-full">
@@ -154,15 +169,15 @@ export default function PlanSettingsScreen() {
                   Total Multas
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatMoneyCompact(fakeTotalPenalties)}
+                  {formatMoneyCompact(totalPenalties)}
                 </Text>
               </View>
               <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
-                  Taxa Admin ({formatPercent(fakeAdminFee)})
+                  Taxa Admin ({formatPercent(ADMIN_FEE_RATE)})
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatMoneyCompact(fakeTotalAdminFee)}
+                  {formatMoneyCompact(totalAdminFee)}
                 </Text>
               </View>
               <View className="flex flex-col gap-1 justify-center items-center">
@@ -177,7 +192,50 @@ export default function PlanSettingsScreen() {
           </View>
         </GradientView>
 
-        <View className="flex flex-col gap-4 justify-center items-center px-4 my-4">
+        <View className="flex flex-col gap-4 justify-center items-center px-4 -mt-2 mb-4">
+          <Card className="flex flex-col w-full gap-3">
+            <View>
+              <Label size="text-xs">Descrição</Label>
+              <Text style={{ color: getColor('black') }} className="text-base">
+                {plan.description ?? plan.habitName}
+              </Text>
+            </View>
+            <View className="flex flex-row gap-4">
+              <View className="flex-1">
+                <Label size="text-xs">Início</Label>
+                <Text style={{ color: getColor('black') }} className="text-base">
+                  {getDateToFront(plan.startsAt)}
+                </Text>
+              </View>
+              <View className="flex-1">
+                <Label size="text-xs">Término</Label>
+                <Text style={{ color: getColor('black') }} className="text-base">
+                  {getDateToFront(plan.endsAt)}
+                </Text>
+              </View>
+            </View>
+            <View className="flex flex-row gap-4">
+              <View className="flex-1">
+                <Label size="text-xs">Tipo</Label>
+                <Text style={{ color: getColor('black') }} className="text-base">
+                  {plan.type === 'Private' ? 'Privado' : 'Público'}
+                </Text>
+              </View>
+              <View className="flex-1">
+                <Label size="text-xs">Frequência</Label>
+                <Text style={{ color: getColor('black') }} className="text-base">
+                  {`${7 - plan.daysOffPerWeek}x por semana`}
+                </Text>
+              </View>
+            </View>
+            <View>
+              <Label size="text-xs">Multa</Label>
+              <Text style={{ color: getColor('black') }} className="text-base">
+                {formatMoney(plan.penaltyValue)}
+              </Text>
+            </View>
+          </Card>
+
           <View
             className="flex overflow-hidden flex-row justify-center items-center w-full h-14 bg-white rounded-2xl shadow-md"
             onLayout={handleTabsLayout}

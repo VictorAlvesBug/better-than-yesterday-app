@@ -62,10 +62,11 @@ export type ApiCheckIn = {
   planName: string;
   userId: string;
   userName: string;
+  userPhotoUrl?: string | null;
   date: string;
   index: number;
   title: string;
-  photoUrl: string;
+  evidencePhotoUrl: string;
   status: string;
   reviews: ApiReview[];
   createdAt: string;
@@ -98,6 +99,7 @@ export type ApiPlanRankingItem = {
   position: number;
   userId: string;
   userName: string;
+  photoUrl?: string | null;
   checkinCount: number;
   penalty: number;
   streak: number;
@@ -163,7 +165,7 @@ export function mapCheckInFromApi(checkIn: ApiCheckIn): Checkin {
     userId: checkIn.userId,
     date: getDateTime(checkIn.date as AllTypes) as DateTime,
     title: checkIn.title,
-    photoUrl: checkIn.photoUrl,
+    evidencePhotoUrl: checkIn.evidencePhotoUrl,
     status: checkIn.status as CheckinStatus,
     reviews: checkIn.reviews.map((review) => ({
       reviewerId: review.reviewerId,
@@ -178,6 +180,7 @@ export function mapCheckInEnrichedFromApi(checkIn: ApiCheckIn): CheckinEnriched 
     ...mapCheckInFromApi(checkIn),
     planName: checkIn.planName,
     userName: checkIn.userName,
+    userPhotoUrl: checkIn.userPhotoUrl ?? undefined,
   };
 }
 
@@ -237,6 +240,7 @@ function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriche
     position: item.position,
     userId: item.userId,
     userName: item.userName,
+    photoUrl: item.photoUrl ?? undefined,
     checkinCount: item.checkinCount,
     penalty: item.penalty,
     streak: item.streak,
