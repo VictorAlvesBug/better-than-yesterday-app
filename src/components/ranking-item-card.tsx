@@ -64,12 +64,14 @@ export default function RankingItemCard({
                   {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
                 </Text>
               </View>
+              {pendingCheckinCount > 0 && 
               <View className="flex flex-row items-center justify-center gap-1">
                 <Icon type="font-awesome-5" name="hourglass-half" size={12} color="warning" />
-                <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
-                  {`${formatInteger(pendingCheckinCount)}/${formatInteger(totalCount)}`}
+                <Text style={{ color: getColor('warning') }} className="text-xs font-bold" numberOfLines={1}>
+                  {`+${formatInteger(pendingCheckinCount)}`}
                 </Text>
               </View>
+              }
               <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
                 {`Streak: ${formatInteger(streak)}${streakBonus > 0 ? ` (+${formatInteger(streakBonus)})` : ''}`}
               </Text>
