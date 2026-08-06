@@ -20,7 +20,6 @@ type RankingItemCardProps = {
   pendingCheckinCount: number;
   penalty: number;
   streak: number;
-  streakBonus: number;
   totalCount: number;
 };
 
@@ -33,7 +32,6 @@ export default function RankingItemCard({
   pendingCheckinCount,
   penalty,
   streak,
-  streakBonus,
   totalCount,
 }: RankingItemCardProps) {
   const validatedPercent = totalCount > 0 ? checkinCount / totalCount : 0;
@@ -60,7 +58,7 @@ export default function RankingItemCard({
             <View className="flex flex-row flex-wrap items-center justify-start gap-x-3 gap-y-1">
               <View className="flex flex-row items-center justify-center gap-1">
                 <Icon type="font-awesome-5" name="check-circle" size={12} color="success" />
-                <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
+                <Text style={{ color: getColor('gray-3') }} className="text-xs" numberOfLines={1}>
                   {`${formatInteger(checkinCount)}/${formatInteger(totalCount)}`}
                 </Text>
               </View>
@@ -72,15 +70,15 @@ export default function RankingItemCard({
                 </Text>
               </View>
               }
-              <Text style={{ color: getColor('gray-7') }} className="text-xs" numberOfLines={1}>
-                {`Streak: ${formatInteger(streak)}${streakBonus > 0 ? ` (+${formatInteger(streakBonus)})` : ''}`}
+              <Text style={{ color: getColor('gray-3') }} className="text-xs" numberOfLines={1}>
+                {`Streak: ${formatInteger(streak)}`}
               </Text>
             </View>
           </View>
         </View>
         <View className="flex flex-col items-end justify-center gap-1">
           {renderPenaltyStatus(penalty)}
-          <Text style={{ color: getColor('gray-7') }} className="text-xs">
+          <Text style={{ color: getColor('gray-3') }} className="text-xs">
             {formatPercent(validatedPercent)}
           </Text>
         </View>
@@ -138,7 +136,7 @@ function renderPosition(position: number) {
             : positionLength === 3 ? 'text-lg'
               : 'text-base';
       return (
-        <Text style={{ color: getColor('gray-9') }} className={`${textSize} font-bold`}>
+        <Text style={{ color: getColor('gray-7') }} className={`${textSize} font-bold`}>
           #{formatIntegerCompact(position)}
         </Text>
       );

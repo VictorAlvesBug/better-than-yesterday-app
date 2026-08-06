@@ -1,6 +1,5 @@
 import Memory from '@/src/api/memory';
 import createUserRepository from '@/src/api/userRepository';
-import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import {
   CreateUser,
@@ -9,7 +8,6 @@ import {
   PixKeyType,
   pixKeyTypeSchema,
 } from '@/types/user.type';
-import Constants from 'expo-constants';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Image,
@@ -19,11 +17,14 @@ import {
   View
 } from 'react-native';
 import { Button } from '../components/button';
+import Card from '../components/card';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
+import ScreenHeader from '../components/screen-header';
+import ScreenLayout from '../components/screen-layout';
 import Select from '../components/select';
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
@@ -126,33 +127,28 @@ export default function CreateUserScreen() {
   }
 
   return (
-    <>
-      <GradientView
-        style={{
-          paddingTop: Constants.statusBarHeight,
-        }}
-        className="flex flex-row items-center justify-between w-full">
-        <Text className="pl-8 text-xl font-bold text-center text-white">
-          Seja bem-vindo!
-        </Text>
-
-        <Pressable
-          className="flex items-center justify-center w-20 h-20"
-          onPress={() => {
-            signOut();
-          }}
-        >
-          <Icon name="log-out-outline" size={24} color="white" />
-        </Pressable>
-      </GradientView>
-
+    <ScreenLayout
+      header={
+        <ScreenHeader
+          title="Seja bem-vindo!"
+          left={<View className="w-20 h-20" />}
+          right={
+            <Pressable
+              className="flex items-center justify-center w-20 h-20"
+              onPress={() => {
+                signOut();
+              }}
+            >
+              <Icon name="log-out-outline" size={24} color="white" />
+            </Pressable>
+          }
+        />
+      }
+    >
       <KeyboardableView>
         <View
           style={{
-            //flex: 1,
             backgroundColor: getColor("gray-e"),
-            borderWidth: 2,
-            borderColor: 'blue',
           }}
           className="flex-1 w-full gap-6 px-4 py-3"
         >
@@ -272,6 +268,6 @@ export default function CreateUserScreen() {
           </Button>
         </View>
       </KeyboardableView>
-    </>
+    </ScreenLayout>
   );
 }

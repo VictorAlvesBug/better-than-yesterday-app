@@ -2,7 +2,6 @@ import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import { User } from '@/types/user.type';
-import Constants from 'expo-constants';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -11,9 +10,12 @@ import {
   Easing,
   Image,
   Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
 import { useRepositories } from '../hooks/useRepositories';
@@ -51,6 +53,7 @@ type SideDrawerProps = {
 };
 
 export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
+  const insets = useSafeAreaInsets();
   const { signOut } = useAuth();
   const navigation = useNavigation();
   const { plan: planRepository, ranking: rankingRepository, user: userRepository } = useRepositories();
@@ -147,8 +150,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       const planId = await Memory.get('planId');
       if (planId) {
         try {
-          const ranking = await rankingRepository.getByPlanId(planId, user.id);
-          setRankingPosition(ranking.currentUser?.position ?? null);
+          const ranking = await rankingRepository.getByPlanIdAndUserId(planId, user.id);
+          setRankingPosition(ranking.currentUser.position);
         } catch {
           setRankingPosition(null);
         }
@@ -167,18 +170,22 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
   return (
     <View
-      style={{ paddingTop: Constants.statusBarHeight }}
-      className="absolute z-30 flex flex-row w-full h-full"
+      style={[StyleSheet.absoluteFillObject, { zIndex: 30 }]}
+      className="flex flex-row"
       pointerEvents={isOpen ? 'auto' : 'none'}
     >
       <Animated.View
         style={{
           width: DRAWER_WIDTH,
+          alignSelf: 'stretch',
           transform: [{ translateX }],
         }}
-        className="flex flex-col bg-white"
       >
-        <GradientView className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10">
+        <View style={{ flex: 1, backgroundColor: getColor('white') }}>
+        <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+        <GradientView
+          className="flex flex-row items-center justify-between gap-3 px-6 pt-6 pb-10"
+        >
           {user ? (
             <Pressable
               className="flex flex-row items-center justify-between flex-1 gap-3"
@@ -214,6 +221,11 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             <Icon name="close" size={26} color="white" />
           </Pressable>
         </GradientView>
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+        >
         <View className="flex flex-col">
           {loading && (
             <ActivityIndicator size="large" color={getColor('gray-6')} />
@@ -221,7 +233,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           {!loading && activePlans.length > 0 && (
             <View className="flex flex-col">
               <Text
-                style={{ color: getColor('gray-7') }}
+                style={{ color: getColor('gray-3') }}
                 className="px-6 pt-4 pb-2 text-xs font-semibold uppercase"
               >
                 Planos Ativos
@@ -251,7 +263,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           {!loading && finishedPlans.length > 0 && (
             <View className="flex flex-col">
               <Text
-                style={{ color: getColor('gray-7') }}
+                style={{ color: getColor('gray-3') }}
                 className="px-6 pt-4 pb-2 text-xs font-semibold uppercase"
               >
                 Planos Finalizados
@@ -328,6 +340,9 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               Sair
             </Text>
           </Pressable>
+        </View>
+        </ScrollView>
+        </SafeAreaView>
         </View>
       </Animated.View>
       <Animated.View

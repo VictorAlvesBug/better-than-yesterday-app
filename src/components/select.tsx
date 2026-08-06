@@ -126,7 +126,7 @@ export default function Select<TBaseOption extends BaseOption>({
                   <Icon
                     name="close"
                     size={22}
-                    color={'gray-7'}
+                    color={'gray-3'}
                   />
                 </Pressable>
               </View>
@@ -177,7 +177,7 @@ export default function Select<TBaseOption extends BaseOption>({
                       {!isStringOption(option) && option.justAdded && (
                         <Text
                           className="text-xs"
-                          style={{ color: getColor('gray-7') }}
+                          style={{ color: getColor('gray-3') }}
                         >
                           Recém-adicionado
                         </Text>
@@ -197,7 +197,7 @@ export default function Select<TBaseOption extends BaseOption>({
                   createOption === undefined || !searchText ? (
                     <Text
                       className="py-4 text-sm text-center"
-                      style={{ color: getColor('gray-7') }}
+                      style={{ color: getColor('gray-3') }}
                     >
                       Nenhum resultado encontrado
                     </Text>

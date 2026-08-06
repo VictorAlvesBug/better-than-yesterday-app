@@ -1,5 +1,5 @@
 import { Checkin, CheckinEnriched, CheckinReview, CheckinStatus, CreateCheckin } from '@/types/checkin.type';
-import { PlanRanking, RankingItemEnriched } from '@/types/ranking.type';
+import { PlanRanking, PlanRankingWithCurrentUser, RankingItemEnriched } from '@/types/ranking.type';
 import { CreateHabit, Habit, HabitEnriched } from '@/types/habit.type';
 import {
   CreatePlan,
@@ -104,14 +104,16 @@ export type ApiPlanRankingItem = {
   pendingCheckinCount: number;
   penalty: number;
   streak: number;
-  streakBonus: number;
 };
 
 export type ApiPlanRanking = {
   totalCheckinCount: number;
   daysOffAvailable: number;
   items: ApiPlanRankingItem[];
-  currentUser: ApiPlanRankingItem | null;
+};
+
+export type ApiPlanRankingWithCurrentUser = ApiPlanRanking & {
+  currentUser: ApiPlanRankingItem;
 };
 
 export type ApiUseDayOffResult = {
@@ -166,7 +168,7 @@ export function mapCheckInFromApi(checkIn: ApiCheckIn): Checkin {
     userId: checkIn.userId,
     date: getDateTime(checkIn.date as AllTypes) as DateTime,
     title: checkIn.title,
-    evidencePhotoUrl: checkIn.evidencePhotoUrl,
+    evidencePhotoUrl: checkIn.evidencePhotoUrl?.trim() ?? '',
     status: checkIn.status as CheckinStatus,
     reviews: checkIn.reviews.map((review) => ({
       reviewerId: review.reviewerId,
@@ -246,7 +248,6 @@ function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriche
     pendingCheckinCount: item.pendingCheckinCount ?? 0,
     penalty: item.penalty,
     streak: item.streak,
-    streakBonus: item.streakBonus ?? 0,
   };
 }
 
@@ -255,7 +256,15 @@ export function mapPlanRankingFromApi(ranking: ApiPlanRanking): PlanRanking {
     totalCheckinCount: ranking.totalCheckinCount,
     daysOffAvailable: ranking.daysOffAvailable,
     items: ranking.items.map(mapPlanRankingItemFromApi),
-    currentUser: ranking.currentUser ? mapPlanRankingItemFromApi(ranking.currentUser) : null,
+  };
+}
+
+export function mapPlanRankingWithCurrentUserFromApi(ranking: ApiPlanRankingWithCurrentUser): PlanRankingWithCurrentUser {
+  return {
+    totalCheckinCount: ranking.totalCheckinCount,
+    daysOffAvailable: ranking.daysOffAvailable,
+    items: ranking.items.map(mapPlanRankingItemFromApi),
+    currentUser: mapPlanRankingItemFromApi(ranking.currentUser),
   };
 }
 

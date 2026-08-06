@@ -54,7 +54,7 @@ export function DateInput({
         />
         {
           formatValueDescription && 
-          <Text style={{ color: getColor('gray-7') }} className='px-2 py-1 text-xs'>
+          <Text style={{ color: getColor('gray-3') }} className='px-2 py-1 text-xs'>
             {formatValueDescription(value)}
           </Text>
         }

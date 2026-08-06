@@ -2,7 +2,6 @@ import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import { PlanRanking } from '@/types/ranking.type';
-import Constants from 'expo-constants';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,13 +14,14 @@ import {
   View,
 } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
-import BackButton from '../components/back-button';
 import Card from '../components/card';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
 import Label from '../components/label';
 import Ranking from '../components/ranking';
+import ScreenHeader from '../components/screen-header';
+import ScreenLayout from '../components/screen-layout';
 import { useRepositories } from '../hooks/useRepositories';
 import {
   formatInteger,
@@ -65,7 +65,9 @@ export default function PlanSettingsScreen() {
 
   const fetchRanking = useCallback(async (id: string) => {
     const userId = (await Memory.get('userId')) ?? undefined;
-    const data = await rankingRepository.getByPlanId(id, userId);
+    if (!userId)
+      return;
+    const data = await rankingRepository.getByPlanIdAndUserId(id, userId);
     setRanking(data);
   }, [rankingRepository]);
 
@@ -126,34 +128,17 @@ export default function PlanSettingsScreen() {
   }
 
   return (
-    <View className="relative flex-1" style={{ backgroundColor: getColor('gray-e') }}>
-      <ScrollView
-        style={{ flex: 1 }}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={getColor('violet')}
-            colors={[getColor('violet')]}
-          />
-        }
-      >
-        <GradientView
-          style={{ paddingTop: Constants.statusBarHeight }}
-          className="flex flex-col justify-center items-center w-full"
-        >
-          <View className="flex flex-row justify-center items-center w-full">
-            <BackButton />
-            <Text style={{ color: getColor('white') }} className="flex-1 text-lg font-bold text-left">
-              {plan.description ?? plan.habitName}
-            </Text>
+    <ScreenLayout
+      header={
+        <ScreenHeader
+          title={plan.description ?? plan.habitName}
+          titleSize="text-lg"
+          right={
             <Pressable className="flex justify-center items-center w-20 h-20" onPress={copyInviteLink}>
               <Icon name="share-social" size={24} color="white" />
             </Pressable>
-          </View>
-
+          }
+        >
           <View
             style={{ backgroundColor: getColor('opaque') }}
             className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg"
@@ -190,8 +175,21 @@ export default function PlanSettingsScreen() {
               </View>
             </View>
           </View>
-        </GradientView>
-
+        </ScreenHeader>
+      }
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={getColor('violet')}
+            colors={[getColor('violet')]}
+          />
+        }
+      >
         <View className="flex flex-col gap-4 justify-center items-center px-4 -mt-2 mb-4">
           <Card className="flex flex-col w-full gap-3">
             <View>
@@ -291,6 +289,6 @@ export default function PlanSettingsScreen() {
           )}
         </View>
       </ScrollView>
-    </View>
+    </ScreenLayout>
   );
 }

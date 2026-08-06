@@ -11,12 +11,13 @@ import {
 import Constants from 'expo-constants';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
-import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import Card from '../components/card';
 import GradientView from '../components/gradient-view';
 import Input from '../components/input';
 import Label from '../components/label';
+import ScreenHeader from '../components/screen-header';
+import ScreenLayout from '../components/screen-layout';
 import Select from '../components/select';
 import useNavigation from '../hooks/useNavigation';
 import {
@@ -136,11 +137,7 @@ export default function SettingsScreen() {
   }
 
   return (
-    <View className="flex-1" style={{ backgroundColor: getColor('gray-e') }}>
-      <GradientView style={{ paddingTop: Constants.statusBarHeight }} className="flex flex-row items-center w-full">
-        <BackButton />
-        <Text className="text-xl font-bold text-white">Configurações</Text>
-      </GradientView>
+    <ScreenLayout header={<ScreenHeader title="Configurações" />}>
       <ScrollView className="flex-1 px-4 py-4" keyboardShouldPersistTaps="handled">
         <Card className="flex flex-row items-center justify-center w-full gap-3 mb-4">
           <Pressable onPress={onPickPhoto}>
@@ -224,6 +221,6 @@ export default function SettingsScreen() {
           </GradientView>
         </Button>
       </ScrollView>
-    </View>
+    </ScreenLayout>
   );
 }

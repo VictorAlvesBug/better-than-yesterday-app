@@ -6,6 +6,7 @@ import {
   ApiPlan,
   ApiPlanMemberDetails,
   ApiPlanRanking,
+  ApiPlanRankingWithCurrentUser,
   ApiPlanWithMembers,
   ApiUseDayOffResult,
   ApiUser,
@@ -37,6 +38,18 @@ export type ApiResponse<T> = {
 export const isSuccessfulStatusCode = (statusCode: number) =>
   statusCode >= 200 && statusCode <= 299;
 
+const API_DEBUG = process.env.EXPO_PUBLIC_API_DEBUG === 'true';
+
+function logApi(direction: string, url: string, payload?: unknown) {
+  if (!API_DEBUG)
+    return;
+
+  if (payload === undefined)
+    console.log(`[API ${direction}]`, url);
+  else
+    console.log(`[API ${direction}]`, url, payload);
+}
+
 const resolveStatus = (status: number) => {
   switch (status) {
     case 0: return 'Falha';
@@ -48,10 +61,14 @@ const resolveStatus = (status: number) => {
 
 export const logErrorAndThrow = (error: unknown) => {
   if (!axios.isAxiosError(error)) {
-    //console.error('Unexpected error:', error);
+    if (API_DEBUG)
+      console.log('[API ✗]', error);
+
     throw error;
   }
 
+  if (API_DEBUG)
+    console.log('[API ✗]', error.config?.url, error.response?.data ?? error.message);
 
   if (error.response?.data) {
     const status = resolveStatus(error.response.data.status);
@@ -78,9 +95,12 @@ function buildQueryString(params: Record<string, string | undefined>): string {
 
 async function getData<T>(url: string): Promise<T> {
   try {
+    logApi('→ GET', url);
     const response = await axios.get<ApiResponse<T>>(url);
-    if (isSuccessfulStatusCode(response.status))
+    if (isSuccessfulStatusCode(response.status)) {
+      logApi('✓ GET', url, response.data.data);
       return response.data.data;
+    }
 
     throw new Error(`GET ${url} failed with status ${response.status}`);
   } catch (error) {
@@ -95,9 +115,12 @@ async function getListData<T>(url: string): Promise<T[]> {
 
 async function postData<TBody, TResult>(url: string, body?: TBody): Promise<TResult> {
   try {
+    logApi('→ POST', url, body);
     const response = await axios.post<ApiResponse<TResult>>(url, body);
-    if (isSuccessfulStatusCode(response.status))
+    if (isSuccessfulStatusCode(response.status)) {
+      logApi('✓ POST', url, response.data.data);
       return response.data.data;
+    }
 
     throw new Error(`POST ${url} failed with status ${response.status}`);
   } catch (error) {
@@ -108,9 +131,12 @@ async function postData<TBody, TResult>(url: string, body?: TBody): Promise<TRes
 
 async function putData<TBody, TResult>(url: string, body?: TBody): Promise<TResult> {
   try {
+    logApi('→ PUT', url, body);
     const response = await axios.put<ApiResponse<TResult>>(url, body);
-    if (isSuccessfulStatusCode(response.status))
+    if (isSuccessfulStatusCode(response.status)) {
+      logApi('✓ PUT', url, response.data.data);
       return response.data.data;
+    }
 
     throw new Error(`PUT ${url} failed with status ${response.status}`);
   } catch (error) {
@@ -121,9 +147,12 @@ async function putData<TBody, TResult>(url: string, body?: TBody): Promise<TResu
 
 async function deleteRequest(url: string): Promise<void> {
   try {
+    logApi('→ DELETE', url);
     const response = await axios.delete(url);
-    if (isSuccessfulStatusCode(response.status))
+    if (isSuccessfulStatusCode(response.status)) {
+      logApi('✓ DELETE', url);
       return;
+    }
 
     throw new Error(`DELETE ${url} failed with status ${response.status}`);
   } catch (error) {
@@ -134,9 +163,12 @@ async function deleteRequest(url: string): Promise<void> {
 
 async function deleteData<T>(url: string): Promise<T> {
   try {
+    logApi('→ DELETE', url);
     const response = await axios.delete<ApiResponse<T>>(url);
-    if (isSuccessfulStatusCode(response.status))
+    if (isSuccessfulStatusCode(response.status)) {
+      logApi('✓ DELETE', url, response.data.data);
       return response.data.data;
+    }
 
     throw new Error(`DELETE ${url} failed with status ${response.status}`);
   } catch (error) {
@@ -228,10 +260,15 @@ export const backendApi = {
       { fileName, contentType }
     ),
 
-  getPlanRanking: (planId: string, userId?: string) =>
-    getData<ApiPlanRanking>(
-      `${API_URL}/Plans/${planId}/Ranking${buildQueryString({ userId })}`
-    ),
+    getPlanRanking: (planId: string) =>
+      getData<ApiPlanRanking>(
+        `${API_URL}/Plans/${planId}/Ranking`
+      ),
+
+    getPlanRankingWithCurrentUser: (planId: string, userId: string) =>
+      getData<ApiPlanRankingWithCurrentUser>(
+        `${API_URL}/Plans/${planId}/Ranking${buildQueryString({ userId })}`
+      ),
 
   useDayOff: (planId: string, userId: string, date: string) =>
     postData<{ date: string }, ApiUseDayOffResult>(

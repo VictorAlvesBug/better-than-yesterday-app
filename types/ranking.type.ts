@@ -3,7 +3,6 @@ export type RankingItem = {
     userId: string;
     penalty: number;
     streak: number;
-    streakBonus: number;
 };
 
 export type RankingItemEnriched = RankingItem & {
@@ -17,5 +16,8 @@ export type PlanRanking = {
     totalCheckinCount: number;
     daysOffAvailable: number;
     items: RankingItemEnriched[];
-    currentUser: RankingItemEnriched | null;
+};
+
+export type PlanRankingWithCurrentUser = PlanRanking & {
+    currentUser: RankingItemEnriched;
 };

@@ -49,7 +49,7 @@ type IconProps = {
 
 export default function Icon({
     type,
-    color = 'gray-7',
+    color = 'gray-a',
     name,
     size = 18,
     ...rest

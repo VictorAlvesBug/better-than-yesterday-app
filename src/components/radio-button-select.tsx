@@ -49,7 +49,7 @@ export default function RadioButtonSelect({
               <Text className='text-base font-bold'>{title}</Text>
               {
                 complement
-                && <Text style={{ color: getColor('gray-7') }} className='text-sm font-bold'>
+                && <Text style={{ color: getColor('gray-3') }} className='text-sm'>
                   {complement}
                 </Text>
               }

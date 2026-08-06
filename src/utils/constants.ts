@@ -9,3 +9,6 @@ const host = hostUri?.split(':')[0];
 const defaultApiUrl = host ? `http://${host}:5018/api` : 'http://localhost:5018/api';
 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL ?? defaultApiUrl;
+
+if (process.env.EXPO_PUBLIC_API_DEBUG === 'true')
+  console.log('[API] base URL:', API_URL);

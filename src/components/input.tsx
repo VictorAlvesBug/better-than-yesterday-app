@@ -50,8 +50,8 @@ export default function Input({
   return (
     <View
       style={{
-        borderColor: getColor("gray-d"),
-        backgroundColor: getColor(grayBackground ? "gray-d" : "white"), 
+        borderColor: getColor("gray-b"),
+        backgroundColor: getColor(grayBackground ? "gray-b" : "white"), 
         pointerEvents: typeable ? 'auto' : 'none'
       }}
       className={
@@ -65,7 +65,7 @@ export default function Input({
           ref={ref}
           className="flex-1 outline-none"
           placeholder={placeholder}
-          placeholderTextColor={getColor("gray-7")}
+          placeholderTextColor={getColor("gray-9")}
           value={value || ""}
           multiline={false}
           onChangeText={onChange}

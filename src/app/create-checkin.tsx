@@ -1,6 +1,5 @@
 import { CreateCheckin, createCheckinSchema } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -13,7 +12,6 @@ import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
 import createPlanRepository from '../api/planRepository';
 import createS3Repository from '../api/s3Repository';
-import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import Card from '../components/card';
 import { DateInput } from '../components/date-input';
@@ -21,6 +19,8 @@ import GradientView from '../components/gradient-view';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
+import ScreenHeader from '../components/screen-header';
+import ScreenLayout from '../components/screen-layout';
 import useNavigation from '../hooks/useNavigation';
 import {
   formatDateRelativeToToday,
@@ -164,35 +164,31 @@ export default function CreateCheckinScreen() {
   };
 
   return (
-    <>
-      <GradientView
-        style={{ paddingTop: Constants.statusBarHeight }}
-        className="flex flex-row items-center justify-start w-full"
-      >
-        <BackButton />
-        <Text className="text-xl font-bold text-center text-white">Marcar Check-in</Text>
-      </GradientView>
+    <ScreenLayout header={<ScreenHeader title="Marcar Check-in" />}>
       <KeyboardableView>
         <View className="flex-1 w-full gap-6 px-4 py-3" style={{ backgroundColor: getColor('gray-e') }}>
           <Card className="relative flex flex-row items-center justify-center w-full">
             <View className="flex flex-col items-start justify-center w-full">
               {localPhotoUri ? (
-                <Image
+                <><Image
                   source={{ uri: localPhotoUri }}
                   style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 16 }}
                 />
+                  <Button action={handleOpenCamera} className="absolute right-7 bottom-7">
+                    Alterar foto
+                  </Button>
+                </>
               ) : (
                 <View
                   style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 16, backgroundColor: getColor('gray-d') }}
                   className="items-center justify-center"
                 >
-                  <Text style={{ color: getColor('gray-7') }}>Nenhuma foto selecionada</Text>
+                  <Button action={handleOpenCamera}>
+                    Escolher foto
+                  </Button>
                 </View>
               )}
             </View>
-            <Button action={handleOpenCamera} className="absolute right-7 bottom-7">
-              Escolher foto
-            </Button>
           </Card>
           <Card className="flex flex-col items-start justify-center w-full gap-1">
             <Label>Título</Label>
@@ -223,6 +219,6 @@ export default function CreateCheckinScreen() {
           </Button>
         </View>
       </KeyboardableView>
-    </>
+    </ScreenLayout>
   );
 }

@@ -24,7 +24,7 @@ type ButtonProps = {
 
 const defaultColor: ColorNameSet = {
   text: "gray-3",
-  border: "gray-7",
+  border: "gray-3",
   background: "gray-e",
 };
 

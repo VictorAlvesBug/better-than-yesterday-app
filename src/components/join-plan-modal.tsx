@@ -3,8 +3,13 @@ import { PlanEnriched } from '@/types/plan.type';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
+  KeyboardEvent,
   Modal,
+  Platform,
   Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -50,6 +55,33 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
   const [searching, setSearching] = useState(false);
   const [joining, setJoining] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const onKeyboardShow = (event: KeyboardEvent) => {
+      setKeyboardHeight(event.endCoordinates.height);
+    };
+
+    const onKeyboardHide = () => {
+      setKeyboardHeight(0);
+    };
+
+    const showSub = Keyboard.addListener(showEvent, onKeyboardShow);
+    const hideSub = Keyboard.addListener(hideEvent, onKeyboardHide);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!visible)
+      setKeyboardHeight(0);
+  }, [visible]);
 
   const searchPlan = useCallback(async (planIdOverride?: string) => {
     const planId = planIdOverride ?? parsePlanIdFromInviteInput(linkInput);
@@ -120,69 +152,81 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
 
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={handleClose}>
-      <View
-        className="flex-1 items-center justify-center px-6"
-        style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
-      >
-        <Pressable className="absolute inset-0" onPress={handleClose} />
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
         <View
-          className="relative w-full px-4 pt-4 pb-6 bg-white rounded-3xl"
-          style={{ maxHeight: '85%' }}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 24,
+            paddingBottom: keyboardHeight,
+          }}
         >
-          <View className="flex flex-row items-start justify-between mb-4">
-            <Text
-              style={{ color: getColor('black') }}
-              className="flex-1 pr-3 text-lg font-bold"
+          <View
+            className="relative w-full px-4 pt-4 pb-6 bg-white rounded-3xl"
+            style={{ maxHeight: '85%' }}
+          >
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
             >
-              Entrar com link de convite
-            </Text>
-            <Pressable
-              onPress={handleClose}
-              hitSlop={10}
-              className="items-center justify-center w-8 h-8"
-            >
-              <Icon name="close" size={24} color="gray-7" />
-            </Pressable>
-          </View>
+              <View className="flex flex-row items-start justify-between mb-4">
+                <Text
+                  style={{ color: getColor('black') }}
+                  className="flex-1 pr-3 text-lg font-bold"
+                >
+                  Entrar com link de convite
+                </Text>
+                <Pressable
+                  onPress={handleClose}
+                  hitSlop={10}
+                  className="items-center justify-center w-8 h-8"
+                >
+                  <Icon name="close" size={24} color="gray-3" />
+                </Pressable>
+              </View>
 
-          <Label>Cole o link ou ID do plano</Label>
-          <Input
-            placeholder="betterthanyesterdayapp://join/..."
-            value={linkInput}
-            onChange={setLinkInput}
-          />
+              <Label>Cole o link ou ID do plano</Label>
+              <Input
+                placeholder="betterthanyesterdayapp://join/..."
+                value={linkInput}
+                onChange={setLinkInput}
+              />
 
-          <Button action={() => searchPlan()} className="mt-3">
-            Buscar
-          </Button>
-
-          {searching && (
-            <ActivityIndicator className="mt-4" color={getColor('violet')} />
-          )}
-
-          {searchError && (
-            <Text style={{ color: getColor('danger') }} className="mt-3 text-sm">{searchError}</Text>
-          )}
-
-          {plan && !searching && (
-            <Card className="flex flex-col gap-2 mt-4">
-              <Text style={{ color: getColor('black') }} className="text-lg font-bold">
-                {plan.description ?? plan.habitName}
-              </Text>
-              <Text style={{ color: getColor('gray-7') }} className="text-sm">
-                {plan.habitName} · {7 - plan.daysOffPerWeek}x/semana
-              </Text>
-              <Text style={{ color: getColor('gray-7') }} className="text-sm">
-                Multa: {formatMoney(plan.penaltyValue)} · {getDifferenceInDays(plan.startsAt, plan.endsAt)} dias
-              </Text>
-              <Text style={{ color: getColor('gray-7') }} className="text-sm">
-                Status: {plan.status} · {plan.memberCount} membros
-              </Text>
-              <Button action={joinPlan} className="mt-2" color="success">
-                {joining ? 'Entrando...' : 'Participar'}
+              <Button action={() => searchPlan()} className="mt-3">
+                Buscar
               </Button>
-            </Card>
-          )}
+
+              {searching && (
+                <ActivityIndicator className="mt-4" color={getColor('violet')} />
+              )}
+
+              {searchError && (
+                <Text style={{ color: getColor('danger') }} className="mt-3 text-sm">{searchError}</Text>
+              )}
+
+              {plan && !searching && (
+                <Card className="flex flex-col gap-2 mt-4">
+                  <Text style={{ color: getColor('black') }} className="text-lg font-bold">
+                    {plan.description ?? plan.habitName}
+                  </Text>
+                  <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                    {plan.habitName} · {7 - plan.daysOffPerWeek}x/semana
+                  </Text>
+                  <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                    Multa: {formatMoney(plan.penaltyValue)} · {getDifferenceInDays(plan.startsAt, plan.endsAt)} dias
+                  </Text>
+                  <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                    Status: {plan.status} · {plan.memberCount} membros
+                  </Text>
+                  <Button action={joinPlan} className="mt-2" color="success">
+                    {joining ? 'Entrando...' : 'Participar'}
+                  </Button>
+                </Card>
+              )}
+            </ScrollView>
+          </View>
         </View>
       </View>
     </Modal>

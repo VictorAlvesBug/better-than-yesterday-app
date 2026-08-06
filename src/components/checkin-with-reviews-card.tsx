@@ -1,16 +1,14 @@
 import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
 import { formatRelativeDateTime } from '../utils/dateUtils';
 import { formatIntegerCompact } from '../utils/numberUtils';
+import EvidencePhoto from './evidence-photo';
 import Icon from './icon';
 import ProfilePhoto from './profile-photo';
-
-const unavailablePhotoUrl =
-  'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
 
 type CheckinWithReviewsCardProps = {
   checkin: CheckinEnriched;
@@ -66,11 +64,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
 
   return (
     <View className="flex flex-col items-start justify-center w-full gap-2 pb-4 overflow-hidden bg-white shadow-md rounded-2xl">
-      <Image
-        source={{ uri: evidencePhotoUrl || unavailablePhotoUrl }}
-        style={{ width: '100%', aspectRatio: '16/9' }}
-        resizeMode="cover"
-      />
+      <EvidencePhoto uri={evidencePhotoUrl} />
 
       <View className="flex flex-row items-center justify-start w-full gap-1 px-4">
         <ProfilePhoto name={userName} photoUrl={userPhotoUrl} />
@@ -81,7 +75,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
           >
             {userName}
           </Text>
-          <Text style={{ color: getColor("gray-7") }} className="text-xs" numberOfLines={1}>
+          <Text style={{ color: getColor("gray-3") }} className="text-xs" numberOfLines={1}>
             {formatRelativeDateTime(date)}
           </Text>
         </View>

@@ -3,15 +3,15 @@ import Card from '@/src/components/card';
 import { CheckinEnriched } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched, PlanStatus } from '@/types/plan.type';
-import { PlanRanking } from '@/types/ranking.type';
+import { PlanRankingWithCurrentUser } from '@/types/ranking.type';
 import Constants from 'expo-constants';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Pressable,
   RefreshControl,
-  ScrollView,
   Text,
   View,
 } from 'react-native';
@@ -19,7 +19,9 @@ import CheckinWithReviewsCard from '../components/checkin-with-reviews-card';
 import DaysOffCard from '../components/days-off-card';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
-import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
+import PlanTrackerHeader from '../components/plan-tracker-header';
+import ScreenLayout from '../components/screen-layout';
+import SideDrawer from '../components/side-drawer';
 import useNavigation from '../hooks/useNavigation';
 import { useRepositories } from '../hooks/useRepositories';
 import { DateOnly, getDate, getDateOnly, getDateToFront, getDifferenceInDays } from '../utils/dateUtils';
@@ -33,11 +35,12 @@ export default function PlanTrackerScreen() {
 
   const [plan, setPlan] = useState<PlanEnriched | null>(null);
   const [checkins, setCheckins] = useState<CheckinEnriched[]>([]);
-  const [ranking, setRanking] = useState<PlanRanking | null>(null);
+  const [ranking, setRanking] = useState<PlanRankingWithCurrentUser | null>(null);
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const navigation = useNavigation();
 
@@ -70,7 +73,7 @@ export default function PlanTrackerScreen() {
       setCheckins(planCheckins.sort((a, b) => b.date.localeCompare(a.date)));
 
       if (dbPlan.status === 'Running') {
-        const planRanking = await rankingRepository.getByPlanId(planId, storedUserId || undefined);
+        const planRanking = await rankingRepository.getByPlanIdAndUserId(planId, storedUserId);
         setRanking(planRanking);
       } else {
         setRanking(null);
@@ -158,203 +161,182 @@ export default function PlanTrackerScreen() {
   const daysSinceStart = getDifferenceInDays(new Date(), plan.startsAt);
   const totalDays = getDifferenceInDays(plan.startsAt, plan.endsAt);
   const streak = currentUser?.streak ?? 0;
-  const streakBonus = currentUser?.streakBonus ?? 0;
   const position = currentUser?.position ?? 0;
   const checkinCount = currentUser?.checkinCount ?? 0;
   const totalCheckinCount = ranking?.totalCheckinCount ?? 0;
   const daysOffAvailable = ranking?.daysOffAvailable ?? 0;
 
   return (
-    <View
-      className="relative flex-1"
-      style={{ backgroundColor: getColor('gray-e') }}
-    >
+    <View className="flex-1">
+      <ScreenLayout
+        header={
+          <PlanTrackerHeader
+            plan={plan}
+            scrollY={scrollY}
+            setIsDrawerOpen={setIsDrawerOpen}
+            onOpenSettings={() => navigation.push('/plan-settings')}
+          />
+        }
+      >
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={getColor('violet')}
+              colors={[getColor('violet')]}
+            />
+          }
+        >
+          <View className="flex flex-col gap-5 justify-center items-start px-4 mt-4">
+            {isRunning ? (
+              <>
+                <View
+                  className="flex flex-row flex-1 gap-4 justify-between items-center w-full"
+                  style={{ zIndex: 10 }}
+                >
+                  <Card className="flex flex-col flex-1 gap-1 justify-center items-start w-full">
+                    <View className="flex flex-row gap-3 justify-start items-center">
+                      <Icon type="font-awesome-5" name="fire" size={16} color="orange" />
+                      <Text style={{ color: getColor('black') }}>Sequência</Text>
+                    </View>
+                    <View className="flex flex-row gap-1 justify-start items-center">
+                      <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
+                        {formatInteger(streak)}
+                      </Text>
+                    </View>
+                    <Text style={{ color: getColor('gray-3') }} className="text-xs">
+                      dias seguidos
+                    </Text>
+                  </Card>
+                  <Card className="flex flex-col flex-1 gap-1 justify-center items-start w-full">
+                    <View className="flex flex-row gap-3 justify-start items-center">
+                      <Icon type="font-awesome-5" name="award" size={16} color="violet" />
+                      <Text style={{ color: getColor('black') }}>Posição</Text>
+                    </View>
+                    <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
+                      #{formatInteger(position)}
+                    </Text>
+                    <Text style={{ color: getColor('gray-3') }} className="text-xs">
+                      de {plan.memberCount} pessoas
+                    </Text>
+                  </Card>
+                </View>
+
+                <Card className="flex flex-col flex-1 gap-3 justify-center items-start w-full">
+                  <View className="flex flex-row justify-between items-center w-full">
+                    <Text style={{ color: getColor('black') }} className="text-md">Progresso</Text>
+                    <Text style={{ color: getColor('violet') }} className="font-bold text-md">
+                      {formatInteger(checkinCount)}/{formatInteger(totalCheckinCount)} dias
+                    </Text>
+                  </View>
+                  <View style={{ backgroundColor: getColor('gray-e'), borderRadius: 9999, height: 10, width: '100%' }}>
+                    <GradientView
+                      style={{
+                        flex: 1,
+                        height: '100%',
+                        borderRadius: 9999,
+                        width: `${totalDays > 0 ? (100 * daysSinceStart) / totalDays : 0}%`,
+                      }}
+                    />
+                  </View>
+                  <View className="flex flex-row gap-2 justify-between items-center w-full">
+                    <Icon name="calendar-clear-outline" size={16} />
+                    <Text style={{ color: getColor('gray-3') }} className="flex-1">
+                      {`Termina em ${formatInteger(Math.max(0, totalDays - daysSinceStart))} ${totalDays - daysSinceStart === 1 ? 'dia' : 'dias'}`}
+                    </Text>
+                    <Text style={{ color: getColor('violet') }} className="font-semibold">
+                      {formatPercentCompact(totalDays > 0 ? daysSinceStart / totalDays : 0)}
+                    </Text>
+                  </View>
+
+                  <View className="flex flex-row justify-between items-center w-full">
+                    <View className="flex flex-col gap-1 justify-center items-start">
+                      <Text style={{ color: getColor('gray-3') }} className="text-xs font-thin">
+                        Início
+                      </Text>
+                      <Text style={{ color: getColor('gray-3') }} className="font-semibold">
+                        {getDateToFront(plan.startsAt)}
+                      </Text>
+                    </View>
+                    <View className="flex flex-col gap-1 justify-center items-end">
+                      <Text style={{ color: getColor('gray-3') }} className="text-xs font-thin">
+                        Fim
+                      </Text>
+                      <Text style={{ color: getColor('gray-3') }} className="font-semibold">
+                        {getDateToFront(plan.endsAt)}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="flex flex-row justify-between items-center w-full">
+                    <View className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor('gray-3') }} />
+                    <View className="flex-1 h-[2px] flex flex-row justify-center items-center">
+                      <View className="h-full" style={{ width: `${resolvePeriodProgress(plan.startsAt, plan.endsAt)}%`, backgroundColor: getColor('gray-3'), opacity: 1 }} />
+                      <View className="flex-1 h-full" style={{ backgroundColor: getColor('gray-3'), opacity: 0.2 }} />
+                    </View>
+                    <View className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor('gray-3') }} />
+                  </View>
+                </Card>
+
+              </>
+            ) : (
+              <Card className="flex flex-col gap-1 justify-center items-start w-full">
+                <Text style={{ color: getColor('gray-3') }} className="text-sm font-semibold">
+                  Status do plano
+                </Text>
+                <Text style={{ color: getColor('black') }} className="text-lg font-bold">
+                  {getPlanStatusLabel(plan.status)}
+                </Text>
+              </Card>
+            )}
+
+            <DaysOffCard daysOffAvailable={daysOffAvailable} onUseDayOff={handleUseDayOff} />
+
+            <View className="mt-2 -mb-5">
+              <Text style={{ color: getColor('black') }} className="mb-3 text-lg font-extrabold">
+                Check-ins Recentes
+              </Text>
+              {checkins.length === 0 && (
+                <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                  Faça seu primeiro check-in hoje para aparecer aqui!
+                </Text>
+              )}
+            </View>
+
+            {checkins.map((checkin) => (
+              <CheckinWithReviewsCard
+                key={checkin.id}
+                checkin={checkin}
+                onUpdate={handleUpdateCheckIn}
+              />
+            ))}
+          </View>
+        </Animated.ScrollView>
+
+        {isRunning && (
+          <Pressable
+            style={{ backgroundColor: getColor('violet') }}
+            onPress={() => navigation.push('/create-checkin')}
+            className="overflow-hidden absolute right-4 bottom-4 justify-center items-center w-16 h-16 rounded-full shadow-xl active:opacity-80"
+          >
+            <GradientView className="flex flex-col justify-center items-center w-full h-full">
+              <Icon name="camera" size={24} color="white" />
+            </GradientView>
+          </Pressable>
+        )}
+      </ScreenLayout>
       <SideDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
       />
-
-      <ScrollView
-        style={{ flex: 1 }}
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={getColor('violet')}
-            colors={[getColor('violet')]}
-          />
-        }
-      >
-        <GradientView
-          style={{ paddingTop: Constants.statusBarHeight }}
-          className="flex flex-col justify-center items-center w-full"
-        >
-          <View className="flex flex-row justify-between items-center w-full">
-            <SideDrawerOpenButton setIsDrawerOpen={setIsDrawerOpen} />
-
-            <View className="flex flex-col justify-center items-center">
-              <Text style={{ color: getColor('white') }} className="text-xl font-bold text-center">
-                BTY
-              </Text>
-            </View>
-
-            <Pressable
-              className="flex justify-center items-center w-20 h-20"
-              onPress={() => navigation.push('/plan-settings')}
-            >
-              <Icon name="people" size={24} color="white" />
-            </Pressable>
-          </View>
-          <View className="flex flex-col gap-2 justify-evenly items-start px-4 py-1 mb-8 w-full">
-            <Text style={{ color: getColor('white') }} className="text-2xl font-bold">
-              {plan.description ?? plan.habitName}
-            </Text>
-            <Text style={{ color: getColor('white') }} className="text-md">
-              {`${7 - plan.daysOffPerWeek}x por semana`}
-            </Text>
-          </View>
-        </GradientView>
-
-        <View className="flex flex-col gap-5 justify-center items-start px-4 -mt-6">
-          {isRunning ? (
-            <>
-              <View className="flex flex-row flex-1 gap-4 justify-between items-center w-full">
-                <Card className="flex flex-col flex-1 gap-1 justify-center items-start w-full">
-                  <View className="flex flex-row gap-3 justify-start items-center">
-                    <Icon type="font-awesome-5" name="fire" size={16} color="orange" />
-                    <Text style={{ color: getColor('gray-7') }}>Sequência</Text>
-                  </View>
-                  <View className="flex flex-row gap-1 justify-start items-center">
-                    <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
-                      {formatInteger(streak)}
-                    </Text>
-                    <Text className="font-bold text-md" style={{ color: getColor('orange') }}>
-                      {streakBonus > 0 ? ` +${formatInteger(streakBonus)}` : ''}
-                    </Text>
-                  </View>
-                  <Text style={{ color: getColor('gray-7') }} className="text-xs font-semibold">
-                    dias seguidos
-                  </Text>
-                </Card>
-                <Card className="flex flex-col flex-1 gap-1 justify-center items-start w-full">
-                  <View className="flex flex-row gap-3 justify-start items-center">
-                    <Icon type="font-awesome-5" name="award" size={16} color="violet" />
-                    <Text style={{ color: getColor('gray-7') }}>Posição</Text>
-                  </View>
-                  <Text style={{ color: getColor('black') }} className="text-3xl font-bold">
-                    #{formatInteger(position)}
-                  </Text>
-                  <Text style={{ color: getColor('gray-7') }} className="text-xs font-semibold">
-                    de {plan.memberCount} pessoas
-                  </Text>
-                </Card>
-              </View>
-
-              <Card className="flex flex-col flex-1 gap-3 justify-center items-start w-full">
-                <View className="flex flex-row justify-between items-center w-full">
-                  <Text style={{ color: getColor('black') }} className="font-bold text-md">Progresso</Text>
-                  <Text style={{ color: getColor('violet') }} className="font-bold text-md">
-                    {formatInteger(checkinCount)}/{formatInteger(totalCheckinCount)} dias
-                  </Text>
-                </View>
-                <View style={{ backgroundColor: getColor('gray-e'), borderRadius: 9999, height: 10, width: '100%' }}>
-                  <GradientView
-                    style={{
-                      flex: 1,
-                      height: '100%',
-                      borderRadius: 9999,
-                      width: `${totalDays > 0 ? (100 * daysSinceStart) / totalDays : 0}%`,
-                    }}
-                  />
-                </View>
-                <View className="flex flex-row gap-2 justify-between items-center w-full">
-                  <Icon name="calendar-clear-outline" size={16} />
-                  <Text style={{ color: getColor('gray-7') }} className="flex-1">
-                    {`Termina em ${formatInteger(Math.max(0, totalDays - daysSinceStart))} ${totalDays - daysSinceStart === 1 ? 'dia' : 'dias'}`}
-                  </Text>
-                  <Text style={{ color: getColor('violet') }} className="font-semibold">
-                    {formatPercentCompact(totalDays > 0 ? daysSinceStart / totalDays : 0)}
-                  </Text>
-                </View>
-
-            <View className="flex flex-row justify-between items-center w-full">
-              <View className="flex flex-col gap-1 justify-center items-start">
-                <Text style={{ color: getColor('gray-7') }} className="text-xs font-thin">
-                  Início
-                </Text>
-                <Text style={{ color: getColor('gray-7') }} className="font-semibold">
-                  {getDateToFront(plan.startsAt)}
-                </Text>
-              </View>
-              <View className="flex flex-col gap-1 justify-center items-end">
-                <Text style={{ color: getColor('gray-7') }} className="text-xs font-thin">
-                  Fim
-                </Text>
-                <Text style={{ color: getColor('gray-7') }} className="font-semibold">
-                  {getDateToFront(plan.endsAt)}
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex flex-row justify-between items-center w-full">
-              <View className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor('gray-7') }} />
-              <View className="flex-1 h-[2px] flex flex-row justify-center items-center">
-                <View className="h-full" style={{ width: `${resolvePeriodProgress(plan.startsAt, plan.endsAt)}%`, backgroundColor: getColor('gray-7'), opacity: 1 }} />
-                <View className="flex-1 h-full" style={{ backgroundColor: getColor('gray-7'), opacity: 0.2 }} />
-              </View>
-              <View className="w-2 h-2 rounded-full" style={{ backgroundColor: getColor('gray-7') }} />
-            </View>
-              </Card>
-
-            </>
-          ) : (
-            <Card className="flex flex-col gap-1 justify-center items-start w-full">
-              <Text style={{ color: getColor('gray-7') }} className="text-sm font-semibold">
-                Status do plano
-              </Text>
-              <Text style={{ color: getColor('black') }} className="text-lg font-bold">
-                {getPlanStatusLabel(plan.status)}
-              </Text>
-            </Card>
-          )}
-
-          <DaysOffCard daysOffAvailable={daysOffAvailable} onUseDayOff={handleUseDayOff} />
-
-          <View className="mt-2 -mb-5">
-            <Text style={{ color: getColor('black') }} className="mb-3 text-lg font-extrabold">
-              Check-ins Recentes
-            </Text>
-            {checkins.length === 0 && (
-              <Text style={{ color: getColor('gray-7') }} className="text-xs">
-                Faça seu primeiro check-in hoje para aparecer aqui!
-              </Text>
-            )}
-          </View>
-
-          {checkins.map((checkin) => (
-            <CheckinWithReviewsCard
-              key={checkin.id}
-              checkin={checkin}
-              onUpdate={handleUpdateCheckIn}
-            />
-          ))}
-        </View>
-      </ScrollView>
-
-      {isRunning && (
-        <Pressable
-          style={{ backgroundColor: getColor('violet') }}
-          onPress={() => navigation.push('/create-checkin')}
-          className="overflow-hidden absolute right-4 bottom-4 justify-center items-center w-16 h-16 rounded-full shadow-xl active:opacity-80"
-        >
-          <GradientView className="flex flex-col justify-center items-center w-full h-full">
-            <Icon name="camera" size={24} color="white" />
-          </GradientView>
-        </Pressable>
-      )}
     </View>
   );
 }

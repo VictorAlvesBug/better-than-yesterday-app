@@ -5,7 +5,6 @@ import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit, HabitWithJustAdded } from '@/types/habit.type';
 import { CreatePlan, createPlanSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
-import Constants from 'expo-constants';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,7 +13,6 @@ import {
   View
 } from 'react-native';
 import AmountSelect from '../components/amount-select';
-import BackButton from '../components/back-button';
 import { Button } from '../components/button';
 import DateRangeSelect from '../components/date-range-select';
 import GradientView from '../components/gradient-view';
@@ -22,6 +20,8 @@ import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
 import RadioButtonSelect, { RadioButtonOption } from '../components/radio-button-select';
+import ScreenHeader from '../components/screen-header';
+import ScreenLayout from '../components/screen-layout';
 import Select from '../components/select';
 import useNavigation from '../hooks/useNavigation';
 import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
@@ -149,17 +149,7 @@ export default function CreatePlanScreen() {
   }
 
   return (
-    <>
-      <GradientView
-        style={{
-          paddingTop: Constants.statusBarHeight,
-        }}
-        className="flex flex-row items-center justify-start w-full">
-        <BackButton />
-        <Text className="text-xl font-bold text-center text-white">
-          Criar Plano
-        </Text>
-      </GradientView>
+    <ScreenLayout header={<ScreenHeader title="Criar Plano" />}>
       <KeyboardableView>
         {loading ? (
           <ActivityIndicator size="large" color={getColor("gray-6")} />
@@ -271,6 +261,6 @@ export default function CreatePlanScreen() {
           )}
 
       </KeyboardableView>
-    </>
+    </ScreenLayout>
   );
 }
