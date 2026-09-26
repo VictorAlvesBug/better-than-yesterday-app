@@ -8,7 +8,7 @@ import {
   ApiPlanRanking,
   ApiPlanRankingWithCurrentUser,
   ApiPlanWithMembers,
-  ApiUseDayOffResult,
+  ApiPenalty,
   ApiUser,
   ApiUserWithPlans,
   CreateCheckInPayload,
@@ -270,12 +270,15 @@ export const backendApi = {
         `${API_URL}/Plans/${planId}/Ranking${buildQueryString({ userId })}`
       ),
 
-  useDayOff: (planId: string, userId: string, date: string) =>
-    postData<{ date: string }, ApiUseDayOffResult>(
-      `${API_URL}/Plans/${planId}/Members/${userId}/DayOffs`,
-      { date }
-    ),
+  listPenaltiesByPlanId: (planId: string) =>
+    getListData<ApiPenalty>(`${API_URL}/Plans/${planId}/Penalties`),
 
-  getDayOffAvailability: (planId: string, userId: string) =>
-    getData<number>(`${API_URL}/Plans/${planId}/Members/${userId}/DayOffs/Available`),
+  listPenaltiesByPlanMember: (planId: string, userId: string) =>
+    getListData<ApiPenalty>(`${API_URL}/Plans/${planId}/Members/${userId}/Penalties`),
+
+  payPenalty: (planId: string, penaltyId: string, confirmedByUserId: string) =>
+    postData<{ confirmedByUserId: string }, ApiPenalty>(
+      `${API_URL}/Plans/${planId}/Penalties/${penaltyId}/Pay`,
+      { confirmedByUserId }
+    ),
 };

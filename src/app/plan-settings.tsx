@@ -1,6 +1,7 @@
 import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
+import { Penalty } from '@/types/penalty.type';
 import { PlanRanking } from '@/types/ranking.type';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -20,6 +21,7 @@ import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
 import Label from '../components/label';
 import Ranking from '../components/ranking';
+import PenaltiesCard from '../components/penalties-card';
 import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
 import { useRepositories } from '../hooks/useRepositories';
@@ -29,17 +31,21 @@ import {
   formatMoneyCompact,
   formatPercent,
 } from '../utils/numberUtils';
-import { toastSuccessMessage } from '../utils/toastUtils';
+import { toastSuccessMessage, toastErrorMessage } from '../utils/toastUtils';
 import { getDateToFront } from '../utils/dateUtils';
 
 const ADMIN_FEE_RATE = 0.1;
 
 export default function PlanSettingsScreen() {
-  const { plan: planRepository, ranking: rankingRepository } = useRepositories();
+  const { plan: planRepository, ranking: rankingRepository, penalty: penaltyRepository } = useRepositories();
   const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins'>('ranking');
   const [planId, setPlanId] = useState('');
   const [plan, setPlan] = useState<PlanEnriched | null>(null);
   const [ranking, setRanking] = useState<PlanRanking | null>(null);
+  const [penalties, setPenalties] = useState<Penalty[]>([]);
+  const [penaltiesLoading, setPenaltiesLoading] = useState(false);
+  const [payingPenaltyId, setPayingPenaltyId] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -71,12 +77,24 @@ export default function PlanSettingsScreen() {
     setRanking(data);
   }, [rankingRepository]);
 
+  const fetchPenalties = useCallback(async (id: string) => {
+    setPenaltiesLoading(true);
+    try {
+      const data = await penaltyRepository.listByPlanId(id);
+      setPenalties(data);
+    } finally {
+      setPenaltiesLoading(false);
+    }
+  }, [penaltyRepository]);
+
   const fetchPlan = useCallback(async (showLoading = true) => {
     if (showLoading)
       setLoading(true);
 
     try {
       const storedPlanId = await Memory.get('planId') || '';
+      const storedUserId = await Memory.get('userId') || '';
+      setCurrentUserId(storedUserId);
       setPlanId(storedPlanId);
 
       if (!storedPlanId)
@@ -85,13 +103,14 @@ export default function PlanSettingsScreen() {
       const [dbPlan] = await Promise.all([
         planRepository.getById(storedPlanId),
         fetchRanking(storedPlanId),
+        fetchPenalties(storedPlanId),
       ]);
       setPlan(dbPlan);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [planRepository, fetchRanking]);
+  }, [planRepository, fetchRanking, fetchPenalties]);
 
   useEffect(() => {
     fetchPlan();
@@ -102,6 +121,30 @@ export default function PlanSettingsScreen() {
     setRefreshKey((k) => k + 1);
     fetchPlan(false);
   }, [fetchPlan]);
+
+  const isPlanOwner = plan?.ownerId === currentUserId;
+
+  const userNamesById = ranking?.items.reduce<Record<string, string>>((acc, item) => {
+    acc[item.userId] = item.userName;
+    return acc;
+  }, {}) ?? {};
+
+  const handlePayPenalty = async (penaltyId: string) => {
+    if (!planId || !currentUserId)
+      return;
+
+    setPayingPenaltyId(penaltyId);
+    try {
+      await penaltyRepository.pay(planId, penaltyId, currentUserId);
+      toastSuccessMessage('Pagamento confirmado');
+      await Promise.all([fetchRanking(planId), fetchPenalties(planId)]);
+      setRefreshKey((k) => k + 1);
+    } catch {
+      toastErrorMessage('Não foi possível confirmar o pagamento');
+    } finally {
+      setPayingPenaltyId(null);
+    }
+  };
 
   const copyInviteLink = () => {
     if (!planId)
@@ -233,6 +276,17 @@ export default function PlanSettingsScreen() {
               </Text>
             </View>
           </Card>
+
+          {isPlanOwner && (
+            <PenaltiesCard
+              penalties={penalties}
+              loading={penaltiesLoading}
+              userNamesById={userNamesById}
+              canConfirmPayment={true}
+              onPayPenalty={handlePayPenalty}
+              payingPenaltyId={payingPenaltyId}
+            />
+          )}
 
           <View
             className="flex overflow-hidden flex-row justify-center items-center w-full h-14 bg-white rounded-2xl shadow-md"

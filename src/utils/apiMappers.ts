@@ -1,3 +1,4 @@
+import { Penalty } from '@/types/penalty.type';
 import { Checkin, CheckinEnriched, CheckinReview, CheckinStatus, CreateCheckin } from '@/types/checkin.type';
 import { PlanRanking, PlanRankingWithCurrentUser, RankingItemEnriched } from '@/types/ranking.type';
 import { CreateHabit, Habit, HabitEnriched } from '@/types/habit.type';
@@ -14,7 +15,7 @@ import {
   UserWithPlans,
 } from '@/types/plan.type';
 import { CreateUser, PixKeyType, User } from '@/types/user.type';
-import { AllTypes, DateOnly, DateTime, getDateTime } from '@/src/utils/dateUtils';
+import { AllTypes, DateOnly, DateTime, getDateOnly, getDateTime, parseDateTime, isDateTime } from '@/src/utils/dateUtils';
 
 export type ApiHabit = {
   id: string;
@@ -116,16 +117,41 @@ export type ApiPlanRankingWithCurrentUser = ApiPlanRanking & {
   currentUser: ApiPlanRankingItem;
 };
 
-export type ApiUseDayOffResult = {
-  dayOff: {
-    id: string;
-    planId: string;
-    userId: string;
-    date: string;
-    createdAt: string;
-  };
-  daysOffAvailable: number;
+export type ApiPenalty = {
+  id: string;
+  planId: string;
+  userId: string;
+  date: string;
+  amount: number;
+  status: string;
+  reason: string;
+  createdAt: string;
+  paidAt?: string | null;
+  paymentMethod?: string | null;
+  externalPaymentId?: string | null;
+  confirmedByUserId?: string | null;
 };
+
+export function mapPenaltyFromApi(penalty: ApiPenalty): Penalty {
+  const dateOnly = isDateTime(penalty.date)
+    ? getDateOnly(penalty.date)
+    : penalty.date as DateOnly;
+
+  return {
+    id: penalty.id,
+    planId: penalty.planId,
+    userId: penalty.userId,
+    date: dateOnly,
+    amount: penalty.amount,
+    status: penalty.status as Penalty['status'],
+    reason: penalty.reason as Penalty['reason'],
+    createdAt: parseDateTime(penalty.createdAt),
+    paidAt: penalty.paidAt ? parseDateTime(penalty.paidAt) : undefined,
+    paymentMethod: penalty.paymentMethod as Penalty['paymentMethod'],
+    externalPaymentId: penalty.externalPaymentId ?? undefined,
+    confirmedByUserId: penalty.confirmedByUserId ?? undefined,
+  };
+}
 
 export function mapUserFromApi(user: ApiUser): User {
   return {

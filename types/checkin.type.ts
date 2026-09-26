@@ -1,4 +1,4 @@
-import { parseDateOnly, parseDateTime } from "@/src/utils/dateUtils";
+import { parseDateTime } from "@/src/utils/dateUtils";
 import { zodEnumWithValidation, zodExtractWithValidation } from "@/src/utils/zodUtils";
 import { z } from "zod";
 import { baseResourceSchema } from "./common.type";
@@ -50,39 +50,6 @@ export const createCheckinSchema = checkinSchema.omit({
 });
 export type CreateCheckin = z.infer<typeof createCheckinSchema>;
 
-const dayOffSchema = baseResourceSchema.extend({
-  kind: z.literal('dayoff'),
-  planId: z.guid({ error: "ID do plano é obrigatório" }),
-  userId: z.guid({ error: "ID do usuário é obrigatório" }),
-  date: z.string().transform((str) => parseDateOnly(str)),
-});
-export type DayOff = z.infer<typeof dayOffSchema>;
-
-
-export type DayOffEnriched = DayOff & {
-  planName: string;
-  userName: string;
-};
-
-export const createDayOffSchema = dayOffSchema.omit({
-  kind: true,
-  id: true,
-  createdAt: true,
-});
-export type CreateDayOff = z.infer<typeof createDayOffSchema>;
-
-const checkinOrDayOffSchema = z.discriminatedUnion('kind', [
-  checkinSchema,
-  dayOffSchema,
-]);
-export type CheckinOrDayOff = z.infer<typeof checkinOrDayOffSchema>;
-
-export type CheckinOrDayOffEnriched = CheckinEnriched | DayOffEnriched;
-
-export function isCheckin(checkinOrDayOff: CheckinOrDayOff): checkinOrDayOff is Checkin {
-  return checkinOrDayOff.kind === 'checkin';
-}
-
-export function isDayOff(checkinOrDayOff: CheckinOrDayOff): checkinOrDayOff is DayOff {
-  return checkinOrDayOff.kind === 'dayoff';
+export function isCheckin(checkin: Checkin): checkin is Checkin {
+  return checkin.kind === 'checkin';
 }

@@ -2,16 +2,13 @@ import { getColor } from '@/types/color.type'
 import React from 'react'
 import { Text, View } from 'react-native'
 import { formatInteger } from '../utils/numberUtils'
-import { Button } from './button'
 import Icon from './icon'
 
 type DaysOffCardProps = {
-    onUseDayOff?: () => void;
     daysOffAvailable: number;
 }
 
 export default function DaysOffCard({
-    onUseDayOff,
     daysOffAvailable
 }: DaysOffCardProps) {
     const anyDayOffIsAvailable = daysOffAvailable > 0;
@@ -20,7 +17,9 @@ export default function DaysOffCard({
 
     const baseColor = anyDayOffIsAvailable ? 'success' : 'secondary';
     const title = anyDayOffIsAvailable ? singularOrPlularTitle : 'Nenhuma folga disponível';
-    const complement = anyDayOffIsAvailable ? 'Use com sabedoria!' : 'Mantenha o foco e aguente firme!';
+    const complement = anyDayOffIsAvailable
+        ? 'Folgas são usadas automaticamente em dias sem check-in.'
+        : 'Mantenha o foco e aguente firme!';
 
     return (
         <View
@@ -34,12 +33,6 @@ export default function DaysOffCard({
                 </Text>
                 <Text style={{ color: getColor(baseColor) }} className="text-sm">{complement}</Text>
             </View>
-            {anyDayOffIsAvailable
-                && <Button 
-                    color="success" 
-                    textSize='text-base' 
-                    className="h-auto px-4 py-2 rounded-xl"
-                    action={onUseDayOff}>Usar</Button>}
         </View>
     )
 }

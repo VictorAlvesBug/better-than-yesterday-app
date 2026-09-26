@@ -288,7 +288,7 @@ export function getDateTimeToFront(param: AllTypes = new Date()) {
 export type DateTime = string & { __brand: 'DateTime' };
 
 export function isDateTime(dateTime: string): dateTime is DateTime {
-  const pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/g;
+  const pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z?$/g;
   return pattern.test(dateTime);
 }
 
