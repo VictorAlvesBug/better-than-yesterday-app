@@ -170,7 +170,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
   return (
     <View
-      style={[StyleSheet.absoluteFillObject, { zIndex: 30 }]}
+      style={[StyleSheet.absoluteFill, { zIndex: 30 }]}
       className="flex flex-row"
       pointerEvents={isOpen ? 'auto' : 'none'}
     >

@@ -1,7 +1,10 @@
 
 import { getColor } from '@/types/color.type';
 import { LinearGradient, LinearGradientPoint } from 'expo-linear-gradient';
+import { cssInterop } from 'nativewind';
 import { View } from 'react-native';
+
+cssInterop(LinearGradient, { className: 'style' });
 
 type GradientFlowDirection =
   | 'left-to-right'

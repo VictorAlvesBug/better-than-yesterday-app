@@ -20,6 +20,10 @@ export default function HomeScreen() {
     const planRepository = useMemo(() => createPlanRepository(), []);
 
     useEffect(() => {
+        // #region agent log
+        fetch('http://127.0.0.1:7592/ingest/3ca86e35-fb03-43a9-869d-50a6c2ae00ee',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f797c0'},body:JSON.stringify({sessionId:'f797c0',runId:'pre',hypothesisId:'C',location:'home.tsx:effect',message:'home effect ran',data:{isSignedIn,hasAuthUser:Boolean(authUser),redirectionScreen},timestamp:Date.now()})}).catch(()=>{});
+        console.log('[debug-f797c0]', JSON.stringify({hypothesisId:'C',message:'home effect ran',isSignedIn,hasAuthUser:Boolean(authUser),redirectionScreen}));
+        // #endregion
         if (!isSignedIn || !authUser)
             return;
 
@@ -58,10 +62,14 @@ export default function HomeScreen() {
 
     setTimeout(() => {
         setRedirectionScreen(prev => {
-            if (prev === 'loading')
-                return isSignedIn ? 'not-found' : 'login';
-
-            else return prev;
+            const next = prev === 'loading' ? (isSignedIn ? 'not-found' : 'login') : prev;
+            if (prev === 'loading') {
+                // #region agent log
+                fetch('http://127.0.0.1:7592/ingest/3ca86e35-fb03-43a9-869d-50a6c2ae00ee',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f797c0'},body:JSON.stringify({sessionId:'f797c0',runId:'pre',hypothesisId:'C',location:'home.tsx:timeout',message:'loading timeout chose screen',data:{isSignedIn,prev,next},timestamp:Date.now()})}).catch(()=>{});
+                console.log('[debug-f797c0]', JSON.stringify({hypothesisId:'C',message:'loading timeout chose screen',isSignedIn,prev,next}));
+                // #endregion
+            }
+            return next;
         });
     }, 2000)
 

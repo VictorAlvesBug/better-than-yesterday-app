@@ -46,7 +46,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
-      if (isSuccessResponse(response)) {
+      const success = isSuccessResponse(response);
+      const hasIdToken = success ? Boolean(response.data.idToken) : false;
+      const hasUser = success ? Boolean(response.data.user) : false;
+      // #region agent log
+      fetch('http://127.0.0.1:7592/ingest/3ca86e35-fb03-43a9-869d-50a6c2ae00ee',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f797c0'},body:JSON.stringify({sessionId:'f797c0',runId:'pre',hypothesisId:'A-B',location:'auth.tsx:signIn',message:'google sign-in returned',data:{success,type:response.type,hasIdToken,hasUser},timestamp:Date.now()})}).catch(()=>{});
+      console.log('[debug-f797c0]', JSON.stringify({hypothesisId:'A-B',message:'google sign-in returned',success,type:response.type,hasIdToken,hasUser}));
+      // #endregion
+      if (success) {
         const { idToken, user } = response.data;
         idToken && Memory.set("google_idToken", idToken);
         setAuthUser(user);
@@ -60,6 +67,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       setIsLoading(false);
     } catch (error) {
+      // #region agent log
+      const code = isErrorWithCode(error) ? error.code : null;
+      const message = error instanceof Error ? error.message : String(error);
+      fetch('http://127.0.0.1:7592/ingest/3ca86e35-fb03-43a9-869d-50a6c2ae00ee',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f797c0'},body:JSON.stringify({sessionId:'f797c0',runId:'post-fix',hypothesisId:'A',location:'auth.tsx:signIn:catch',message:'google sign-in threw',data:{code,message},timestamp:Date.now()})}).catch(()=>{});
+      console.log('[debug-f797c0]', JSON.stringify({runId:'post-fix',hypothesisId:'A',message:'google sign-in threw',code,errorMessage:message}));
+      // #endregion
       if (isErrorWithCode(error)) {
         switch (error.code) {
           case statusCodes.IN_PROGRESS:

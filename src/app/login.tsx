@@ -6,12 +6,22 @@ import { useAuth } from '../context/auth';
 import { formatIntegerCompact, formatMoneyCompact } from '../utils/numberUtils';
 
 export default function LoginScreen() {
-  const { isLoading, signIn } = useAuth();
+  const { errorMessage, isLoading, signIn } = useAuth();
+  const loggedLayout = React.useRef(false);
 
   return (
     <GradientView
       gradientFlowDirection="top-to-bottom"
       className="flex items-center justify-center flex-1"
+      onLayout={(event) => {
+        if (loggedLayout.current) return;
+        loggedLayout.current = true;
+        const { width, height } = event.nativeEvent.layout;
+        // #region agent log
+        fetch('http://127.0.0.1:7592/ingest/3ca86e35-fb03-43a9-869d-50a6c2ae00ee',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'f797c0'},body:JSON.stringify({sessionId:'f797c0',runId:'post-fix',hypothesisId:'D',location:'login.tsx:onLayout',message:'login root layout',data:{width,height},timestamp:Date.now()})}).catch(()=>{});
+        console.log('[debug-f797c0]', JSON.stringify({runId:'post-fix',hypothesisId:'D',message:'login root layout',width,height}));
+        // #endregion
+      }}
     >
       <View className="flex items-center justify-center flex-1 w-[90%] max-w-[450px]">
         <Image
@@ -46,6 +56,11 @@ export default function LoginScreen() {
             </Text>
           </View>
         </Pressable>
+        {errorMessage ? (
+          <Text className="px-8 mb-6 text-sm font-semibold text-center text-white">
+            {errorMessage}
+          </Text>
+        ) : null}
         <Text className="px-8 mb-12 text-xs font-thin text-center text-white">
           Ao continuar, você concorda com nossos Termos de Uso e Política de
           Privacidade.
