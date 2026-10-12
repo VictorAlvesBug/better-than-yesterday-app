@@ -1,3 +1,4 @@
+import { Href } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from '../components/button';
@@ -34,6 +35,7 @@ export default function ManagePlansScreen() {
             <Button action={() => navigation.push('/create-plan')}>Criar Novo Plano</Button>
             <Button action={() => setIsJoinModalOpen(true)}>Tenho um Link de Convidado</Button>
             <Button action={() => navigation.push('/public-plans')}>Planos Populares</Button>
+            <Button action={() => navigation.push('/my-plans' as Href)} type="outline">Meus planos</Button>
           </View>
         </ScrollView>
       </ScreenLayout>

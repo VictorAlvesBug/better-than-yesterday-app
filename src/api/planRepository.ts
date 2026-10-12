@@ -87,6 +87,14 @@ export default function createPlanRepository() {
         await backendApi.unblockPlanMember(unblockPlanMember.planId, unblockPlanMember.userId);
     };
 
+    const updatePeriod = async (planId: string, ownerId: string, startsAt: string, endsAt: string) => {
+        await backendApi.updatePlanPeriod(planId, { ownerId, startsAt, endsAt });
+    };
+
+    const cancel = async (planId: string) => {
+        await backendApi.cancelPlan(planId);
+    };
+
     return {
         list,
         getPlanWithMembersByPlanId,
@@ -99,5 +107,7 @@ export default function createPlanRepository() {
         leave,
         block,
         unblock,
+        updatePeriod,
+        cancel,
     }
 }

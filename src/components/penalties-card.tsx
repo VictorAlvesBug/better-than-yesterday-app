@@ -14,6 +14,7 @@ type PenaltiesCardProps = {
   canConfirmPayment?: boolean;
   onPayPenalty?: (penaltyId: string) => void;
   payingPenaltyId?: string | null;
+  onPayWithPix?: (penaltyId: string) => void;
 };
 
 export default function PenaltiesCard({
@@ -23,6 +24,7 @@ export default function PenaltiesCard({
   canConfirmPayment = false,
   onPayPenalty,
   payingPenaltyId = null,
+  onPayWithPix,
 }: PenaltiesCardProps) {
   const pendingPenalties = penalties.filter((p) => p.status === 'Pending');
 
@@ -77,11 +79,22 @@ export default function PenaltiesCard({
                 {isPaying ? '...' : 'Confirmar pagamento'}
               </Button>
             )}
+            {!canConfirmPayment && onPayWithPix && (
+              <Button
+                color="violet"
+                textSize="text-sm"
+                className="h-auto px-3 py-2 rounded-xl"
+                disabled={isPaying}
+                action={() => onPayWithPix(penalty.id)}
+              >
+                {isPaying ? '...' : 'Pagar com Pix'}
+              </Button>
+            )}
           </View>
         );
       })}
 
-      {!canConfirmPayment && (
+      {!canConfirmPayment && !onPayWithPix && (
         <Text style={{ color: getColor('gray-7') }} className="text-xs">
           Entre em contato com o dono do plano para confirmar o pagamento.
         </Text>

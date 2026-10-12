@@ -248,6 +248,9 @@ export const backendApi = {
   addCheckIn: (body: CreateCheckInPayload) =>
     postData<CreateCheckInPayload, ApiCheckIn>(`${API_URL}/CheckIns`, body),
 
+  replaceCheckIn: (checkInId: string, body: { userId: string; title: string; evidencePhotoUrl: string }) =>
+    putData<{ userId: string; title: string; evidencePhotoUrl: string }, ApiCheckIn>(`${API_URL}/CheckIns/${checkInId}`, body),
+
   reviewCheckIn: (checkInId: string, body: ReviewCheckInPayload) =>
     postData<ReviewCheckInPayload, ApiCheckIn>(`${API_URL}/CheckIns/${checkInId}/Reviews`, body),
 
@@ -280,5 +283,36 @@ export const backendApi = {
     postData<{ confirmedByUserId: string }, ApiPenalty>(
       `${API_URL}/Plans/${planId}/Penalties/${penaltyId}/Pay`,
       { confirmedByUserId }
+    ),
+
+  createPixCharge: (planId: string, penaltyId: string, userId: string) =>
+    postData<{ userId: string }, { externalId: string; copyAndPaste: string; amount: number }>(
+      `${API_URL}/Plans/${planId}/Penalties/${penaltyId}/Pix`,
+      { userId }
+    ),
+
+  updatePlanPeriod: (planId: string, body: { ownerId: string; startsAt: string; endsAt: string }) =>
+    putData<{ ownerId: string; startsAt: string; endsAt: string }, ApiPlan>(
+      `${API_URL}/Plans/${planId}/Period`,
+      body
+    ),
+
+  cancelPlan: (planId: string) =>
+    deleteData<ApiPlan>(`${API_URL}/Plans/${planId}`),
+
+  createCheckInReport: (body: { checkInId: string; reporterId: string; reason: string }) =>
+    postData<{ checkInId: string; reporterId: string; reason: string }, { id: string }>(
+      `${API_URL}/CheckInReports`,
+      body
+    ),
+
+  listCheckInReports: (planId: string, requesterId: string) =>
+    getListData<{ id: string; checkInId: string; reporterId: string; targetUserId: string; reason: string; createdAt: string }>(
+      `${API_URL}/CheckInReports${buildQueryString({ planId, requesterId })}`
+    ),
+
+  generateNotifications: (userId: string) =>
+    postData<undefined, { id: string; planId: string; kind: string; message: string; createdAt: string }[]>(
+      `${API_URL}/Users/${userId}/Notifications`
     ),
 };

@@ -18,5 +18,9 @@ export default function createPenaltyRepository() {
     return mapPenaltyFromApi(penalty);
   };
 
-  return { listByPlanId, listByPlanMember, pay };
+  const createPixCharge = async (planId: string, penaltyId: string, userId: string) => {
+    return backendApi.createPixCharge(planId, penaltyId, userId);
+  };
+
+  return { listByPlanId, listByPlanMember, pay, createPixCharge };
 }

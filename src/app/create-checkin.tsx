@@ -1,6 +1,7 @@
 import { CreateCheckin, createCheckinSchema } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,32 +15,35 @@ import createPlanRepository from '../api/planRepository';
 import createS3Repository from '../api/s3Repository';
 import { Button } from '../components/button';
 import Card from '../components/card';
-import { DateInput } from '../components/date-input';
 import GradientView from '../components/gradient-view';
 import Input from '../components/input';
 import KeyboardableView from '../components/keyboardable-view';
 import Label from '../components/label';
+import NotFoundState from '../components/not-found-state';
 import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
 import useNavigation from '../hooks/useNavigation';
 import {
-  formatDateRelativeToToday,
   getDateComponents,
   getDateOnly,
+  getDateOnlyWithOffset,
   getDateTime,
   getDateToFront,
-  getDateToFrontWithOffset,
 } from '../utils/dateUtils';
 import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 import { generateId } from '../utils/stringUtils';
 
 export default function CreateCheckinScreen() {
   const navigation = useNavigation();
+  const params = useLocalSearchParams<{ checkInId?: string }>();
+  const replacingCheckInId = typeof params.checkInId === 'string' ? params.checkInId : '';
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [missing, setMissing] = useState<'checkin' | 'plan' | null>(null);
   const [localPhotoUri, setLocalPhotoUri] = useState('');
 
   const [selectedDate, setSelectedDate] = useState(getDateOnly());
+  const [planStartsAt, setPlanStartsAt] = useState('');
   const [checkin, setCheckin] = useState<Omit<CreateCheckin, 'date'>>({
     userId: '',
     planId: '',
@@ -85,6 +89,37 @@ export default function CreateCheckinScreen() {
       const userId = await Memory.get('userId') || '';
       const planId = await Memory.get('planId') || '';
 
+      if (replacingCheckInId) {
+        try {
+          const existing = await checkinRepository.getById(replacingCheckInId);
+          setCheckin({
+            userId,
+            planId: existing.planId,
+            evidencePhotoUrl: existing.evidencePhotoUrl,
+            title: existing.title,
+          });
+        } catch {
+          setMissing('checkin');
+        }
+        setLoading(false);
+        return;
+      }
+
+      let plan;
+      try {
+        plan = await planRepository.getById(planId);
+      } catch {
+        setMissing('plan');
+        setLoading(false);
+        return;
+      }
+
+      if (!plan) {
+        setMissing('plan');
+        setLoading(false);
+        return;
+      }
+
       const planMembers = await planRepository.getPlanMemberDetails(planId, userId);
 
       if (!planMembers) {
@@ -98,6 +133,8 @@ export default function CreateCheckinScreen() {
         navigation.back();
         return;
       }
+
+      setPlanStartsAt(plan.startsAt);
 
       setCheckin({
         ...checkin,
@@ -115,8 +152,30 @@ export default function CreateCheckinScreen() {
   if (loading)
     return <ActivityIndicator size="large" color={getColor('gray-6')} />;
 
+  if (missing === 'checkin') {
+    return (
+      <NotFoundState
+        title="Ops, check-in não encontrado"
+        description="Esse check-in não está mais disponível."
+        primaryLabel="Voltar"
+        onPrimary={() => navigation.back()}
+      />
+    );
+  }
+
+  if (missing === 'plan') {
+    return (
+      <NotFoundState
+        title="Ops, plano não encontrado"
+        description="Não foi possível abrir o plano deste check-in."
+        primaryLabel="Voltar"
+        onPrimary={() => navigation.back()}
+      />
+    );
+  }
+
   const createCheckin = async () => {
-    if (!localPhotoUri) {
+    if (!localPhotoUri && !checkin.evidencePhotoUrl) {
       toastErrorMessage('Tire uma foto antes de marcar o check-in');
       return;
     }
@@ -124,7 +183,6 @@ export default function CreateCheckinScreen() {
     setSubmitting(true);
 
     try {
-      const assetUri = localPhotoUri;
       const fileType = 'image/jpeg';
       const { year, month, day } = getDateComponents(selectedDate);
       const now = new Date();
@@ -137,11 +195,21 @@ export default function CreateCheckinScreen() {
         now.getSeconds(),
       ));
 
-      const evidencePhotoUrl = await s3Repository.uploadFile({
-        filePath: assetUri,
-        fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/${generateId()}.jpg`,
-        fileType,
-      });
+      let evidencePhotoUrl = checkin.evidencePhotoUrl;
+      if (localPhotoUri) {
+        evidencePhotoUrl = await s3Repository.uploadFile({
+          filePath: localPhotoUri,
+          fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/${generateId()}.jpg`,
+          fileType,
+        });
+      }
+
+      if (replacingCheckInId) {
+        await checkinRepository.replace(replacingCheckInId, checkin.userId, checkin.title, evidencePhotoUrl);
+        toastSuccessMessage('Check-in substituído com sucesso');
+        navigation.back();
+        return;
+      }
 
       const payload: CreateCheckin = { ...checkin, date: submitDate, evidencePhotoUrl };
 
@@ -153,25 +221,31 @@ export default function CreateCheckinScreen() {
       navigation.back();
     } catch (err) {
       console.error(err);
-      if (err instanceof Error) {
-        toastErrorMessage(err.message);
-      } else {
-        toastErrorMessage('Erro ao criar check-in');
-      }
+      const fallback = replacingCheckInId
+        ? 'Não foi possível substituir o check-in'
+        : 'Erro ao criar check-in';
+      toastErrorMessage(err instanceof Error && err.message ? err.message : fallback);
     } finally {
       setSubmitting(false);
     }
   };
 
+  const today = getDateOnly();
+  const yesterday = getDateOnlyWithOffset(-1);
+  const dateOptions = [
+    { label: 'Hoje', date: today, disabled: false },
+    { label: 'Ontem', date: yesterday, disabled: planStartsAt !== '' && yesterday < planStartsAt },
+  ];
+
   return (
-    <ScreenLayout header={<ScreenHeader title="Marcar Check-in" />}>
+    <ScreenLayout header={<ScreenHeader title={replacingCheckInId ? 'Substituir check-in' : 'Marcar Check-in'} />}>
       <KeyboardableView>
         <View className="flex-1 w-full gap-6 px-4 py-3" style={{ backgroundColor: getColor('gray-e') }}>
           <Card className="relative flex flex-row items-center justify-center w-full">
             <View className="flex flex-col items-start justify-center w-full">
-              {localPhotoUri ? (
+              {localPhotoUri || checkin.evidencePhotoUrl ? (
                 <><Image
-                  source={{ uri: localPhotoUri }}
+                  source={{ uri: localPhotoUri || checkin.evidencePhotoUrl }}
                   style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 16 }}
                 />
                   <Button action={handleOpenCamera} className="absolute right-7 bottom-7">
@@ -198,22 +272,36 @@ export default function CreateCheckinScreen() {
               onChange={(value) => setCheckin({ ...checkin, title: value })}
             />
           </Card>
-          <Card className="flex flex-col items-start justify-center w-full gap-1">
+          {!replacingCheckInId && (
+          <Card className="flex flex-col items-start justify-center w-full gap-3">
             <Label>Data</Label>
-            <DateInput
-              value={getDateToFront(selectedDate)}
-              setValue={(value) => setSelectedDate(getDateOnly(value))}
-              minValue={getDateToFrontWithOffset(-1)}
-              maxValue={getDateToFront()}
-              formatValueDescription={formatDateRelativeToToday}
-            />
+            <View className="flex flex-row w-full gap-3">
+              {dateOptions.map((option) => (
+                <View key={option.label} className="flex flex-col flex-1 gap-1">
+                  <Button
+                    color={selectedDate === option.date
+                      ? { text: 'black', border: 'violet', background: 'white' }
+                      : { text: 'gray-3', border: 'gray-d', background: 'white' }}
+                    className="border-2"
+                    disabled={option.disabled}
+                    action={() => setSelectedDate(option.date)}
+                  >
+                    {option.label}
+                  </Button>
+                  <Text style={{ color: getColor('gray-7') }} className="text-sm text-center">
+                    {getDateToFront(option.date)}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </Card>
+          )}
           <Button className="p-0 overflow-hidden" action={createCheckin} disabled={submitting}>
             <GradientView className="flex flex-col items-center justify-center w-full h-full py-4">
               {submitting ? (
                 <ActivityIndicator color={getColor('white')} />
               ) : (
-                <Text style={{ color: getColor('white') }} className="text-lg font-bold">Marcar</Text>
+                <Text style={{ color: getColor('white') }} className="text-lg font-bold">{replacingCheckInId ? 'Substituir' : 'Marcar'}</Text>
               )}
             </GradientView>
           </Button>

@@ -32,6 +32,8 @@ const checkinSchema = baseResourceSchema.extend({
   evidencePhotoUrl: z.string().min(3, { error: "Foto é obrigatória" }),
   status: checkinStatusSchema,
   reviews: z.array(checkinReviewSchema),
+  reviewClosesAt: z.string().optional(),
+  isReplacement: z.boolean().optional().default(false),
 });
 export type Checkin = z.infer<typeof checkinSchema>;
 
@@ -46,7 +48,9 @@ export const createCheckinSchema = checkinSchema.omit({
   kind: true,
   createdAt: true,
   status: true,
-  reviews: true
+  reviews: true,
+  reviewClosesAt: true,
+  isReplacement: true,
 });
 export type CreateCheckin = z.infer<typeof createCheckinSchema>;
 

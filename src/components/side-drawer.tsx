@@ -2,6 +2,7 @@ import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import { User } from '@/types/user.type';
+import { Href } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -299,6 +300,20 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
             </View>
             <Text style={{ color: getColor('gray-3') }} className="font-semibold">
               Gerenciar Planos
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              navigation.push('/notifications' as Href);
+              onClose();
+            }}
+            className="flex flex-row items-center justify-start gap-3 px-8 py-3"
+          >
+            <View className="flex flex-row items-center justify-center w-5">
+              <Icon name="notifications-outline" size={16} color="gray-3" />
+            </View>
+            <Text style={{ color: getColor('gray-3') }} className="font-semibold">
+              Avisos
             </Text>
           </Pressable>
           <Pressable

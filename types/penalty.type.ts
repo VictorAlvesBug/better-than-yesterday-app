@@ -3,7 +3,7 @@ import { zodEnumWithValidation } from '@/src/utils/zodUtils';
 import { z } from 'zod';
 import { baseResourceSchema } from './common.type';
 
-const penaltyStatusSchema = zodEnumWithValidation(['Pending', 'Paid'] as const, 'Status da multa');
+const penaltyStatusSchema = zodEnumWithValidation(['Pending', 'Paid', 'Forgiven'] as const, 'Status da multa');
 export type PenaltyStatus = z.infer<typeof penaltyStatusSchema>;
 
 const penaltyReasonSchema = zodEnumWithValidation(['MissedCheckIn'] as const, 'Motivo da multa');

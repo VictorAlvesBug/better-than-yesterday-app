@@ -66,12 +66,28 @@ export default function createCheckinRepository() {
         return mapCheckInEnrichedFromApi(checkinUpdated);
     };
 
+    const replace = async (checkInId: string, userId: string, title: string, evidencePhotoUrl: string): Promise<CheckinEnriched> => {
+        const checkinUpdated = await backendApi.replaceCheckIn(checkInId, { userId, title, evidencePhotoUrl });
+        return mapCheckInEnrichedFromApi(checkinUpdated);
+    };
+
+    const report = async (checkInId: string, reporterId: string, reason: string) => {
+        await backendApi.createCheckInReport({ checkInId, reporterId, reason });
+    };
+
+    const listReports = async (planId: string, requesterId: string) => {
+        return backendApi.listCheckInReports(planId, requesterId);
+    };
+
     return {
         list,
         get,
         getById,
         create,
+        replace,
         saveReview,
-        removeReview
+        removeReview,
+        report,
+        listReports,
     }
 }

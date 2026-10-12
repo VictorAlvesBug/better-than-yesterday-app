@@ -187,6 +187,7 @@ export default function PlanTrackerContent({
 }
 
 function NotStartedPlanView({ plan }: { plan: PlanEnriched }) {
+  const startHasArrived = plan.startsAt <= getDateOnly();
   return (
     <Card className="flex flex-col gap-1 justify-center items-start w-full">
       <Text style={{ color: getColor('black') }} className="text-lg font-bold">
@@ -195,6 +196,11 @@ function NotStartedPlanView({ plan }: { plan: PlanEnriched }) {
       <Text style={{ color: getColor('gray-3') }} className="text-base">
         O desafio começa {formatRelativeDateOnly(plan.startsAt).toLowerCase()} ({getDateToFront(plan.startsAt)})
       </Text>
+      {startHasArrived && (
+        <Text style={{ color: getColor('dark-orange') }} className="text-sm">
+          O plano precisa de pelo menos dois membros para começar. O dono pode adiar ou cancelar em Meus planos.
+        </Text>
+      )}
     </Card>
   );
 }
@@ -214,6 +220,8 @@ function RunningPlanView({
   isMemberBlocked: boolean;
   onUpdateCheckIn: (checkin: CheckinEnriched) => void;
 }) {
+  const [pixCode, setPixCode] = useState<string | null>(null);
+  const { penalty: penaltyRepository } = useRepositories();
   const currentUser = ranking?.currentUser;
   const daysSinceStart = getDifferenceInDays(new Date(), plan.startsAt);
   const totalDays = getDifferenceInDays(plan.startsAt, plan.endsAt);
@@ -323,7 +331,20 @@ function RunningPlanView({
       <DaysOffCard daysOffAvailable={daysOffAvailable} />
 
       {(isMemberBlocked || memberPenalties.some((p) => p.status === 'Pending')) && (
-        <PenaltiesCard penalties={memberPenalties} />
+        <PenaltiesCard
+          penalties={memberPenalties}
+          onPayWithPix={async (penaltyId) => {
+            const userId = await Memory.get('userId') || '';
+            const charge = await penaltyRepository.createPixCharge(plan.id, penaltyId, userId);
+            setPixCode(charge.copyAndPaste);
+          }}
+        />
+      )}
+      {pixCode && (
+        <Card className="w-full gap-2">
+          <Text style={{ color: getColor('black') }} className="text-sm font-semibold">Pix copia e cola</Text>
+          <Text style={{ color: getColor('gray-3') }} className="text-xs">{pixCode}</Text>
+        </Card>
       )}
 
       <View className="mt-2 -mb-5">

@@ -55,6 +55,7 @@ export type ApiReview = {
   reviewerId: string;
   status: string;
   date: string;
+  enable?: boolean;
 };
 
 export type ApiCheckIn = {
@@ -71,6 +72,8 @@ export type ApiCheckIn = {
   status: string;
   reviews: ApiReview[];
   createdAt: string;
+  reviewClosesAt?: string;
+  isReplacement?: boolean;
 };
 
 export type ApiPlanMemberDetails = {
@@ -196,11 +199,15 @@ export function mapCheckInFromApi(checkIn: ApiCheckIn): Checkin {
     title: checkIn.title,
     evidencePhotoUrl: checkIn.evidencePhotoUrl?.trim() ?? '',
     status: checkIn.status as CheckinStatus,
-    reviews: checkIn.reviews.map((review) => ({
+    reviews: checkIn.reviews
+      .filter((review) => review.enable !== false)
+      .map((review) => ({
       reviewerId: review.reviewerId,
       status: review.status as CheckinReview['status'],
     })),
     createdAt: checkIn.createdAt as DateTime,
+    reviewClosesAt: checkIn.reviewClosesAt,
+    isReplacement: checkIn.isReplacement ?? false,
   };
 }
 

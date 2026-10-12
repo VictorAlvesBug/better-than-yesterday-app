@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import createCheckinRepository from '../api/checkinRepository';
+import createNotificationRepository from '../api/notificationRepository';
 import createPenaltyRepository from '../api/penaltyRepository';
 import createPlanRepository from '../api/planRepository';
 import createRankingRepository from '../api/rankingRepository';
@@ -13,6 +14,7 @@ export function useRepositories() {
       ranking: createRankingRepository(),
       penalty: createPenaltyRepository(),
       user: createUserRepository(),
+      notification: createNotificationRepository(),
     }),
     []
   );

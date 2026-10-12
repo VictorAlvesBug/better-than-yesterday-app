@@ -1,7 +1,7 @@
 import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Modal, Pressable, Text, TextInput, View } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
 import { formatRelativeDateTime } from '../utils/dateUtils';
@@ -9,6 +9,23 @@ import { formatIntegerCompact } from '../utils/numberUtils';
 import EvidencePhoto from './evidence-photo';
 import Icon from './icon';
 import ProfilePhoto from './profile-photo';
+import useNavigation from '../hooks/useNavigation';
+import { Button } from './button';
+import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
+
+const REPLACE_LEAD_MS = 4 * 60 * 60 * 1000;
+
+function canReplaceCheckIn(
+  userId: string,
+  checkinUserId: string,
+  isReplacement: boolean,
+  reviewClosesAt: string | null | undefined,
+) {
+  if (userId !== checkinUserId || isReplacement || !reviewClosesAt)
+    return false;
+
+  return new Date(reviewClosesAt).getTime() - Date.now() >= REPLACE_LEAD_MS;
+}
 
 type CheckinWithReviewsCardProps = {
   checkin: CheckinEnriched;
@@ -16,10 +33,13 @@ type CheckinWithReviewsCardProps = {
 }
 
 export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWithReviewsCardProps) {
-  const { id, userName, userPhotoUrl, date, title, evidencePhotoUrl, status, reviews, userId: checkinUserId } = checkin;
+  const { id, userName, userPhotoUrl, date, title, evidencePhotoUrl, status, reviews, userId: checkinUserId, isReplacement, reviewClosesAt } = checkin;
+  const navigation = useNavigation();
 
   const [userId, setUserId] = useState('');
   const [userReview, setUserReview] = useState<CheckinReview | undefined>();
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('');
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -83,6 +103,61 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
       </View>
 
       <Text className="px-6 text-md">{title}</Text>
+
+      {userId && userId !== checkinUserId && (
+        <View className="px-6 mt-3">
+          <Button color="danger" type="outline" textSize="text-sm" className="h-10" action={() => setReportOpen(true)}>
+            Denunciar
+          </Button>
+        </View>
+      )}
+
+      <Modal visible={reportOpen} transparent animationType="fade" onRequestClose={() => setReportOpen(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', paddingHorizontal: 24 }}>
+          <View className="gap-3 p-4 bg-white rounded-3xl">
+            <Text style={{ color: getColor('black') }} className="text-lg font-bold">Denunciar check-in</Text>
+            <TextInput
+              value={reportReason}
+              onChangeText={setReportReason}
+              placeholder="Motivo"
+              className="px-3 py-2 border border-gray-300 rounded-xl"
+            />
+            <Button action={async () => {
+              const reason = reportReason.trim();
+              if (!reason) {
+                toastErrorMessage('Informe o motivo da denúncia');
+                return;
+              }
+
+              try {
+                await checkinRepository.report(id, userId, reason);
+                toastSuccessMessage('Denúncia registrada');
+                setReportOpen(false);
+                setReportReason('');
+              } catch {
+                toastErrorMessage('Não foi possível registrar a denúncia');
+              }
+            }}>
+              Enviar
+            </Button>
+            <Pressable onPress={() => setReportOpen(false)}>
+              <Text style={{ color: getColor('gray-3') }} className="text-center">Fechar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      {canReplaceCheckIn(userId, checkinUserId, isReplacement, reviewClosesAt) && (
+        <View className="px-6 mt-3">
+          <Button
+            color={{ text: 'primary', border: 'primary', background: 'light-primary' }}
+            textSize="text-sm"
+            className="h-10 border-2"
+            action={() => navigation.push(`/create-checkin?checkInId=${id}`)}
+          >
+            Substituir check-in
+          </Button>
+        </View>
+      )}
 
       {(userId !== checkinUserId && (reviews.length > 0 || status === 'Pending'))
         && <View style={{ backgroundColor: getColor("gray-d"), width: "90%", height: 0.5 }} className="mx-auto mt-3 mb-1"></View>}

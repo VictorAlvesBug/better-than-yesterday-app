@@ -5,6 +5,7 @@ import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit, HabitWithJustAdded } from '@/types/habit.type';
 import { CreatePlan, createPlanSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -31,6 +32,13 @@ import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '
 
 export default function CreatePlanScreen() {
   const navigation = useNavigation();
+  const params = useLocalSearchParams<{
+    habitId?: string;
+    description?: string;
+    type?: string;
+    daysOffPerWeek?: string;
+    penaltyValue?: string;
+  }>();
   const [loading, setLoading] = useState(true);
 
   const [daysPerWeek, setDaysPerWeek] = useState(5);
@@ -82,14 +90,20 @@ export default function CreatePlanScreen() {
 
         const userId = await Memory.get('userId') || '';
 
+        const duplicatedDaysOff = Number(params.daysOffPerWeek);
+        const commitment = Number.isFinite(duplicatedDaysOff) ? 7 - duplicatedDaysOff : daysPerWeek;
+        if (Number.isFinite(duplicatedDaysOff))
+          setDaysPerWeek(commitment);
+
         setPlan({
           ownerId: userId,
-          habitId: '',
+          habitId: params.habitId || '',
+          description: params.description || undefined,
           startsAt: getDateOnlyWithOffset(1),
           endsAt: getDateOnlyWithOffset(8),
-          daysOffPerWeek: daysPerWeek,
-          penaltyValue: 10,
-          type: 'Private',
+          daysOffPerWeek: Number.isFinite(duplicatedDaysOff) ? duplicatedDaysOff : daysPerWeek,
+          penaltyValue: params.penaltyValue ? parsePenaltyValue(String(params.penaltyValue)) : 10,
+          type: params.type === 'Public' ? 'Public' : 'Private',
         });
 
         setLoading(false);

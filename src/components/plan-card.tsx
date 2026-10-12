@@ -1,15 +1,14 @@
 import { ColorName, getColor } from '@/types/color.type'
 import { PlanToJoin } from '@/types/plan.type'
-import React, { useMemo } from 'react'
-import { Text, View } from 'react-native'
+import React, { useMemo, useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
 import createPlanRepository from '../api/planRepository'
 import useNavigation from '../hooks/useNavigation'
-import { formatDateRelativeToToday, getDateToFront, getDifferenceInDays } from '../utils/dateUtils'
-import { formatIntegerCompact, formatMoney } from '../utils/numberUtils'
-import { getAbbreviatedName } from '../utils/stringUtils'
-import AmountSelect from './amount-select'
+import { formatDateRelativeToToday } from '../utils/dateUtils'
 import { Button } from './button'
 import Icon from './icon'
+import PlanDetailsModal from './plan-details-modal'
+import InviteLinkModal from './invite-link-modal'
 
 type ButtonRole = 'join' | 'leave' | 'peek';
 
@@ -26,6 +25,8 @@ function PlanCard({
 }: PlanCardProps) {
     const planRepository = useMemo(() => createPlanRepository(), []);
     const navigation = useNavigation();
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const [inviteOpen, setInviteOpen] = useState(false);
 
     const role = getButtonRole(plan);
 
@@ -40,8 +41,12 @@ function PlanCard({
 
     const statusInfo = getStatusInfo(plan.status);
 
+    const dollarSigns = plan.penaltyValue >= 50 ? '$$$' : plan.penaltyValue >= 10 ? '$$' : '$';
+
     return (
         <View className="py-2 pb-4 mx-4">
+            <PlanDetailsModal plan={detailsOpen ? plan : null} onClose={() => setDetailsOpen(false)} />
+            <InviteLinkModal visible={inviteOpen} planId={plan.id} onClose={() => setInviteOpen(false)} />
             <View className="flex flex-row w-full overflow-hidden bg-white shadow-md rounded-2xl">
                 <View
                     style={{ backgroundColor: statusInfo.backgroundColor, width: 22 }}
@@ -64,7 +69,9 @@ function PlanCard({
                     </Text>
                 </View>
 
-                <View className="flex flex-col items-start justify-start flex-1 gap-2 py-2 bg-white">
+                <View className="flex flex-col flex-1 bg-white">
+                    <View className="flex flex-row items-start py-2">
+                    <Pressable onPress={() => setDetailsOpen(true)} className="flex flex-col items-start justify-start flex-1 gap-2">
                     {/* Header */}
                     <View className="flex flex-row items-center shrink-0 gap-3 px-4 py-1 w-full">
                         <Icon name="goal" size={16} />
@@ -76,138 +83,36 @@ function PlanCard({
                             >
                                 {plan.habitName}
                             </Text>
-
-                            {plan.description && (
-                                <Text
-                                    className="text-sm"
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
+                            <Text className="text-sm" numberOfLines={1}>
+                                {plan.ownerName}
+                            </Text>
+                            {plan.description ? (
+                                <Text className="text-sm" numberOfLines={2}>
                                     {plan.description}
                                 </Text>
-                            )}
+                            ) : null}
                         </View>
-
-                        {plan.ownerName && (
-                            <Text
-                                style={{
-                                    backgroundColor: getColor("light-violet"),
-                                    color: getColor("white")
-                                }}
-                                className="px-2 py-0.5 font-bold rounded-full text-xs"
-                                numberOfLines={1}
-                                ellipsizeMode="tail"
-                            >
-                                {getAbbreviatedName(plan.ownerName)}
-                            </Text>
-                        )}
                     </View>
 
-                    <View
-                        style={{ backgroundColor: getColor("gray-3"), width: "95%", height: 0.5 }}
-                        className="mx-auto"
-                    />
-
-                    {/* Content */}
-                    <View className="flex flex-col items-start justify-center gap-4 px-6">
-                        <View className="flex flex-row items-center justify-between w-full">
-                            <View className="flex flex-row items-center justify-center gap-3">
-                                <Icon name="calendar-clear-outline" size={14} />
-                                <View className="flex flex-col items-start justify-center">
-                                    <Text
-                                        className="text-base font-semibold"
-                                        numberOfLines={1}
-                                        ellipsizeMode="tail"
-                                    >
-                                        Início:
-                                    </Text>
-                                    <Text
-                                        className="text-sm"
-                                        numberOfLines={1}
-                                        ellipsizeMode="tail"
-                                    >
-                                        {`${getDateToFront(plan.startsAt)} (${formatDateRelativeToToday(plan.startsAt).toLocaleLowerCase()})`}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <View className="flex flex-col items-start justify-center">
-                                <Text
-                                    className="text-base font-semibold"
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
-                                    Duração:
-                                </Text>
-                                <Text
-                                    className="text-sm"
-                                    numberOfLines={1}
-                                    ellipsizeMode="tail"
-                                >
-                                    {getDifferenceInDays(plan.startsAt, plan.endsAt)} dias
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View className="flex flex-row items-center justify-between w-full">
-                            <View className="flex flex-row items-center justify-center gap-3">
-                                <Icon name="money" size={14} />
-                                <View className="flex flex-col items-start justify-center">
-                                    <Text
-                                        className="text-base font-semibold"
-                                        numberOfLines={1}
-                                        ellipsizeMode="tail"
-                                    >
-                                        Penalidade por falha:
-                                    </Text>
-                                    <Text
-                                        className="text-sm"
-                                        numberOfLines={1}
-                                        ellipsizeMode="tail"
-                                    >
-                                        {formatMoney(plan.penaltyValue)}
-                                    </Text>
-                                </View>
-                            </View>
-
-                            <View className="flex flex-row items-center justify-center gap-1">
-                                <Icon name="people" size={16} />
-                                <View className="flex flex-col items-start justify-center">
-                                    <Text
-                                        className="text-sm font-bold"
-                                        style={{ color: getColor('gray-3') }}
-                                        numberOfLines={1}
-                                        ellipsizeMode="tail"
-                                    >
-                                        {formatIntegerCompact(plan.memberCount)}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View className="flex flex-row">
-                            <AmountSelect
-                                value={7 - plan.daysOffPerWeek}
-                                minValue={1}
-                                maxValue={7}
-                                selectedIcon={{
-                                    type: 'octicons',
-                                    name: 'check-circle-fill',
-                                    color: 'violet',
-                                    size: 16
-                                }}
-                                nonSelectedIcon={{
-                                    type: 'font-awesome-6',
-                                    name: 'umbrella-beach',
-                                    size: 16
-                                }}
-                                className="flex-1"
-                            />
-                        </View>
+                    <View className="flex flex-row items-center justify-between w-full px-4">
+                        <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                            {formatDateRelativeToToday(plan.startsAt)}
+                        </Text>
+                        <Text style={{ color: getColor('violet') }} className="text-sm font-bold">
+                            {`${dollarSigns} · ${7 - plan.daysOffPerWeek}/7`}
+                        </Text>
+                    </View>
+                    </Pressable>
+                    <Pressable
+                        onPress={() => setInviteOpen(true)}
+                        className="items-center justify-center w-8 h-8 mt-2 mr-3"
+                    >
+                        <Icon name="share-social" size={20} color="violet" />
+                    </Pressable>
                     </View>
 
                     {/* Footer */}
-                    <View className="flex flex-row items-center justify-between w-full gap-2 px-4">
+                    <View className="flex flex-row items-center justify-between w-full gap-2 px-4 pb-2">
                         <Button
                             color={buttonInfo.baseColor}
                             action={buttonInfo.action}

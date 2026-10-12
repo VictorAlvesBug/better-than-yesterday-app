@@ -14,11 +14,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
 import Card from '../components/card';
 import CheckinsWithReviewsList from '../components/checkins-with-reviews-list';
 import GradientView from '../components/gradient-view';
 import Icon from '../components/icon';
+import InviteLinkModal from '../components/invite-link-modal';
 import Label from '../components/label';
 import Ranking from '../components/ranking';
 import PenaltiesCard from '../components/penalties-card';
@@ -37,14 +37,16 @@ import { getDateToFront } from '../utils/dateUtils';
 const ADMIN_FEE_RATE = 0.1;
 
 export default function PlanSettingsScreen() {
-  const { plan: planRepository, ranking: rankingRepository, penalty: penaltyRepository } = useRepositories();
+  const { plan: planRepository, ranking: rankingRepository, penalty: penaltyRepository, checkin: checkinRepository } = useRepositories();
   const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins'>('ranking');
   const [planId, setPlanId] = useState('');
   const [plan, setPlan] = useState<PlanEnriched | null>(null);
   const [ranking, setRanking] = useState<PlanRanking | null>(null);
   const [penalties, setPenalties] = useState<Penalty[]>([]);
   const [penaltiesLoading, setPenaltiesLoading] = useState(false);
+  const [reports, setReports] = useState<{ id: string; reason: string; targetUserId: string }[]>([]);
   const [payingPenaltyId, setPayingPenaltyId] = useState<string | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,9 +56,9 @@ export default function PlanSettingsScreen() {
   const [tabsWidth, setTabsWidth] = useState(0);
   const tabWidth = tabsWidth / 2 || 0;
 
-  const totalPenalties = ranking?.items.reduce((sum, item) => sum + item.penalty, 0) ?? 0;
-  const totalAdminFee = totalPenalties * ADMIN_FEE_RATE;
-  const rewardsPool = totalPenalties - totalAdminFee;
+  const paidTotal = penalties.filter((penalty) => penalty.status === 'Paid').reduce((sum, penalty) => sum + penalty.amount, 0);
+  const totalAdminFee = paidTotal * ADMIN_FEE_RATE;
+  const rewardsPool = paidTotal - totalAdminFee;
 
   useEffect(() => {
     Animated.spring(translateX, {
@@ -106,11 +108,15 @@ export default function PlanSettingsScreen() {
         fetchPenalties(storedPlanId),
       ]);
       setPlan(dbPlan);
+      if (dbPlan.ownerId === storedUserId) {
+        const foundReports = await checkinRepository.listReports(storedPlanId, storedUserId).catch(() => []);
+        setReports(foundReports);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [planRepository, fetchRanking, fetchPenalties]);
+  }, [planRepository, fetchRanking, fetchPenalties, checkinRepository]);
 
   useEffect(() => {
     fetchPlan();
@@ -146,14 +152,6 @@ export default function PlanSettingsScreen() {
     }
   };
 
-  const copyInviteLink = () => {
-    if (!planId)
-      return;
-
-    Clipboard.setString(`betterthanyesterdayapp://join/${planId}`);
-    toastSuccessMessage('Link de convite copiado!');
-  };
-
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center" style={{ backgroundColor: getColor('gray-e') }}>
@@ -177,7 +175,7 @@ export default function PlanSettingsScreen() {
           title={plan.description ?? plan.habitName}
           titleSize="text-lg"
           right={
-            <Pressable className="flex justify-center items-center w-20 h-20" onPress={copyInviteLink}>
+            <Pressable className="flex justify-center items-center w-20 h-20" onPress={() => setInviteOpen(true)}>
               <Icon name="share-social" size={24} color="white" />
             </Pressable>
           }
@@ -197,7 +195,7 @@ export default function PlanSettingsScreen() {
                   Total Multas
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatMoneyCompact(totalPenalties)}
+                  {formatMoneyCompact(paidTotal)}
                 </Text>
               </View>
               <View className="flex flex-col gap-1 justify-center items-center">
@@ -277,6 +275,17 @@ export default function PlanSettingsScreen() {
             </View>
           </Card>
 
+          {isPlanOwner && reports.length > 0 && (
+            <Card className="flex flex-col w-full gap-2">
+              <Label size="text-xs">Denúncias</Label>
+              {reports.map((report) => (
+                <Text key={report.id} style={{ color: getColor('black') }} className="text-sm">
+                  {report.reason}
+                </Text>
+              ))}
+            </Card>
+          )}
+
           {isPlanOwner && (
             <PenaltiesCard
               penalties={penalties}
@@ -343,6 +352,7 @@ export default function PlanSettingsScreen() {
           )}
         </View>
       </ScrollView>
+      <InviteLinkModal visible={inviteOpen} planId={plan.id} onClose={() => setInviteOpen(false)} />
     </ScreenLayout>
   );
 }
