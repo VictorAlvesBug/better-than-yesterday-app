@@ -3,21 +3,21 @@ import axios from 'axios';
 import {
   ApiCheckIn,
   ApiHabit,
-  ApiPlan,
-  ApiPlanMemberDetails,
-  ApiPlanRanking,
-  ApiPlanRankingWithCurrentUser,
-  ApiPlanWithMembers,
+  ApiChallenge,
+  ApiChallengeMemberDetails,
+  ApiChallengeRanking,
+  ApiChallengeRankingWithCurrentUser,
+  ApiChallengeWithMembers,
   ApiPenalty,
   ApiUser,
-  ApiUserWithPlans,
+  ApiUserWithChallenges,
   CreateCheckInPayload,
   CreateHabitPayload,
-  CreatePlanPayload,
+  CreateChallengePayload,
   CreateUserPayload,
   ListCheckInsFilter,
   ListHabitsFilter,
-  ListPlansFilter,
+  ListChallengesFilter,
   ListUsersFilter,
   PresignedUploadUrl,
   ReviewCheckInPayload,
@@ -25,7 +25,7 @@ import {
 } from './apiMappers';
 
 export type {
-  ListCheckInsFilter, ListHabitsFilter, ListPlansFilter, ListUsersFilter
+  ListCheckInsFilter, ListHabitsFilter, ListChallengesFilter, ListUsersFilter
 } from './apiMappers';
 
 export type ApiResponse<T> = {
@@ -199,47 +199,47 @@ export const backendApi = {
   createHabit: (body: CreateHabitPayload) =>
     postData<CreateHabitPayload, ApiHabit>(`${API_URL}/Habits`, body),
 
-  getPlanById: (id: string) =>
-    getData<ApiPlan>(`${API_URL}/Plans/${id}`),
+  getChallengeById: (id: string) =>
+    getData<ApiChallenge>(`${API_URL}/Challenges/${id}`),
 
-  listPlans: (filter?: ListPlansFilter) =>
-    getListData<ApiPlan>(`${API_URL}/Plans${buildQueryString({
+  listChallenges: (filter?: ListChallengesFilter) =>
+    getListData<ApiChallenge>(`${API_URL}/Challenges${buildQueryString({
       ownerId: filter?.ownerId,
       habitId: filter?.habitId,
       status: filter?.status,
       type: filter?.type,
     })}`),
 
-  createPlan: (body: CreatePlanPayload) =>
-    postData<CreatePlanPayload, ApiPlan>(`${API_URL}/Plans`, body),
+  createChallenge: (body: CreateChallengePayload) =>
+    postData<CreateChallengePayload, ApiChallenge>(`${API_URL}/Challenges`, body),
 
-  getPlanWithMembersByPlanId: (planId: string) =>
-    getData<ApiPlanWithMembers>(`${API_URL}/Plans/${planId}/Members`),
+  getChallengeWithMembersByChallengeId: (challengeId: string) =>
+    getData<ApiChallengeWithMembers>(`${API_URL}/Challenges/${challengeId}/Members`),
 
-  getUserWithPlansByUserId: (userId: string) =>
-    getData<ApiUserWithPlans>(`${API_URL}/Users/${userId}/Plans`),
+  getUserWithChallengesByUserId: (userId: string) =>
+    getData<ApiUserWithChallenges>(`${API_URL}/Users/${userId}/Challenges`),
 
-  getPlanMemberDetails: (planId: string, userId: string) =>
-    getData<ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}`),
+  getChallengeMemberDetails: (challengeId: string, userId: string) =>
+    getData<ApiChallengeMemberDetails>(`${API_URL}/Challenges/${challengeId}/Members/${userId}`),
 
-  joinPlan: (planId: string, userId: string) =>
-    postData<undefined, ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}`),
+  joinChallenge: (challengeId: string, userId: string) =>
+    postData<undefined, ApiChallengeMemberDetails>(`${API_URL}/Challenges/${challengeId}/Members/${userId}`),
 
-  leavePlan: (planId: string, userId: string) =>
-    deleteRequest(`${API_URL}/Plans/${planId}/Members/${userId}`),
+  leaveChallenge: (challengeId: string, userId: string) =>
+    deleteRequest(`${API_URL}/Challenges/${challengeId}/Members/${userId}`),
 
-  blockPlanMember: (planId: string, userId: string) =>
-    postData<undefined, ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}/Block`),
+  blockChallengeMember: (challengeId: string, userId: string) =>
+    postData<undefined, ApiChallengeMemberDetails>(`${API_URL}/Challenges/${challengeId}/Members/${userId}/Block`),
 
-  unblockPlanMember: (planId: string, userId: string) =>
-    deleteData<ApiPlanMemberDetails>(`${API_URL}/Plans/${planId}/Members/${userId}/Block`),
+  unblockChallengeMember: (challengeId: string, userId: string) =>
+    deleteData<ApiChallengeMemberDetails>(`${API_URL}/Challenges/${challengeId}/Members/${userId}/Block`),
 
   getCheckInById: (id: string) =>
     getData<ApiCheckIn>(`${API_URL}/CheckIns/${id}`),
 
   listCheckIns: (filter?: ListCheckInsFilter) =>
     getListData<ApiCheckIn>(`${API_URL}/CheckIns${buildQueryString({
-      planId: filter?.planId,
+      challengeId: filter?.challengeId,
       userId: filter?.userId,
       date: filter?.date,
       status: filter?.status,
@@ -263,42 +263,42 @@ export const backendApi = {
       { fileName, contentType }
     ),
 
-    getPlanRanking: (planId: string) =>
-      getData<ApiPlanRanking>(
-        `${API_URL}/Plans/${planId}/Ranking`
+    getChallengeRanking: (challengeId: string) =>
+      getData<ApiChallengeRanking>(
+        `${API_URL}/Challenges/${challengeId}/Ranking`
       ),
 
-    getPlanRankingWithCurrentUser: (planId: string, userId: string) =>
-      getData<ApiPlanRankingWithCurrentUser>(
-        `${API_URL}/Plans/${planId}/Ranking${buildQueryString({ userId })}`
+    getChallengeRankingWithCurrentUser: (challengeId: string, userId: string) =>
+      getData<ApiChallengeRankingWithCurrentUser>(
+        `${API_URL}/Challenges/${challengeId}/Ranking${buildQueryString({ userId })}`
       ),
 
-  listPenaltiesByPlanId: (planId: string) =>
-    getListData<ApiPenalty>(`${API_URL}/Plans/${planId}/Penalties`),
+  listPenaltiesByChallengeId: (challengeId: string) =>
+    getListData<ApiPenalty>(`${API_URL}/Challenges/${challengeId}/Penalties`),
 
-  listPenaltiesByPlanMember: (planId: string, userId: string) =>
-    getListData<ApiPenalty>(`${API_URL}/Plans/${planId}/Members/${userId}/Penalties`),
+  listPenaltiesByChallengeMember: (challengeId: string, userId: string) =>
+    getListData<ApiPenalty>(`${API_URL}/Challenges/${challengeId}/Members/${userId}/Penalties`),
 
-  payPenalty: (planId: string, penaltyId: string, confirmedByUserId: string) =>
+  payPenalty: (challengeId: string, penaltyId: string, confirmedByUserId: string) =>
     postData<{ confirmedByUserId: string }, ApiPenalty>(
-      `${API_URL}/Plans/${planId}/Penalties/${penaltyId}/Pay`,
+      `${API_URL}/Challenges/${challengeId}/Penalties/${penaltyId}/Pay`,
       { confirmedByUserId }
     ),
 
-  createPixCharge: (planId: string, penaltyId: string, userId: string) =>
+  createPixCharge: (challengeId: string, penaltyId: string, userId: string) =>
     postData<{ userId: string }, { externalId: string; copyAndPaste: string; amount: number }>(
-      `${API_URL}/Plans/${planId}/Penalties/${penaltyId}/Pix`,
+      `${API_URL}/Challenges/${challengeId}/Penalties/${penaltyId}/Pix`,
       { userId }
     ),
 
-  updatePlanPeriod: (planId: string, body: { ownerId: string; startsAt: string; endsAt: string }) =>
-    putData<{ ownerId: string; startsAt: string; endsAt: string }, ApiPlan>(
-      `${API_URL}/Plans/${planId}/Period`,
+  updateChallengePeriod: (challengeId: string, body: { ownerId: string; startsAt: string; endsAt: string }) =>
+    putData<{ ownerId: string; startsAt: string; endsAt: string }, ApiChallenge>(
+      `${API_URL}/Challenges/${challengeId}/Period`,
       body
     ),
 
-  cancelPlan: (planId: string) =>
-    deleteData<ApiPlan>(`${API_URL}/Plans/${planId}`),
+  cancelChallenge: (challengeId: string) =>
+    deleteData<ApiChallenge>(`${API_URL}/Challenges/${challengeId}`),
 
   createCheckInReport: (body: { checkInId: string; reporterId: string; reason: string }) =>
     postData<{ checkInId: string; reporterId: string; reason: string }, { id: string }>(
@@ -306,7 +306,7 @@ export const backendApi = {
       body
     ),
 
-  listCheckInReports: (planId: string, requesterId: string) =>
+  listCheckInReports: (challengeId: string, requesterId: string) =>
     getListData<{
       id: string;
       checkInId: string;
@@ -318,11 +318,11 @@ export const backendApi = {
       checkInTitle?: string;
       evidencePhotoUrl?: string;
     }>(
-      `${API_URL}/CheckInReports${buildQueryString({ planId, requesterId })}`
+      `${API_URL}/CheckInReports${buildQueryString({ challengeId, requesterId })}`
     ),
 
   generateNotifications: (userId: string) =>
-    postData<undefined, { id: string; planId: string; kind: string; message: string; createdAt: string; payload?: { type: string; planId: string; checkInId?: string; reviewerId?: string; authorId?: string; reporterId?: string; targetUserId?: string } }[]>(
+    postData<undefined, { id: string; challengeId: string; kind: string; message: string; createdAt: string; payload?: { type: string; challengeId: string; checkInId?: string; reviewerId?: string; authorId?: string; reporterId?: string; targetUserId?: string } }[]>(
       `${API_URL}/Users/${userId}/Notifications`
     ),
 };

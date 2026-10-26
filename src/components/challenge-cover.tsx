@@ -1,13 +1,13 @@
 import React from 'react';
 import { Image, ImageStyle, StyleProp } from 'react-native';
 
-type PlanCoverProps = {
+type ChallengeCoverProps = {
   uri?: string;
   className?: string;
   style?: StyleProp<ImageStyle>;
 };
 
-export default function PlanCover({ uri, className, style }: PlanCoverProps) {
+export default function ChallengeCover({ uri, className, style }: ChallengeCoverProps) {
   if (!uri)
     return null;
 

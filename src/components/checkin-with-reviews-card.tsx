@@ -126,17 +126,17 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
             <Button action={async () => {
               const reason = reportReason.trim();
               if (!reason) {
-                toastErrorMessage('Informe o motivo da denúncia');
+                toastErrorMessage('Conta o motivo da denúncia');
                 return;
               }
 
               try {
                 await checkinRepository.report(id, userId, reason);
-                toastSuccessMessage('Denúncia registrada');
+                toastSuccessMessage('Denúncia na mesa. O dono já fica sabendo');
                 setReportOpen(false);
                 setReportReason('');
               } catch {
-                toastErrorMessage('Não foi possível registrar a denúncia');
+                toastErrorMessage('A denúncia não entrou. Tenta de novo.');
               }
             }}>
               Enviar
@@ -151,7 +151,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
         <View className="gap-2 px-6 mt-3">
           {reviews.filter((review) => review.status === 'Rejected').length > Math.floor(reviews.length / 2) && (
             <Text style={{ color: getColor('dark-orange') }} className="text-sm">
-              Este check-in não está sendo bem aceito. Recomendamos substituí-lo.
+              Este check-in está perdendo a votação. Vale trocar.
             </Text>
           )}
           <Button
@@ -160,7 +160,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
             className="h-10 border-2"
             action={() => navigation.push(`/create-checkin?checkInId=${id}`)}
           >
-            Substituir check-in
+            Trocar check-in
           </Button>
         </View>
       )}

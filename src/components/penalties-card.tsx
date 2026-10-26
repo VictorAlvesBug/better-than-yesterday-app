@@ -76,7 +76,7 @@ export default function PenaltiesCard({
                 disabled={isPaying}
                 action={() => onPayPenalty(penalty.id)}
               >
-                {isPaying ? '...' : 'Confirmar pagamento'}
+                {isPaying ? '...' : 'Pagamento recebido'}
               </Button>
             )}
             {!canConfirmPayment && onPayWithPix && (
@@ -96,7 +96,7 @@ export default function PenaltiesCard({
 
       {!canConfirmPayment && !onPayWithPix && (
         <Text style={{ color: getColor('gray-7') }} className="text-xs">
-          Entre em contato com o dono do plano para confirmar o pagamento.
+          Fala com o dono do desafio para confirmar o pagamento.
         </Text>
       )}
     </View>

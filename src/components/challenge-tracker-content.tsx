@@ -3,8 +3,8 @@ import Card from '@/src/components/card';
 import { CheckinEnriched } from '@/types/checkin.type';
 import { Penalty } from '@/types/penalty.type';
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
-import { PlanRankingWithCurrentUser } from '@/types/ranking.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
+import { ChallengeRankingWithCurrentUser } from '@/types/ranking.type';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Image, Pressable, RefreshControl, Text, View } from 'react-native';
 import { Button } from './button';
@@ -13,7 +13,7 @@ import DaysOffCard from './days-off-card';
 import PenaltiesCard from './penalties-card';
 import GradientView from './gradient-view';
 import Icon from './icon';
-import PlanTrackerHeader from './plan-tracker-header';
+import ChallengeTrackerHeader from './challenge-tracker-header';
 import Ranking from './ranking';
 import ScreenLayout from './screen-layout';
 import SideDrawer from './side-drawer';
@@ -29,23 +29,23 @@ import {
   getDifferenceInDays,
 } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
-import { duplicatePlanPath } from '../utils/planUtils';
+import { duplicateChallengePath } from '../utils/challengeUtils';
 
-type PlanTrackerContentProps = {
-  plan: PlanEnriched;
+type ChallengeTrackerContentProps = {
+  challenge: ChallengeEnriched;
   refreshing: boolean;
   onRefresh: () => void;
   refreshKey: number;
 };
 
-export default function PlanTrackerContent({
-  plan,
+export default function ChallengeTrackerContent({
+  challenge,
   refreshing,
   onRefresh,
   refreshKey,
-}: PlanTrackerContentProps) {
+}: ChallengeTrackerContentProps) {
   const {
-    plan: planRepository,
+    challenge: challengeRepository,
     checkin: checkinRepository,
     ranking: rankingRepository,
     penalty: penaltyRepository,
@@ -53,7 +53,7 @@ export default function PlanTrackerContent({
   const navigation = useNavigation();
 
   const [checkins, setCheckins] = useState<CheckinEnriched[]>([]);
-  const [ranking, setRanking] = useState<PlanRankingWithCurrentUser | null>(null);
+  const [ranking, setRanking] = useState<ChallengeRankingWithCurrentUser | null>(null);
   const [memberPenalties, setMemberPenalties] = useState<Penalty[]>([]);
   const [isMemberBlocked, setIsMemberBlocked] = useState(false);
   const [currentUserId, setCurrentUserId] = useState('');
@@ -65,9 +65,9 @@ export default function PlanTrackerContent({
     const userId = (await Memory.get('userId')) || '';
     setCurrentUserId(userId);
 
-    if (plan.status === 'Running') {
-      const planCheckins = await checkinRepository.list({ planId: plan.id });
-      setCheckins(planCheckins.sort((a, b) => b.date.localeCompare(a.date)));
+    if (challenge.status === 'Running') {
+      const challengeCheckins = await checkinRepository.list({ challengeId: challenge.id });
+      setCheckins(challengeCheckins.sort((a, b) => b.date.localeCompare(a.date)));
 
       if (!userId) {
         setRanking(null);
@@ -76,12 +76,12 @@ export default function PlanTrackerContent({
         return;
       }
 
-      const planRanking = await rankingRepository.getByPlanIdAndUserId(plan.id, userId);
-      setRanking(planRanking);
+      const challengeRanking = await rankingRepository.getByChallengeIdAndUserId(challenge.id, userId);
+      setRanking(challengeRanking);
 
       let memberDetails;
       try {
-        memberDetails = await planRepository.getPlanMemberDetails(plan.id, userId);
+        memberDetails = await challengeRepository.getChallengeMemberDetails(challenge.id, userId);
       } catch {
         setIsViewer(true);
         setIsMemberBlocked(false);
@@ -92,8 +92,8 @@ export default function PlanTrackerContent({
       setIsViewer(false);
       setIsMemberBlocked(memberDetails.status === 'Blocked');
 
-      if (memberDetails.status === 'Blocked' || planRanking.currentUser.penalty > 0) {
-        const penalties = await penaltyRepository.listByPlanMember(plan.id, userId);
+      if (memberDetails.status === 'Blocked' || challengeRanking.currentUser.penalty > 0) {
+        const penalties = await penaltyRepository.listByChallengeMember(challenge.id, userId);
         setMemberPenalties(penalties);
       } else {
         setMemberPenalties([]);
@@ -106,11 +106,11 @@ export default function PlanTrackerContent({
     setMemberPenalties([]);
     setIsMemberBlocked(false);
   }, [
-    plan.id,
-    plan.status,
+    challenge.id,
+    challenge.status,
     checkinRepository,
     rankingRepository,
-    planRepository,
+    challengeRepository,
     penaltyRepository,
   ]);
 
@@ -126,10 +126,10 @@ export default function PlanTrackerContent({
     );
   };
 
-  const isRunning = plan.status === 'Running';
+  const isRunning = challenge.status === 'Running';
   const today = getDateOnly();
   const yesterday = getDateOnlyWithOffset(-1);
-  const yesterdayAllowed = yesterday >= plan.startsAt;
+  const yesterdayAllowed = yesterday >= challenge.startsAt;
   const ownCheckins = checkins.filter((checkin) => checkin.userId === currentUserId);
   const hasToday = ownCheckins.some((checkin) => getDateOnly(checkin.date) === today);
   const hasYesterday = ownCheckins.some((checkin) => getDateOnly(checkin.date) === yesterday);
@@ -140,11 +140,11 @@ export default function PlanTrackerContent({
     <View className="flex-1">
       <ScreenLayout
         header={
-          <PlanTrackerHeader
-            plan={plan}
+          <ChallengeTrackerHeader
+            challenge={challenge}
             scrollY={scrollY}
             setIsDrawerOpen={setIsDrawerOpen}
-            onOpenSettings={() => navigation.push('/plan-settings')}
+            onOpenSettings={() => navigation.push('/challenge-settings')}
           />
         }
       >
@@ -166,14 +166,14 @@ export default function PlanTrackerContent({
           }
         >
           <View className="flex flex-col gap-5 justify-center items-start px-4 mt-4">
-            {plan.coverPhotoUrl ? (
-              <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: '100%', height: 160, borderRadius: 16 }} />
+            {challenge.coverPhotoUrl ? (
+              <Image source={{ uri: challenge.coverPhotoUrl }} style={{ width: '100%', height: 160, borderRadius: 16 }} />
             ) : null}
-            <Button action={() => navigation.push(duplicatePlanPath(plan))} type="outline">Duplicar</Button>
-            {plan.status === 'NotStarted' && <NotStartedPlanView plan={plan} />}
-            {plan.status === 'Running' && (
-              <RunningPlanView
-                plan={plan}
+            <Button action={() => navigation.push(duplicateChallengePath(challenge))} type="outline">Repetir desafio</Button>
+            {challenge.status === 'NotStarted' && <NotStartedChallengeView challenge={challenge} />}
+            {challenge.status === 'Running' && (
+              <RunningChallengeView
+                challenge={challenge}
                 ranking={ranking}
                 checkins={checkins}
                 memberPenalties={memberPenalties}
@@ -182,10 +182,10 @@ export default function PlanTrackerContent({
                 onUpdateCheckIn={handleUpdateCheckIn}
               />
             )}
-            {plan.status === 'Finished' && (
-              <FinishedPlanView planId={plan.id} refreshKey={refreshKey} />
+            {challenge.status === 'Finished' && (
+              <FinishedChallengeView challengeId={challenge.id} refreshKey={refreshKey} />
             )}
-            {plan.status === 'Cancelled' && <CancelledPlanView />}
+            {challenge.status === 'Cancelled' && <CancelledChallengeView />}
           </View>
         </Animated.ScrollView>
 
@@ -209,34 +209,34 @@ export default function PlanTrackerContent({
   );
 }
 
-function NotStartedPlanView({ plan }: { plan: PlanEnriched }) {
-  const startHasArrived = plan.startsAt <= getDateOnly();
-  const startsTomorrow = plan.startsAt === getDateOnlyWithOffset(1);
-  const lacksQuorum = plan.memberCount < 2;
+function NotStartedChallengeView({ challenge }: { challenge: ChallengeEnriched }) {
+  const startHasArrived = challenge.startsAt <= getDateOnly();
+  const startsTomorrow = challenge.startsAt === getDateOnlyWithOffset(1);
+  const lacksQuorum = challenge.memberCount < 2;
   return (
     <Card className="flex flex-col gap-1 justify-center items-start w-full">
       <Text style={{ color: getColor('black') }} className="text-lg font-bold">
-        Prepare-se!
+        Esquenta o motor!
       </Text>
       <Text style={{ color: getColor('gray-3') }} className="text-base">
-        O desafio começa {formatRelativeDateOnly(plan.startsAt).toLowerCase()} ({getDateToFront(plan.startsAt)})
+        O desafio começa {formatRelativeDateOnly(challenge.startsAt).toLowerCase()} ({getDateToFront(challenge.startsAt)})
       </Text>
       {lacksQuorum && startsTomorrow && (
         <Text style={{ color: getColor('dark-orange') }} className="text-sm">
-          O plano ainda não tem dois membros. O início está previsto para amanhã.
+          Falta um jogador para o apito de amanhã.
         </Text>
       )}
       {lacksQuorum && startHasArrived && (
         <Text style={{ color: getColor('dark-orange') }} className="text-sm">
-          O plano precisa de pelo menos dois membros para começar. O dono pode adiar ou cancelar em Meus planos.
+          Faltam dois jogadores para começar. O dono pode adiar ou encerrar em Meus desafios.
         </Text>
       )}
     </Card>
   );
 }
 
-function RunningPlanView({
-  plan,
+function RunningChallengeView({
+  challenge,
   ranking,
   checkins,
   memberPenalties,
@@ -244,8 +244,8 @@ function RunningPlanView({
   readOnly = false,
   onUpdateCheckIn,
 }: {
-  plan: PlanEnriched;
-  ranking: PlanRankingWithCurrentUser | null;
+  challenge: ChallengeEnriched;
+  ranking: ChallengeRankingWithCurrentUser | null;
   checkins: CheckinEnriched[];
   memberPenalties: Penalty[];
   isMemberBlocked: boolean;
@@ -255,8 +255,8 @@ function RunningPlanView({
   const [pixCode, setPixCode] = useState<string | null>(null);
   const { penalty: penaltyRepository } = useRepositories();
   const currentUser = ranking?.currentUser;
-  const daysSinceStart = getDifferenceInDays(new Date(), plan.startsAt);
-  const totalDays = getDifferenceInDays(plan.startsAt, plan.endsAt);
+  const daysSinceStart = getDifferenceInDays(new Date(), challenge.startsAt);
+  const totalDays = getDifferenceInDays(challenge.startsAt, challenge.endsAt);
   const streak = currentUser?.streak ?? 0;
   const position = currentUser?.position ?? 0;
   const checkinCount = currentUser?.checkinCount ?? 0;
@@ -292,7 +292,7 @@ function RunningPlanView({
             #{formatInteger(position)}
           </Text>
           <Text style={{ color: getColor('gray-3') }} className="text-xs">
-            de {plan.memberCount} pessoas
+            de {challenge.memberCount} pessoas
           </Text>
         </Card>
       </View>
@@ -330,7 +330,7 @@ function RunningPlanView({
               Início
             </Text>
             <Text style={{ color: getColor('gray-3') }} className="font-semibold">
-              {getDateToFront(plan.startsAt)}
+              {getDateToFront(challenge.startsAt)}
             </Text>
           </View>
           <View className="flex flex-col gap-1 justify-center items-end">
@@ -338,7 +338,7 @@ function RunningPlanView({
               Fim
             </Text>
             <Text style={{ color: getColor('gray-3') }} className="font-semibold">
-              {getDateToFront(plan.endsAt)}
+              {getDateToFront(challenge.endsAt)}
             </Text>
           </View>
         </View>
@@ -349,7 +349,7 @@ function RunningPlanView({
             <View
               className="h-full"
               style={{
-                width: `${resolvePeriodProgress(plan.startsAt, plan.endsAt)}%`,
+                width: `${resolvePeriodProgress(challenge.startsAt, challenge.endsAt)}%`,
                 backgroundColor: getColor('gray-3'),
                 opacity: 1,
               }}
@@ -367,7 +367,7 @@ function RunningPlanView({
           penalties={memberPenalties}
           onPayWithPix={async (penaltyId) => {
             const userId = await Memory.get('userId') || '';
-            const charge = await penaltyRepository.createPixCharge(plan.id, penaltyId, userId);
+            const charge = await penaltyRepository.createPixCharge(challenge.id, penaltyId, userId);
             setPixCode(charge.copyAndPaste);
           }}
         />
@@ -385,7 +385,7 @@ function RunningPlanView({
         </Text>
         {checkins.length === 0 && (
           <Text style={{ color: getColor('gray-3') }} className="text-sm">
-            Faça seu primeiro check-in hoje para aparecer aqui!
+            Faça o primeiro check-in e entra no placar!
           </Text>
         )}
       </View>
@@ -402,29 +402,29 @@ function RunningPlanView({
   );
 }
 
-function FinishedPlanView({ planId, refreshKey }: { planId: string; refreshKey: number }) {
+function FinishedChallengeView({ challengeId, refreshKey }: { challengeId: string; refreshKey: number }) {
   return (
     <>
       <Card className="flex flex-col gap-1 justify-center items-start w-full">
         <Text style={{ color: getColor('black') }} className="text-lg font-bold">
-          ✅ Desafio finalizado
+          Missão cumprida
         </Text>
       </Card>
       <View className="w-full mt-2">
         <Text style={{ color: getColor('black') }} className="mb-3 text-lg font-extrabold">
           Ranking
         </Text>
-        <Ranking planId={planId} refreshKey={refreshKey} />
+        <Ranking challengeId={challengeId} refreshKey={refreshKey} />
       </View>
     </>
   );
 }
 
-function CancelledPlanView() {
+function CancelledChallengeView() {
   return (
     <Card className="flex flex-col gap-1 justify-center items-start w-full">
       <Text style={{ color: getColor('black') }} className="text-lg font-bold">
-        Ops, este plano não existe mais.
+        Essa arena já fechou.
       </Text>
     </Card>
   );

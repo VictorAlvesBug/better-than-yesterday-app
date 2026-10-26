@@ -1,5 +1,5 @@
 import Memory from '@/src/api/memory';
-import createPlanRepository from '@/src/api/planRepository';
+import createChallengeRepository from '@/src/api/challengeRepository';
 import createUserRepository from '@/src/api/userRepository';
 import { getColor } from '@/types/color.type';
 import React, { useEffect, useMemo } from 'react';
@@ -7,17 +7,17 @@ import { ActivityIndicator, View } from 'react-native';
 import { useAuth } from '../context/auth';
 import CreateUserScreen from './create-user';
 import LoginScreen from './login';
-import ManagePlansScreen from './manage-plans';
+import ManageChallengesScreen from './manage-challenges';
 import NotFoundScreen from './not-found';
-import PlanTrackerScreen from './plan-tracker';
+import ChallengeTrackerScreen from './challenge-tracker';
 
-type RedirectionScreen = 'loading' | 'not-found' | 'login' | 'create-user' | 'plan-tracker' | 'manage-plans';
+type RedirectionScreen = 'loading' | 'not-found' | 'login' | 'create-user' | 'challenge-tracker' | 'manage-challenges';
 
 export default function HomeScreen() {
     const { isSignedIn, authUser } = useAuth();
     const [redirectionScreen, setRedirectionScreen] = React.useState<RedirectionScreen>('loading');
     const userRepository = useMemo(() => createUserRepository(), []);
-    const planRepository = useMemo(() => createPlanRepository(), []);
+    const challengeRepository = useMemo(() => createChallengeRepository(), []);
 
     useEffect(() => {
         // #region agent log
@@ -40,21 +40,21 @@ export default function HomeScreen() {
 
             await Memory.set('userId', dbUser.id);
 
-            const plans = await planRepository.listByUserId(dbUser.id);
-            const lastAccessedPlanId = await Memory.get('planId');
+            const challenges = await challengeRepository.listByUserId(dbUser.id);
+            const lastAccessedChallengeId = await Memory.get('challengeId');
 
-            if (plans.length === 0) {
-                setRedirectionScreen('manage-plans');
+            if (challenges.length === 0) {
+                setRedirectionScreen('manage-challenges');
                 return;
             }
 
-            if (plans.some(plan => plan.id === lastAccessedPlanId)) {
-                setRedirectionScreen('plan-tracker');
+            if (challenges.some(challenge => challenge.id === lastAccessedChallengeId)) {
+                setRedirectionScreen('challenge-tracker');
                 return;
             }
 
-            await Memory.set('planId', plans[0].id);
-            setRedirectionScreen('plan-tracker');
+            await Memory.set('challengeId', challenges[0].id);
+            setRedirectionScreen('challenge-tracker');
         };
 
         fetchData();
@@ -84,10 +84,10 @@ export default function HomeScreen() {
             return <LoginScreen />;
         case 'create-user':
             return <CreateUserScreen />;
-        case 'plan-tracker':
-            return <PlanTrackerScreen />;
-        case 'manage-plans':
-            return <ManagePlansScreen />;
+        case 'challenge-tracker':
+            return <ChallengeTrackerScreen />;
+        case 'manage-challenges':
+            return <ManageChallengesScreen />;
         case 'not-found':
         default:
             return <NotFoundScreen />;

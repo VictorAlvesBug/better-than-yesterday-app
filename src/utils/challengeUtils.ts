@@ -12,22 +12,22 @@ type DuplicateSource = {
   coverPhotoUrl?: string;
 };
 
-export function duplicatePlanPath(plan: DuplicateSource): Href {
-  const duration = getDifferenceInDays(plan.startsAt, plan.endsAt);
+export function duplicateChallengePath(challenge: DuplicateSource): Href {
+  const duration = getDifferenceInDays(challenge.startsAt, challenge.endsAt);
   const startsAt = getDateOnlyWithOffset(1);
   const endsAt = getDateOnlyWithOffset(duration + 1);
   const query = new URLSearchParams({
-    habitId: plan.habitId,
-    description: plan.description ?? '',
-    type: plan.type,
-    daysOffPerWeek: String(plan.daysOffPerWeek),
-    penaltyValue: String(plan.penaltyValue),
+    habitId: challenge.habitId,
+    description: challenge.description ?? '',
+    type: challenge.type,
+    daysOffPerWeek: String(challenge.daysOffPerWeek),
+    penaltyValue: String(challenge.penaltyValue),
     startsAt,
     endsAt,
-    coverPhotoUrl: plan.coverPhotoUrl ?? '',
+    coverPhotoUrl: challenge.coverPhotoUrl ?? '',
   });
 
-  return `/create-plan?${query.toString()}` as Href;
+  return `/create-challenge?${query.toString()}` as Href;
 }
 
 export function penaltyScale(value: number) {

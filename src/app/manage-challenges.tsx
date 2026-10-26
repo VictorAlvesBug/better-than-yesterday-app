@@ -2,13 +2,13 @@ import { Href } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from '../components/button';
-import JoinPlanModal from '../components/join-plan-modal';
+import JoinChallengeModal from '../components/join-challenge-modal';
 import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
 import SideDrawer, { SideDrawerOpenButton } from '../components/side-drawer';
 import useNavigation from '../hooks/useNavigation';
 
-export default function ManagePlansScreen() {
+export default function ManageChallengesScreen() {
   const navigation = useNavigation();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
@@ -18,12 +18,12 @@ export default function ManagePlansScreen() {
       <ScreenLayout
         header={
           <ScreenHeader
-            title="Gerenciar Planos"
+            title="Arena"
             left={<SideDrawerOpenButton setIsDrawerOpen={setIsDrawerOpen} />}
           />
         }
       >
-        <JoinPlanModal
+        <JoinChallengeModal
           visible={isJoinModalOpen}
           onClose={() => setIsJoinModalOpen(false)}
         />
@@ -32,10 +32,10 @@ export default function ManagePlansScreen() {
           contentContainerStyle={{ paddingBottom: 120 }}
         >
           <View className="w-full px-4 gap-3 py-3">
-            <Button action={() => navigation.push('/create-plan')}>Criar Novo Plano</Button>
-            <Button action={() => setIsJoinModalOpen(true)}>Tenho um Link de Convidado</Button>
-            <Button action={() => navigation.push('/public-plans')}>Planos Populares</Button>
-            <Button action={() => navigation.push('/my-plans' as Href)} type="outline">Meus planos</Button>
+            <Button action={() => navigation.push('/create-challenge')}>Criar desafio</Button>
+            <Button action={() => setIsJoinModalOpen(true)}>Tenho um convite</Button>
+            <Button action={() => navigation.push('/public-challenges')}>Desafios em alta</Button>
+            <Button action={() => navigation.push('/my-challenges' as Href)} type="outline">Meus desafios</Button>
           </View>
         </ScrollView>
       </ScreenLayout>

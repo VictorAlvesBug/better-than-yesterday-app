@@ -1,8 +1,8 @@
 import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
 import { Penalty } from '@/types/penalty.type';
-import { PlanRanking } from '@/types/ranking.type';
+import { ChallengeRanking } from '@/types/ranking.type';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -37,17 +37,17 @@ import {
 } from '../utils/numberUtils';
 import { toastSuccessMessage, toastErrorMessage } from '../utils/toastUtils';
 import { getDateToFront } from '../utils/dateUtils';
-import { duplicatePlanPath } from '../utils/planUtils';
+import { duplicateChallengePath } from '../utils/challengeUtils';
 
 const ADMIN_FEE_RATE = 0.1;
 
-export default function PlanSettingsScreen() {
+export default function ChallengeSettingsScreen() {
   const navigation = useNavigation();
-  const { plan: planRepository, ranking: rankingRepository, penalty: penaltyRepository, checkin: checkinRepository } = useRepositories();
+  const { challenge: challengeRepository, ranking: rankingRepository, penalty: penaltyRepository, checkin: checkinRepository } = useRepositories();
   const [currentTab, setCurrentTab] = useState<'ranking' | 'checkins' | 'reports'>('ranking');
-  const [planId, setPlanId] = useState('');
-  const [plan, setPlan] = useState<PlanEnriched | null>(null);
-  const [ranking, setRanking] = useState<PlanRanking | null>(null);
+  const [challengeId, setChallengeId] = useState('');
+  const [challenge, setChallenge] = useState<ChallengeEnriched | null>(null);
+  const [ranking, setRanking] = useState<ChallengeRanking | null>(null);
   const [penalties, setPenalties] = useState<Penalty[]>([]);
   const [penaltiesLoading, setPenaltiesLoading] = useState(false);
   const [reports, setReports] = useState<{
@@ -81,63 +81,63 @@ export default function PlanSettingsScreen() {
     const userId = (await Memory.get('userId')) ?? undefined;
     if (!userId)
       return;
-    const data = await rankingRepository.getByPlanIdAndUserId(id, userId);
+    const data = await rankingRepository.getByChallengeIdAndUserId(id, userId);
     setRanking(data);
   }, [rankingRepository]);
 
   const fetchPenalties = useCallback(async (id: string) => {
     setPenaltiesLoading(true);
     try {
-      const data = await penaltyRepository.listByPlanId(id);
+      const data = await penaltyRepository.listByChallengeId(id);
       setPenalties(data);
     } finally {
       setPenaltiesLoading(false);
     }
   }, [penaltyRepository]);
 
-  const fetchPlan = useCallback(async (showLoading = true) => {
+  const fetchChallenge = useCallback(async (showLoading = true) => {
     if (showLoading)
       setLoading(true);
 
     try {
-      const storedPlanId = await Memory.get('planId') || '';
+      const storedChallengeId = await Memory.get('challengeId') || '';
       const storedUserId = await Memory.get('userId') || '';
       setCurrentUserId(storedUserId);
-      setPlanId(storedPlanId);
+      setChallengeId(storedChallengeId);
 
-      if (!storedPlanId)
+      if (!storedChallengeId)
         return;
 
-      const [dbPlan] = await Promise.all([
-        planRepository.getById(storedPlanId),
-        fetchRanking(storedPlanId),
-        fetchPenalties(storedPlanId),
+      const [dbChallenge] = await Promise.all([
+        challengeRepository.getById(storedChallengeId),
+        fetchRanking(storedChallengeId),
+        fetchPenalties(storedChallengeId),
       ]);
-      setPlan(dbPlan);
-      const membership = await planRepository.getPlanMemberDetails(storedPlanId, storedUserId).catch(() => null);
+      setChallenge(dbChallenge);
+      const membership = await challengeRepository.getChallengeMemberDetails(storedChallengeId, storedUserId).catch(() => null);
       setIsMember(membership !== null);
-      if (dbPlan.ownerId === storedUserId) {
-        const foundReports = await checkinRepository.listReports(storedPlanId, storedUserId).catch(() => []);
+      if (dbChallenge.ownerId === storedUserId) {
+        const foundReports = await checkinRepository.listReports(storedChallengeId, storedUserId).catch(() => []);
         setReports(foundReports);
       }
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [planRepository, fetchRanking, fetchPenalties, checkinRepository]);
+  }, [challengeRepository, fetchRanking, fetchPenalties, checkinRepository]);
 
   useEffect(() => {
-    fetchPlan();
-  }, [fetchPlan]);
+    fetchChallenge();
+  }, [fetchChallenge]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setRefreshKey((k) => k + 1);
-    fetchPlan(false);
-  }, [fetchPlan]);
+    fetchChallenge(false);
+  }, [fetchChallenge]);
 
-  const isPlanOwner = plan?.ownerId === currentUserId;
-  const tabCount = isPlanOwner ? 3 : 2;
+  const isChallengeOwner = challenge?.ownerId === currentUserId;
+  const tabCount = isChallengeOwner ? 3 : 2;
   const tabWidth = tabsWidth / tabCount || 0;
   const tabIndex = currentTab === 'ranking' ? 0 : currentTab === 'checkins' ? 1 : 2;
 
@@ -154,60 +154,60 @@ export default function PlanSettingsScreen() {
   }, {}) ?? {};
 
   const handlePayPenalty = async (penaltyId: string) => {
-    if (!planId || !currentUserId)
+    if (!challengeId || !currentUserId)
       return;
 
     setPayingPenaltyId(penaltyId);
     try {
-      await penaltyRepository.pay(planId, penaltyId, currentUserId);
-      toastSuccessMessage('Pagamento confirmado');
-      await Promise.all([fetchRanking(planId), fetchPenalties(planId)]);
+      await penaltyRepository.pay(challengeId, penaltyId, currentUserId);
+      toastSuccessMessage('Pagamento na conta. De volta ao jogo');
+      await Promise.all([fetchRanking(challengeId), fetchPenalties(challengeId)]);
       setRefreshKey((k) => k + 1);
     } catch {
-      toastErrorMessage('Não foi possível confirmar o pagamento');
+      toastErrorMessage('Não deu para confirmar o pagamento');
     } finally {
       setPayingPenaltyId(null);
     }
   };
 
-  const leavePlan = () => {
-    if (!plan)
+  const leaveChallenge = () => {
+    if (!challenge)
       return;
 
-    Alert.alert('Sair do plano', 'Você deixa de participar deste plano.', [
-      { text: 'Voltar', style: 'cancel' },
+    Alert.alert('Sair do desafio', 'Você deixa a partida. O ranking segue sem você.', [
+      { text: 'Ficar', style: 'cancel' },
       {
         text: 'Sair',
         style: 'destructive',
         onPress: async () => {
           try {
-            await planRepository.leave({ planId: plan.id, userId: currentUserId });
-            toastSuccessMessage('Você saiu do plano');
+            await challengeRepository.leave({ challengeId: challenge.id, userId: currentUserId });
+            toastSuccessMessage('Você saiu do desafio');
             navigation.back();
           } catch {
-            toastErrorMessage('Não foi possível sair do plano');
+            toastErrorMessage('Não deu para sair do desafio');
           }
         },
       },
     ]);
   };
 
-  const cancelPlan = () => {
-    if (!plan)
+  const cancelChallenge = () => {
+    if (!challenge)
       return;
 
-    Alert.alert('Cancelar plano', 'As multas pagas serão devolvidas e os membros serão removidos.', [
-      { text: 'Voltar', style: 'cancel' },
+    Alert.alert('Encerrar desafio', 'As multas já pagas voltam para quem pagou e os jogadores saem da arena.', [
+      { text: 'Ficar', style: 'cancel' },
       {
-        text: 'Cancelar plano',
+        text: 'Encerrar',
         style: 'destructive',
         onPress: async () => {
           try {
-            await planRepository.cancel(plan.id);
-            toastSuccessMessage('Plano cancelado');
+            await challengeRepository.cancel(challenge.id);
+            toastSuccessMessage('Desafio encerrado');
             navigation.back();
           } catch {
-            toastErrorMessage('Não foi possível cancelar o plano');
+            toastErrorMessage('Não deu para encerrar o desafio');
           }
         },
       },
@@ -222,10 +222,10 @@ export default function PlanSettingsScreen() {
     );
   }
 
-  if (!plan) {
+  if (!challenge) {
     return (
       <View className="flex-1 justify-center items-center" style={{ backgroundColor: getColor('gray-e') }}>
-        <Text style={{ color: getColor('white') }} className="text-lg font-bold">Plano não encontrado</Text>
+        <Text style={{ color: getColor('white') }} className="text-lg font-bold">Esse desafio sumiu do mapa</Text>
       </View>
     );
   }
@@ -234,7 +234,7 @@ export default function PlanSettingsScreen() {
     <ScreenLayout
       header={
         <ScreenHeader
-          title={plan.description ?? plan.habitName}
+          title={challenge.description ?? challenge.habitName}
           titleSize="text-lg"
           right={
             <Pressable className="flex justify-center items-center w-20 h-20" onPress={() => setInviteOpen(true)}>
@@ -246,7 +246,7 @@ export default function PlanSettingsScreen() {
             style={{ backgroundColor: getColor('opaque') }}
             className="flex flex-col items-start w-[90%] gap-2 p-4 mb-6 justify-evenly rounded-lg"
           >
-            <Text style={{ color: getColor('white') }} className="font-thin">Pool de Recompensas</Text>
+            <Text style={{ color: getColor('white') }} className="font-thin">Prêmio da arena</Text>
             <Text style={{ color: getColor('white') }} className="mb-1 text-3xl font-bold">
               {formatMoney(rewardsPool)}
             </Text>
@@ -254,7 +254,7 @@ export default function PlanSettingsScreen() {
             <View className="flex flex-row justify-evenly items-center w-full">
               <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
-                  Total Multas
+                  Multas pagas
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
                   {formatMoneyCompact(paidTotal)}
@@ -262,7 +262,7 @@ export default function PlanSettingsScreen() {
               </View>
               <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
-                  Taxa Admin ({formatPercent(ADMIN_FEE_RATE)})
+                  Taxa da casa ({formatPercent(ADMIN_FEE_RATE)})
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
                   {formatMoneyCompact(totalAdminFee)}
@@ -270,10 +270,10 @@ export default function PlanSettingsScreen() {
               </View>
               <View className="flex flex-col gap-1 justify-center items-center">
                 <Text style={{ color: getColor('white') }} className="text-xs font-thin">
-                  Membros
+                  Jogadores
                 </Text>
                 <Text style={{ color: getColor('white') }} className="font-semibold">
-                  {formatInteger(plan.memberCount)}
+                  {formatInteger(challenge.memberCount)}
                 </Text>
               </View>
             </View>
@@ -298,20 +298,20 @@ export default function PlanSettingsScreen() {
             <View>
               <Label size="text-xs">Descrição</Label>
               <Text style={{ color: getColor('black') }} className="text-base">
-                {plan.description ?? plan.habitName}
+                {challenge.description ?? challenge.habitName}
               </Text>
             </View>
             <View className="flex flex-row gap-4">
               <View className="flex-1">
                 <Label size="text-xs">Início</Label>
                 <Text style={{ color: getColor('black') }} className="text-base">
-                  {getDateToFront(plan.startsAt)}
+                  {getDateToFront(challenge.startsAt)}
                 </Text>
               </View>
               <View className="flex-1">
                 <Label size="text-xs">Término</Label>
                 <Text style={{ color: getColor('black') }} className="text-base">
-                  {getDateToFront(plan.endsAt)}
+                  {getDateToFront(challenge.endsAt)}
                 </Text>
               </View>
             </View>
@@ -319,37 +319,37 @@ export default function PlanSettingsScreen() {
               <View className="flex-1">
                 <Label size="text-xs">Tipo</Label>
                 <Text style={{ color: getColor('black') }} className="text-base">
-                  {plan.type === 'Private' ? 'Privado' : 'Público'}
+                  {challenge.type === 'Private' ? 'Privado' : 'Público'}
                 </Text>
               </View>
               <View className="flex-1">
                 <Label size="text-xs">Frequência</Label>
                 <Text style={{ color: getColor('black') }} className="text-base">
-                  {`${7 - plan.daysOffPerWeek}x por semana`}
+                  {`${7 - challenge.daysOffPerWeek}x por semana`}
                 </Text>
               </View>
             </View>
             <View>
               <Label size="text-xs">Multa</Label>
               <Text style={{ color: getColor('black') }} className="text-base">
-                {formatMoney(plan.penaltyValue)}
+                {formatMoney(challenge.penaltyValue)}
               </Text>
             </View>
           </Card>
 
-          {plan.coverPhotoUrl ? (
-            <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: '100%', height: 160, borderRadius: 16 }} />
+          {challenge.coverPhotoUrl ? (
+            <Image source={{ uri: challenge.coverPhotoUrl }} style={{ width: '100%', height: 160, borderRadius: 16 }} />
           ) : null}
 
-          <Button action={() => navigation.push(duplicatePlanPath(plan))} type="outline">Duplicar</Button>
+          <Button action={() => navigation.push(duplicateChallengePath(challenge))} type="outline">Repetir desafio</Button>
           {isMember && (
-            <Button action={leavePlan} color="danger" type="outline">Sair</Button>
+            <Button action={leaveChallenge} color="danger" type="outline">Sair</Button>
           )}
-          {isPlanOwner && (
-            <Button action={cancelPlan} color="danger">Cancelar plano</Button>
+          {isChallengeOwner && (
+            <Button action={cancelChallenge} color="danger">Encerrar desafio</Button>
           )}
 
-          {isPlanOwner && (
+          {isChallengeOwner && (
             <PenaltiesCard
               penalties={penalties}
               loading={penaltiesLoading}
@@ -405,7 +405,7 @@ export default function PlanSettingsScreen() {
                 </Text>
               </View>
             </Pressable>
-            {isPlanOwner && (
+            {isChallengeOwner && (
               <Pressable className="flex-1 h-full" onPress={() => setCurrentTab('reports')}>
                 <View className="flex-1 justify-center items-center mx-1 rounded-xl">
                   <Text
@@ -419,18 +419,18 @@ export default function PlanSettingsScreen() {
             )}
           </View>
 
-          {currentTab === 'ranking' && planId && (
-            <Ranking planId={planId} refreshKey={refreshKey} />
+          {currentTab === 'ranking' && challengeId && (
+            <Ranking challengeId={challengeId} refreshKey={refreshKey} />
           )}
-          {currentTab === 'checkins' && planId && (
-            <CheckinsWithReviewsList planId={planId} refreshKey={refreshKey} />
+          {currentTab === 'checkins' && challengeId && (
+            <CheckinsWithReviewsList challengeId={challengeId} refreshKey={refreshKey} />
           )}
-          {currentTab === 'reports' && isPlanOwner && (
+          {currentTab === 'reports' && isChallengeOwner && (
             <ReportsByCheckIn reports={reports} />
           )}
         </View>
       </ScrollView>
-      <InviteLinkModal visible={inviteOpen} planId={plan.id} onClose={() => setInviteOpen(false)} />
+      <InviteLinkModal visible={inviteOpen} challengeId={challenge.id} onClose={() => setInviteOpen(false)} />
     </ScreenLayout>
   );
 }
@@ -465,7 +465,7 @@ function ReportsByCheckIn({ reports }: {
   if (groups.length === 0) {
     return (
       <Text style={{ color: getColor('gray-3') }} className="text-sm">
-        Nenhuma denúncia neste plano.
+        Nenhuma denúncia nessa arena.
       </Text>
     );
   }

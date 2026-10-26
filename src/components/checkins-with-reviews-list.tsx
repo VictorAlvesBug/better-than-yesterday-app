@@ -6,12 +6,12 @@ import { useRepositories } from '../hooks/useRepositories';
 import CheckinWithReviewsCard from './checkin-with-reviews-card';
 
 type CheckinsWithReviewsListProps = {
-  planId: string;
+  challengeId: string;
   refreshKey?: number;
 };
 
 export default function CheckinsWithReviewsList({
-  planId,
+  challengeId,
   refreshKey = 0,
 }: CheckinsWithReviewsListProps) {
   const { checkin: checkinRepository } = useRepositories();
@@ -27,20 +27,20 @@ export default function CheckinsWithReviewsList({
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!planId)
+      if (!challengeId)
         return;
 
-      const data = await checkinRepository.list({ planId });
+      const data = await checkinRepository.list({ challengeId });
       setCheckins(data.sort((a, b) => b.date.localeCompare(a.date)));
     };
 
     fetchData();
-  }, [checkinRepository, planId, refreshKey]);
+  }, [checkinRepository, challengeId, refreshKey]);
 
   return (
     <View className="flex flex-col w-full gap-4">
       {checkins.length === 0 && (
-        <Text style={{ color: getColor('gray-4') }} className="text-base">Nenhum Check-in aqui...</Text>
+        <Text style={{ color: getColor('gray-4') }} className="text-base">Nenhum check-in nessa rodada...</Text>
       )}
       {checkins.map((checkin) => (
         <CheckinWithReviewsCard key={checkin.id} checkin={checkin} onUpdate={handleUpdateCheckIn} />

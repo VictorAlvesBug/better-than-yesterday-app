@@ -112,9 +112,9 @@ export default function CreateUserScreen() {
       });
 
       await Memory.set('userId', createdUser.id);
-      navigation.replace('./manage-plans');
+      navigation.replace('./manage-challenges');
     } catch (error) {
-      toastErrorMessage(error instanceof Error ? error.message : 'Não foi possível cadastrar');
+      toastErrorMessage(error instanceof Error ? error.message : 'Não deu para criar a conta');
     } finally {
       setSaving(false);
     }
@@ -262,7 +262,7 @@ export default function CreateUserScreen() {
             <GradientView
               className="flex flex-col items-center justify-center w-full h-full">
               <Text style={{ color: getColor('white') }} className='text-lg font-bold'>
-                {saving ? 'Salvando...' : 'Salvar'}
+                {saving ? 'Criando...' : 'Criar conta'}
               </Text>
             </GradientView>
           </Button>

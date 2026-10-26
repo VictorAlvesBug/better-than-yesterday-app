@@ -1,4 +1,4 @@
-import { PlanRanking, PlanRankingWithCurrentUser } from '@/types/ranking.type';
+import { ChallengeRanking, ChallengeRankingWithCurrentUser } from '@/types/ranking.type';
 import { getColor } from '@/types/color.type';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
@@ -8,16 +8,16 @@ import RankingItemCard from './ranking-item-card';
 import useNavigation from '../hooks/useNavigation';
 
 type RankingProps = {
-  planId: string;
+  challengeId: string;
   userId?: string;
   refreshKey?: number;
 };
 
-export default function Ranking({ planId, userId: userIdProp, refreshKey = 0 }: RankingProps) {
+export default function Ranking({ challengeId, userId: userIdProp, refreshKey = 0 }: RankingProps) {
   const { ranking: rankingRepository } = useRepositories();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
-  const [ranking, setRanking] = useState<PlanRankingWithCurrentUser | null>(null);
+  const [ranking, setRanking] = useState<ChallengeRankingWithCurrentUser | null>(null);
 
   useEffect(() => {
     const fetchRanking = async () => {
@@ -28,7 +28,7 @@ export default function Ranking({ planId, userId: userIdProp, refreshKey = 0 }: 
           navigation.replace('/login');
           return;
         }
-        const data = await rankingRepository.getByPlanIdAndUserId(planId, userId);
+        const data = await rankingRepository.getByChallengeIdAndUserId(challengeId, userId);
         setRanking(data);
       } catch {
         setRanking(null);
@@ -37,9 +37,9 @@ export default function Ranking({ planId, userId: userIdProp, refreshKey = 0 }: 
       }
     };
 
-    if (planId)
+    if (challengeId)
       fetchRanking();
-  }, [planId, userIdProp, refreshKey, rankingRepository]);
+  }, [challengeId, userIdProp, refreshKey, rankingRepository]);
 
   console.log('test1');
 
@@ -56,7 +56,7 @@ export default function Ranking({ planId, userId: userIdProp, refreshKey = 0 }: 
     return (
       <View className="flex flex-row items-center justify-center gap-4">
         <Text style={{ color: getColor('gray-4') }} className="text-base">
-          Check-ins insuficientes para ranking...
+          Ainda não tem check-in suficiente para o placar...
         </Text>
       </View>
     );

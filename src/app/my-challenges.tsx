@@ -1,5 +1,5 @@
 import { getColor } from '@/types/color.type';
-import { PlanEnriched, PlanStatus } from '@/types/plan.type';
+import { ChallengeEnriched, ChallengeStatus } from '@/types/challenge.type';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Memory from '../api/memory';
@@ -10,24 +10,24 @@ import ScreenLayout from '../components/screen-layout';
 import { useRepositories } from '../hooks/useRepositories';
 import useNavigation from '../hooks/useNavigation';
 import { DateOnly, getDateOnly, getDateOnlyWithOffset, getDateToFront } from '../utils/dateUtils';
-import { commitmentLabel, duplicatePlanPath, elapsedPercent, penaltyScale } from '../utils/planUtils';
+import { commitmentLabel, duplicateChallengePath, elapsedPercent, penaltyScale } from '../utils/challengeUtils';
 import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
-const statusLabel: Record<PlanStatus, string> = {
-  NotStarted: 'Ainda não começou',
-  Running: 'Em andamento',
-  Finished: 'Encerrado',
-  Cancelled: 'Cancelado',
+const statusLabel: Record<ChallengeStatus, string> = {
+  NotStarted: 'No aquecimento',
+  Running: 'Em jogo',
+  Finished: 'Missão cumprida',
+  Cancelled: 'Arena fechada',
 };
 
-export default function MyPlansScreen() {
+export default function MyChallengesScreen() {
   const navigation = useNavigation();
-  const { plan: planRepository } = useRepositories();
+  const { challenge: challengeRepository } = useRepositories();
   const [userId, setUserId] = useState('');
-  const [plans, setPlans] = useState<PlanEnriched[]>([]);
+  const [challenges, setChallenges] = useState<ChallengeEnriched[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [editing, setEditing] = useState<PlanEnriched | null>(null);
+  const [editing, setEditing] = useState<ChallengeEnriched | null>(null);
   const [startsAt, setStartsAt] = useState<DateOnly>(getDateOnly());
   const [endsAt, setEndsAt] = useState<DateOnly>(getDateOnly());
 
@@ -35,39 +35,39 @@ export default function MyPlansScreen() {
     const storedUserId = await Memory.get('userId') || '';
     setUserId(storedUserId);
     if (!storedUserId) {
-      setPlans([]);
+      setChallenges([]);
       setLoading(false);
       setRefreshing(false);
       return;
     }
 
-    const owned = await planRepository.list({ ownerId: storedUserId });
-    setPlans(owned);
+    const owned = await challengeRepository.list({ ownerId: storedUserId });
+    setChallenges(owned);
     setLoading(false);
     setRefreshing(false);
-  }, [planRepository]);
+  }, [challengeRepository]);
 
   React.useEffect(() => {
     load();
   }, [load]);
 
-  const openPlan = async (plan: PlanEnriched) => {
-    await Memory.set('planId', plan.id);
-    navigation.push('/plan-tracker');
+  const openChallenge = async (challenge: ChallengeEnriched) => {
+    await Memory.set('challengeId', challenge.id);
+    navigation.push('/challenge-tracker');
   };
 
-  const postpone = async (plan: PlanEnriched) => {
+  const postpone = async (challenge: ChallengeEnriched) => {
     try {
-      await planRepository.updatePeriod(
-        plan.id,
+      await challengeRepository.updatePeriod(
+        challenge.id,
         userId,
-        getDateOnlyWithOffset(7, plan.startsAt),
-        getDateOnlyWithOffset(7, plan.endsAt),
+        getDateOnlyWithOffset(7, challenge.startsAt),
+        getDateOnlyWithOffset(7, challenge.endsAt),
       );
-      toastSuccessMessage('Plano adiado em 7 dias');
+      toastSuccessMessage('Desafio adiado em 7 dias');
       await load();
     } catch {
-      toastErrorMessage('Não foi possível adiar o plano');
+      toastErrorMessage('Não deu para adiar o desafio');
     }
   };
 
@@ -77,33 +77,33 @@ export default function MyPlansScreen() {
 
     const today = getDateOnly();
     if (startsAt <= today) {
-      toastErrorMessage('A data de início deve ser a partir de amanhã');
+      toastErrorMessage('A data de início precisa ser a partir de amanhã');
       return;
     }
 
     try {
-      await planRepository.updatePeriod(editing.id, userId, startsAt, endsAt);
-      toastSuccessMessage('Datas atualizadas');
+      await challengeRepository.updatePeriod(editing.id, userId, startsAt, endsAt);
+      toastSuccessMessage('Datas do desafio atualizadas');
       setEditing(null);
       await load();
     } catch {
-      toastErrorMessage('Não foi possível salvar as datas');
+      toastErrorMessage('Não deu para salvar as datas');
     }
   };
 
-  const cancelPlan = (plan: PlanEnriched) => {
-    Alert.alert('Cancelar plano', 'As multas pagas serão devolvidas.', [
+  const cancelChallenge = (challenge: ChallengeEnriched) => {
+    Alert.alert('Encerrar desafio', 'As multas já pagas voltam para quem pagou.', [
       { text: 'Voltar', style: 'cancel' },
       {
-        text: 'Cancelar plano',
+        text: 'Encerrar',
         style: 'destructive',
         onPress: async () => {
           try {
-            await planRepository.cancel(plan.id);
-            toastSuccessMessage('Plano cancelado');
+            await challengeRepository.cancel(challenge.id);
+            toastSuccessMessage('Desafio encerrado');
             await load();
           } catch {
-            toastErrorMessage('Não foi possível cancelar o plano');
+            toastErrorMessage('Não deu para encerrar o desafio');
           }
         },
       },
@@ -111,7 +111,7 @@ export default function MyPlansScreen() {
   };
 
   return (
-    <ScreenLayout header={<ScreenHeader title="Meus planos" />}>
+    <ScreenLayout header={<ScreenHeader title="Meus desafios" />}>
       {loading ? (
         <ActivityIndicator className="mt-8" color={getColor('violet')} />
       ) : (
@@ -121,62 +121,62 @@ export default function MyPlansScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={getColor('violet')} />
           }
         >
-          {plans.length === 0 && (
+          {challenges.length === 0 && (
             <Text style={{ color: getColor('gray-3') }} className="text-base">
-              Você ainda não criou um plano.
+              Você ainda não criou um desafio. A arena está esperando.
             </Text>
           )}
-          {plans.map((plan) => {
-            const canEdit = plan.status === 'NotStarted';
+          {challenges.map((challenge) => {
+            const canEdit = challenge.status === 'NotStarted';
             const today = getDateOnly();
             const tomorrow = getDateOnlyWithOffset(1);
-            const missingQuorumAndStartsTomorrow = plan.memberCount < 2 && plan.startsAt === tomorrow;
-            const percent = elapsedPercent(plan.startsAt, plan.endsAt, today);
+            const missingQuorumAndStartsTomorrow = challenge.memberCount < 2 && challenge.startsAt === tomorrow;
+            const percent = elapsedPercent(challenge.startsAt, challenge.endsAt, today);
             return (
-              <Pressable key={plan.id} onPress={() => openPlan(plan)} className="w-full gap-3 p-4 bg-white shadow-md rounded-2xl">
+              <Pressable key={challenge.id} onPress={() => openChallenge(challenge)} className="w-full gap-3 p-4 bg-white shadow-md rounded-2xl">
                 <View className="flex flex-row gap-3">
-                  {plan.coverPhotoUrl ? (
-                    <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: 72, height: 72, borderRadius: 12 }} />
+                  {challenge.coverPhotoUrl ? (
+                    <Image source={{ uri: challenge.coverPhotoUrl }} style={{ width: 72, height: 72, borderRadius: 12 }} />
                   ) : (
                     <View style={{ width: 72, height: 72, borderRadius: 12, backgroundColor: getColor('gray-e') }} />
                   )}
                   <View className="flex-1 gap-1">
                     <Text style={{ color: getColor('black') }} className="text-base font-semibold">
-                      {plan.description || plan.habitName}
+                      {challenge.description || challenge.habitName}
                     </Text>
                     <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                      {`${getDateToFront(plan.startsAt)} até ${getDateToFront(plan.endsAt)} · ${percent}%`}
+                      {`${getDateToFront(challenge.startsAt)} até ${getDateToFront(challenge.endsAt)} · ${percent}%`}
                     </Text>
                     <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                      {`${plan.memberCount} membros · ${penaltyScale(plan.penaltyValue)} · ${commitmentLabel(plan.daysOffPerWeek)} · ${statusLabel[plan.status]}`}
+                      {`${challenge.memberCount} jogadores · ${penaltyScale(challenge.penaltyValue)} · ${commitmentLabel(challenge.daysOffPerWeek)} · ${statusLabel[challenge.status]}`}
                     </Text>
                   </View>
                 </View>
                 {missingQuorumAndStartsTomorrow && (
                   <Text style={{ color: getColor('dark-orange') }} className="text-sm">
-                    Convide mais amigos e poderemos iniciar amanhã.
+                    Falta um jogador para o apito de amanhã.
                   </Text>
                 )}
                 <View className="gap-2">
                   {canEdit && (
                     <>
-                      <Button action={() => postpone(plan)} type="outline">Adiar 7 dias</Button>
+                      <Button action={() => postpone(challenge)} type="outline">Adiar 7 dias</Button>
                       <Button
                         action={() => {
-                          setEditing(plan);
-                          console.log(JSON.stringify(plan, null, 2));
-                          setStartsAt(plan.startsAt);
-                          setEndsAt(plan.endsAt);
+                          setEditing(challenge);
+                          console.log(JSON.stringify(challenge, null, 2));
+                          setStartsAt(challenge.startsAt);
+                          setEndsAt(challenge.endsAt);
                         }}
                         type="outline"
                       >
                         Editar datas
                       </Button>
-                      <Button action={() => cancelPlan(plan)} color="danger" type="outline">Cancelar</Button>
+                      <Button action={() => cancelChallenge(challenge)} color="danger" type="outline">Encerrar</Button>
                     </>
                   )}
-                  <Button action={() => navigation.push(duplicatePlanPath(plan))}>
-                    Duplicar
+                  <Button action={() => navigation.push(duplicateChallengePath(challenge))}>
+                    Repetir desafio
                   </Button>
                 </View>
               </Pressable>
@@ -187,7 +187,7 @@ export default function MyPlansScreen() {
       <Modal visible={editing !== null} transparent animationType="fade" onRequestClose={() => setEditing(null)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 24 }}>
           <View className="gap-3 p-4 bg-white rounded-3xl">
-            <Text style={{ color: getColor('black') }} className="text-base font-semibold">Editar período</Text>
+            <Text style={{ color: getColor('black') }} className="text-base font-semibold">Ajustar o calendário</Text>
             <DateRangeSelect
               startValueLabel="Início"
               startValue={getDateToFront(startsAt)}
@@ -196,7 +196,7 @@ export default function MyPlansScreen() {
               endValue={getDateToFront(endsAt)}
               setEndValue={(value) => setEndsAt(value.split('/').reverse().join('-') as DateOnly)}
             />
-            <Button action={saveDates}>Salvar</Button>
+            <Button action={saveDates}>Pronto</Button>
             <Pressable onPress={() => setEditing(null)}>
               <Text style={{ color: getColor('gray-3') }} className="text-center">Fechar</Text>
             </Pressable>

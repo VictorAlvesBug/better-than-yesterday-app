@@ -1,11 +1,11 @@
 import createHabitRepository from '@/src/api/habitRepository';
 import Memory from '@/src/api/memory';
-import createPlanRepository from '@/src/api/planRepository';
+import createChallengeRepository from '@/src/api/challengeRepository';
 import createS3Repository from '@/src/api/s3Repository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit, HabitWithJustAdded } from '@/types/habit.type';
-import { CreatePlan, createPlanSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
+import { CreateChallenge, createChallengeSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, ChallengeType } from '@/types/challenge.type';
 import { useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -34,7 +34,7 @@ import { formatMoney } from '../utils/numberUtils';
 import { generateId } from '../utils/stringUtils';
 import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
-export default function CreatePlanScreen() {
+export default function CreateChallengeScreen() {
   const navigation = useNavigation();
   const params = useLocalSearchParams<{
     habitId?: string;
@@ -50,7 +50,7 @@ export default function CreatePlanScreen() {
 
   const [daysPerWeek, setDaysPerWeek] = useState(5);
 
-  const [plan, setPlan] = useState<CreatePlan | null>(null);
+  const [challenge, setChallenge] = useState<CreateChallenge | null>(null);
 
   const [joinAfterCreated, setJoinAfterCreated] = useState(false);
 
@@ -59,7 +59,7 @@ export default function CreatePlanScreen() {
   const s3Repository = useMemo(() => createS3Repository(), []);
 
   const habitRepository = useMemo(() => createHabitRepository(), []);
-  const planRepository = useMemo(() => createPlanRepository(), []);
+  const challengeRepository = useMemo(() => createChallengeRepository(), []);
 
   const penaltyOptions = penaltyValueOptions.map((penaltyValue): PenaltyOption => ({
     id: penaltyValue.toString(),
@@ -104,7 +104,7 @@ export default function CreatePlanScreen() {
         if (Number.isFinite(duplicatedDaysOff))
           setDaysPerWeek(commitment);
 
-        setPlan({
+        setChallenge({
           ownerId: userId,
           habitId: params.habitId || '',
           description: params.description || undefined,
@@ -123,17 +123,17 @@ export default function CreatePlanScreen() {
     fetchData();
   }, [habitRepository, Memory]);
 
-  //if (!plan)
+  //if (!challenge)
   //  return <ActivityIndicator size="large" color={getColor("gray-6")} />
 
-  const createPlan = async () => {
-    if (loading || !plan)
+  const createChallenge = async () => {
+    if (loading || !challenge)
       return;
 
-    const habit = habitList.find(h => h.id === plan.habitId);
+    const habit = habitList.find(h => h.id === challenge.habitId);
 
     if (!habit) {
-      toastErrorMessage('Selecione um hábito para criar o plano.');
+      toastErrorMessage('Escolhe um hábito para criar o desafio.');
       return;
     }
 
@@ -141,47 +141,47 @@ export default function CreatePlanScreen() {
       const newHabit = await habitRepository.create({
         name: habit.name,
       });
-      plan.habitId = newHabit.id;
+      challenge.habitId = newHabit.id;
     }
 
-    plan.ownerId = await Memory.get('userId') || '';
+    challenge.ownerId = await Memory.get('userId') || '';
 
 
-    plan.daysOffPerWeek = 7 - daysPerWeek;
+    challenge.daysOffPerWeek = 7 - daysPerWeek;
 
     if (localCoverUri) {
-      plan.coverPhotoUrl = await s3Repository.uploadFile({
+      challenge.coverPhotoUrl = await s3Repository.uploadFile({
         filePath: localCoverUri,
-        fileName: `covers/${plan.ownerId}/${generateId()}.jpg`,
+        fileName: `covers/${challenge.ownerId}/${generateId()}.jpg`,
         fileType: 'image/jpeg',
       });
     }
 
-    if (!checkIfIsValidAndToast(createPlanSchema, plan)) {
+    if (!checkIfIsValidAndToast(createChallengeSchema, challenge)) {
       return;
     }
 
-    const createdPlan = await planRepository.create(plan);
+    const createdChallenge = await challengeRepository.create(challenge);
 
-    toastSuccessMessage('Plano criado com sucesso');
+    toastSuccessMessage('Desafio criado. Chama a galera!');
 
     if (joinAfterCreated) {
-      await planRepository.join({ planId: createdPlan.id, userId: plan.ownerId });
-      const forceReload = await Memory.get('planId') !== createdPlan.id;
-      await Memory.set('planId', createdPlan.id);
-      navigation.push('/plan-tracker', forceReload);
+      await challengeRepository.join({ challengeId: createdChallenge.id, userId: challenge.ownerId });
+      const forceReload = await Memory.get('challengeId') !== createdChallenge.id;
+      await Memory.set('challengeId', createdChallenge.id);
+      navigation.push('/challenge-tracker', forceReload);
       return;
     }
 
     navigation.back();
   };
 
-  if (!plan){
+  if (!challenge){
     return;
   }
 
   return (
-    <ScreenLayout header={<ScreenHeader title="Criar Plano" />}>
+    <ScreenLayout header={<ScreenHeader title="Criar desafio" />}>
       <KeyboardableView>
         {loading ? (
           <ActivityIndicator size="large" color={getColor("gray-6")} />
@@ -197,11 +197,11 @@ export default function CreatePlanScreen() {
                   enableSearch={true}
                   label="Selecione o Hábito"
                   placeholder="Escolha um hábito..."
-                  value={plan.habitId}
+                  value={challenge.habitId}
                   formatOptionLabel={habit => habit.name}
                   options={habitList}
                   onChange={selectedHabit => {
-                    setPlan({ ...plan, habitId: selectedHabit.id });
+                    setChallenge({ ...challenge, habitId: selectedHabit.id });
                     setHabitList(prev => prev.filter(item => !item.justAdded || (item.justAdded && item.id === selectedHabit.id)))
                   }}
                   createOption={createHabit}
@@ -212,16 +212,16 @@ export default function CreatePlanScreen() {
                 <Label>Descrição (opcional)</Label>
                 <Input
                   placeholder="Ex: Treinar ao menos 45 minutos..."
-                  value={plan.description}
-                  onChange={(value) => setPlan({ ...plan, description: value })}
+                  value={challenge.description}
+                  onChange={(value) => setChallenge({ ...challenge, description: value })}
                 />
               </Card>
 
               <Card className="flex flex-col items-start justify-center w-full gap-2">
                 <Label>Capa (opcional)</Label>
-                {(localCoverUri || plan.coverPhotoUrl) && (
+                {(localCoverUri || challenge.coverPhotoUrl) && (
                   <Image
-                    source={{ uri: localCoverUri || plan.coverPhotoUrl }}
+                    source={{ uri: localCoverUri || challenge.coverPhotoUrl }}
                     style={{ width: '100%', height: 140, borderRadius: 12 }}
                   />
                 )}
@@ -242,16 +242,16 @@ export default function CreatePlanScreen() {
               </Card>
 
               <Card className="flex flex-col items-start justify-center w-full gap-1">
-                <Label>Período do Plano</Label>
+                <Label>Período do desafio</Label>
                 <DateRangeSelect
                   startValueLabel="Data de Início"
-                  startValue={getDateToFront(plan.startsAt)}
-                  setStartValue={startsAt => setPlan({ ...plan, startsAt: getDateOnly(startsAt) })}
+                  startValue={getDateToFront(challenge.startsAt)}
+                  setStartValue={startsAt => setChallenge({ ...challenge, startsAt: getDateOnly(startsAt) })}
                   formatStartDescription={formatDateRelativeToToday}
                   minValue={getDateToFrontWithOffset(+1)}
                   endValueLabel="Data de Término"
-                  endValue={getDateToFront(plan.endsAt)}
-                  setEndValue={endsAt => setPlan({ ...plan, endsAt: getDateOnly(endsAt) })}
+                  endValue={getDateToFront(challenge.endsAt)}
+                  setEndValue={endsAt => setChallenge({ ...challenge, endsAt: getDateOnly(endsAt) })}
                   formatEndDescription={formatDateRelativeToToday}
                 />
               </Card>
@@ -277,28 +277,28 @@ export default function CreatePlanScreen() {
               </Card>
 
               <Card className="flex flex-col items-start justify-center w-full gap-1">
-                <Label>Multa por Descumprimento</Label>
+                <Label>Multa se furar</Label>
                 <Select<PenaltyOption>
                   label="Selecione o Valor"
-                value={plan.penaltyValue.toString()}
+                value={challenge.penaltyValue.toString()}
                 formatOptionLabel={penaltyValue => penaltyValue.label}
                 options={penaltyOptions}
                 onChange={selectedPenaltyValue => {
-                  setPlan({ ...plan, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
+                  setChallenge({ ...challenge, penaltyValue: parsePenaltyValue(selectedPenaltyValue.id) });
                 }}
               />
               </Card>
 
               <Card className="flex flex-col items-start justify-center w-full gap-1">
-                <Label>Tipo de Plano</Label>
+                <Label>Tipo de desafio</Label>
                 <RadioButtonSelect
-                  selectedValue={plan.type}
-                  onChange={value => setPlan({ ...plan, type: value as PlanType })}
+                  selectedValue={challenge.type}
+                  onChange={value => setChallenge({ ...challenge, type: value as ChallengeType })}
                   options={radioButtonOptions} />
               </Card>
 
               <Card className="flex flex-row items-center justify-between w-full gap-1">
-                <Label>Participar do Plano</Label>
+                <Label>Entrar na partida</Label>
                 <Switch
                   value={joinAfterCreated}
                   onValueChange={checked => setJoinAfterCreated(checked)}
@@ -308,9 +308,9 @@ export default function CreatePlanScreen() {
                 />
               </Card>
 
-              <Button className='p-0 overflow-hidden' action={createPlan}>
+              <Button className='p-0 overflow-hidden' action={createChallenge}>
                 <GradientView className="flex flex-col items-center justify-center w-full h-full">
-                  <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Criar Plano</Text>
+                  <Text style={{ color: getColor('white') }} className='text-lg font-bold'>Criar desafio</Text>
                 </GradientView>
               </Button>
             </View>

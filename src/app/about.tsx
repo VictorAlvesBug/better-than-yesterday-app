@@ -15,8 +15,8 @@ export default function AboutScreen() {
             Better Than Yesterday
           </Text>
           <Text style={{ color: getColor('gray-3') }} className="text-base leading-6">
-            O Better Than Yesterday ajuda você e seus amigos a manter hábitos consistentes
-            com accountability em grupo, check-ins com foto e ranking por plano.
+            O Better Than Yesterday coloca você e a sua turma no mesmo hábito:
+            check-in com foto, ranking e uma multa amigável para ninguém furar.
           </Text>
           <Text style={{ color: getColor('gray-3') }} className="text-sm">
             Versão {Constants.expoConfig?.version ?? '1.0.0'}

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
-import createPlanRepository from '../api/planRepository';
+import createChallengeRepository from '../api/challengeRepository';
 import createS3Repository from '../api/s3Repository';
 import { Button } from '../components/button';
 import Card from '../components/card';
@@ -39,22 +39,22 @@ export default function CreateCheckinScreen() {
   const replacingCheckInId = typeof params.checkInId === 'string' ? params.checkInId : '';
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [missing, setMissing] = useState<'checkin' | 'plan' | null>(null);
+  const [missing, setMissing] = useState<'checkin' | 'challenge' | null>(null);
   const [localPhotoUri, setLocalPhotoUri] = useState('');
 
   const [selectedDate, setSelectedDate] = useState(getDateOnly());
-  const [planStartsAt, setPlanStartsAt] = useState('');
+  const [challengeStartsAt, setChallengeStartsAt] = useState('');
   const [dateLocked, setDateLocked] = useState(false);
   const [takenToday, setTakenToday] = useState(false);
   const [takenYesterday, setTakenYesterday] = useState(false);
   const [checkin, setCheckin] = useState<Omit<CreateCheckin, 'date'>>({
     userId: '',
-    planId: '',
+    challengeId: '',
     evidencePhotoUrl: '',
     title: '',
   });
 
-  const planRepository = useMemo(() => createPlanRepository(), []);
+  const challengeRepository = useMemo(() => createChallengeRepository(), []);
   const checkinRepository = useMemo(() => createCheckinRepository(), []);
   const s3Repository = createS3Repository();
 
@@ -82,7 +82,7 @@ export default function CreateCheckinScreen() {
         if (!localPhotoUri)
           navigation.back();
       } else {
-        toastErrorMessage('Ocorreu um erro');
+        toastErrorMessage('A câmera não entrou em campo');
       }
     }
   };
@@ -90,14 +90,14 @@ export default function CreateCheckinScreen() {
   useEffect(() => {
     const fetchData = async () => {
       const userId = await Memory.get('userId') || '';
-      const planId = await Memory.get('planId') || '';
+      const challengeId = await Memory.get('challengeId') || '';
 
       if (replacingCheckInId) {
         try {
           const existing = await checkinRepository.getById(replacingCheckInId);
           setCheckin({
             userId,
-            planId: existing.planId,
+            challengeId: existing.challengeId,
             evidencePhotoUrl: existing.evidencePhotoUrl,
             title: existing.title,
           });
@@ -110,45 +110,45 @@ export default function CreateCheckinScreen() {
         return;
       }
 
-      let plan;
+      let challenge;
       try {
-        plan = await planRepository.getById(planId);
+        challenge = await challengeRepository.getById(challengeId);
       } catch {
-        setMissing('plan');
+        setMissing('challenge');
         setLoading(false);
         return;
       }
 
-      if (!plan) {
-        setMissing('plan');
+      if (!challenge) {
+        setMissing('challenge');
         setLoading(false);
         return;
       }
 
-      const planMembers = await planRepository.getPlanMemberDetails(planId, userId);
+      const challengeMembers = await challengeRepository.getChallengeMemberDetails(challengeId, userId);
 
-      if (!planMembers) {
-        toastErrorMessage('Você não faz parte deste plano');
+      if (!challengeMembers) {
+        toastErrorMessage('Você não está nessa partida');
         navigation.back();
         return;
       }
 
-      if (planMembers.status === 'Blocked') {
-        toastErrorMessage('Você está bloqueado. Pague a multa para continuar participando');
+      if (challengeMembers.status === 'Blocked') {
+        toastErrorMessage('Você está no banco. Quita a multa para voltar ao jogo');
         navigation.back();
         return;
       }
 
-      setPlanStartsAt(plan.startsAt);
+      setChallengeStartsAt(challenge.startsAt);
 
-      const mine = await checkinRepository.list({ planId, userId });
+      const mine = await checkinRepository.list({ challengeId, userId });
       const todayDate = getDateOnly();
       const yesterdayDate = getDateOnlyWithOffset(-1);
       const hasToday = mine.some((item) => getDateOnly(item.date) === todayDate);
       const hasYesterday = mine.some((item) => getDateOnly(item.date) === yesterdayDate);
       setTakenToday(hasToday);
       setTakenYesterday(hasYesterday);
-      const yesterdayAllowed = yesterdayDate >= plan.startsAt;
+      const yesterdayAllowed = yesterdayDate >= challenge.startsAt;
       if (!hasToday)
         setSelectedDate(todayDate);
       else if (yesterdayAllowed && !hasYesterday)
@@ -157,7 +157,7 @@ export default function CreateCheckinScreen() {
       setCheckin({
         ...checkin,
         userId,
-        planId,
+        challengeId,
       });
 
       setLoading(false);
@@ -173,19 +173,19 @@ export default function CreateCheckinScreen() {
   if (missing === 'checkin') {
     return (
       <NotFoundState
-        title="Ops, check-in não encontrado"
-        description="Esse check-in não está mais disponível."
+        title="Esse check-in sumiu"
+        description="Ele não está mais disponível."
         primaryLabel="Voltar"
         onPrimary={() => navigation.back()}
       />
     );
   }
 
-  if (missing === 'plan') {
+  if (missing === 'challenge') {
     return (
       <NotFoundState
-        title="Ops, plano não encontrado"
-        description="Não foi possível abrir o plano deste check-in."
+        title="Esse desafio sumiu do mapa"
+        description="Não deu para abrir o desafio desse check-in."
         primaryLabel="Voltar"
         onPrimary={() => navigation.back()}
       />
@@ -194,7 +194,7 @@ export default function CreateCheckinScreen() {
 
   const createCheckin = async () => {
     if (!localPhotoUri && !checkin.evidencePhotoUrl) {
-      toastErrorMessage('Tire uma foto antes de marcar o check-in');
+      toastErrorMessage('Tira a foto da prova antes de marcar');
       return;
     }
 
@@ -217,14 +217,14 @@ export default function CreateCheckinScreen() {
       if (localPhotoUri) {
         evidencePhotoUrl = await s3Repository.uploadFile({
           filePath: localPhotoUri,
-          fileName: `checkins/${checkin.planId}/${checkin.userId}/${year}-${month}-${day}/${generateId()}.jpg`,
+          fileName: `checkins/${checkin.challengeId}/${checkin.userId}/${year}-${month}-${day}/${generateId()}.jpg`,
           fileType,
         });
       }
 
       if (replacingCheckInId) {
         await checkinRepository.replace(replacingCheckInId, checkin.userId, checkin.title, evidencePhotoUrl);
-        toastSuccessMessage('Check-in substituído com sucesso');
+        toastSuccessMessage('Check-in trocado. A votação recomeça!');
         navigation.back();
         return;
       }
@@ -235,13 +235,13 @@ export default function CreateCheckinScreen() {
         return;
 
       await checkinRepository.create(payload);
-      toastSuccessMessage('Check-in criado com sucesso');
+      toastSuccessMessage('Check-in na conta. Sequência protegida!');
       navigation.back();
     } catch (err) {
       console.error(err);
       const fallback = replacingCheckInId
-        ? 'Não foi possível substituir o check-in'
-        : 'Erro ao criar check-in';
+        ? 'Não deu para trocar o check-in'
+        : 'Não deu para marcar o check-in';
       toastErrorMessage(err instanceof Error && err.message ? err.message : fallback);
     } finally {
       setSubmitting(false);
@@ -250,7 +250,7 @@ export default function CreateCheckinScreen() {
 
   const today = getDateOnly();
   const yesterday = getDateOnlyWithOffset(-1);
-  const yesterdayBeforeStart = planStartsAt !== '' && yesterday < planStartsAt;
+  const yesterdayBeforeStart = challengeStartsAt !== '' && yesterday < challengeStartsAt;
   const dateOptions = [
     {
       label: 'Ontem',
@@ -265,7 +265,7 @@ export default function CreateCheckinScreen() {
   ];
 
   return (
-    <ScreenLayout header={<ScreenHeader title={replacingCheckInId ? 'Substituir check-in' : 'Marcar Check-in'} />}>
+    <ScreenLayout header={<ScreenHeader title={replacingCheckInId ? 'Trocar check-in' : 'Marcar presença'} />}>
       <KeyboardableView>
         <View className="flex-1 w-full gap-6 px-4 py-3" style={{ backgroundColor: getColor('gray-e') }}>
           <Card className="relative flex flex-row items-center justify-center w-full">
@@ -326,7 +326,7 @@ export default function CreateCheckinScreen() {
               {submitting ? (
                 <ActivityIndicator color={getColor('white')} />
               ) : (
-                <Text style={{ color: getColor('white') }} className="text-lg font-bold">{replacingCheckInId ? 'Substituir' : 'Marcar'}</Text>
+                <Text style={{ color: getColor('white') }} className="text-lg font-bold">{replacingCheckInId ? 'Trocar' : 'Marcar'}</Text>
               )}
             </GradientView>
           </Button>

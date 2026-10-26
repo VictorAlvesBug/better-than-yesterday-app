@@ -44,29 +44,29 @@ export default function NotificationsScreen() {
     load();
   }, [load]);
 
-  const openPlan = async (planId: string) => {
-    await Memory.set('planId', planId);
-    navigation.push('/plan-tracker' as Href);
+  const openChallenge = async (challengeId: string) => {
+    await Memory.set('challengeId', challengeId);
+    navigation.push('/challenge-tracker' as Href);
   };
 
-  const openCheckIn = async (planId: string, checkInId?: string) => {
-    await Memory.set('planId', planId);
+  const openCheckIn = async (challengeId: string, checkInId?: string) => {
+    await Memory.set('challengeId', challengeId);
     navigation.push((checkInId ? `/create-checkin?checkInId=${checkInId}` : '/create-checkin') as Href);
   };
 
   const actionFor = (item: AppNotification) => {
-    const planId = item.payload?.planId || item.planId;
+    const challengeId = item.payload?.challengeId || item.challengeId;
     const checkInId = notificationCheckInId(item.payload);
     const kind = item.payload?.type || item.kind;
 
     if (kind === 'CheckInRejectionRisk')
-      return { label: 'Substituir', run: () => openCheckIn(planId, checkInId) };
+      return { label: 'Trocar', run: () => openCheckIn(challengeId, checkInId) };
 
     if (kind === 'RestAtRisk' || kind === 'FineAtRisk')
-      return { label: 'Marcar', run: () => openCheckIn(planId) };
+      return { label: 'Jogar', run: () => openCheckIn(challengeId) };
 
-    if (kind === 'CheckInReviewed' || kind === 'CheckInMade' || kind === 'CheckInReported' || kind === 'PlanStartsToday')
-      return { label: 'Ver', run: () => openPlan(planId) };
+    if (kind === 'CheckInReviewed' || kind === 'CheckInMade' || kind === 'CheckInReported' || kind === 'ChallengeStartsToday')
+      return { label: 'Ver arena', run: () => openChallenge(challengeId) };
 
     return null;
   };
@@ -79,13 +79,13 @@ export default function NotificationsScreen() {
         </View>
       ) : failed ? (
         <NotFoundState
-          title="Não foi possível carregar os avisos"
-          description="Tente abrir esta tela novamente."
+          title="Os avisos não entraram em campo"
+          description="Abre essa tela de novo."
         />
       ) : items.length === 0 ? (
         <NotFoundState
-          title="Nenhum aviso por enquanto"
-          description="Quando algo importante acontecer no plano, o aviso aparece aqui."
+          title="Silêncio na arena"
+          description="Quando o desafio esquentar, o aviso aparece aqui."
         />
       ) : (
         <ScrollView className="flex-1 px-4 py-4" contentContainerStyle={{ gap: 12 }}>

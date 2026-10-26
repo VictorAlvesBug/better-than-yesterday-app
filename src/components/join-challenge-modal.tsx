@@ -1,5 +1,5 @@
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import Memory from '../api/memory';
-import createPlanRepository from '../api/planRepository';
+import createChallengeRepository from '../api/challengeRepository';
 import { Button } from './button';
 import Card from './card';
 import Icon from './icon';
@@ -24,18 +24,18 @@ import Label from './label';
 import useNavigation from '../hooks/useNavigation';
 import { getDifferenceInDays } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
-import { duplicatePlanPath } from '../utils/planUtils';
+import { duplicateChallengePath } from '../utils/challengeUtils';
 import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
-type JoinPlanModalProps = {
+type JoinChallengeModalProps = {
   visible: boolean;
   onClose: () => void;
-  initialPlanId?: string;
+  initialChallengeId?: string;
 };
 
 const GUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
-export function parsePlanIdFromInviteInput(input: string): string | null {
+export function parseChallengeIdFromInviteInput(input: string): string | null {
   const trimmed = input.trim();
   if (!trimmed)
     return null;
@@ -48,12 +48,12 @@ export function parsePlanIdFromInviteInput(input: string): string | null {
   return guidMatch ? guidMatch[0] : null;
 }
 
-export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: JoinPlanModalProps) {
+export default function JoinChallengeModal({ visible, onClose, initialChallengeId = '' }: JoinChallengeModalProps) {
   const navigation = useNavigation();
-  const planRepository = useMemo(() => createPlanRepository(), []);
+  const challengeRepository = useMemo(() => createChallengeRepository(), []);
 
   const [linkInput, setLinkInput] = useState('');
-  const [plan, setPlan] = useState<PlanEnriched | null>(null);
+  const [challenge, setChallenge] = useState<ChallengeEnriched | null>(null);
   const [searching, setSearching] = useState(false);
   const [joining, setJoining] = useState(false);
   const [searchError, setSearchError] = useState('');
@@ -85,12 +85,12 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
       setKeyboardHeight(0);
   }, [visible]);
 
-  const searchPlan = useCallback(async (planIdOverride?: string) => {
-    const planId = planIdOverride ?? parsePlanIdFromInviteInput(linkInput);
+  const searchChallenge = useCallback(async (challengeIdOverride?: string) => {
+    const challengeId = challengeIdOverride ?? parseChallengeIdFromInviteInput(linkInput);
 
-    if (!planId) {
-      setSearchError('Link ou ID do plano inválido');
-      setPlan(null);
+    if (!challengeId) {
+      setSearchError('Esse convite não abre nenhum desafio');
+      setChallenge(null);
       return;
     }
 
@@ -98,27 +98,27 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
     setSearchError('');
 
     try {
-      const found = await planRepository.getById(planId);
-      setPlan(found);
+      const found = await challengeRepository.getById(challengeId);
+      setChallenge(found);
     } catch {
-      setPlan(null);
-      setSearchError('Plano não encontrado');
+      setChallenge(null);
+      setSearchError('Esse desafio sumiu do mapa');
     } finally {
       setSearching(false);
     }
-  }, [linkInput, planRepository]);
+  }, [linkInput, challengeRepository]);
 
   useEffect(() => {
-    if (visible && initialPlanId) {
-      setLinkInput(`betterthanyesterdayapp://join/${initialPlanId}`);
-      searchPlan(initialPlanId);
+    if (visible && initialChallengeId) {
+      setLinkInput(`betterthanyesterdayapp://join/${initialChallengeId}`);
+      searchChallenge(initialChallengeId);
     }
-  }, [visible, initialPlanId, searchPlan]);
+  }, [visible, initialChallengeId, searchChallenge]);
 
   const reset = () => {
-    setPlan(null);
+    setChallenge(null);
     setSearchError('');
-    if (!initialPlanId)
+    if (!initialChallengeId)
       setLinkInput('');
   };
 
@@ -127,26 +127,26 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
     onClose();
   };
 
-  const joinPlan = async () => {
-    if (!plan)
+  const joinChallenge = async () => {
+    if (!challenge)
       return;
 
     const userId = await Memory.get('userId') || '';
     if (!userId) {
-      toastErrorMessage('Faça login para participar');
+      toastErrorMessage('Entra na conta para jogar');
       return;
     }
 
     setJoining(true);
 
     try {
-      await planRepository.join({ planId: plan.id, userId });
-      await Memory.set('planId', plan.id);
-      toastSuccessMessage('Você entrou no plano!');
+      await challengeRepository.join({ challengeId: challenge.id, userId });
+      await Memory.set('challengeId', challenge.id);
+      toastSuccessMessage('Você entrou no desafio. Bora!');
       handleClose();
-      navigation.replace('/plan-tracker');
+      navigation.replace('/challenge-tracker');
     } catch {
-      toastErrorMessage('Não foi possível entrar no plano. Apenas planos não iniciados aceitam novos membros.');
+      toastErrorMessage('Não deu para entrar. Só desafio que ainda não começou aceita jogador novo.');
     } finally {
       setJoining(false);
     }
@@ -178,7 +178,7 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
                   style={{ color: getColor('black') }}
                   className="flex-1 pr-3 text-lg font-bold"
                 >
-                  Entrar com link de convite
+                  Entrar com convite
                 </Text>
                 <Pressable
                   onPress={handleClose}
@@ -189,14 +189,14 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
                 </Pressable>
               </View>
 
-              <Label>Cole o link ou ID do plano</Label>
+              <Label>Cola o convite ou o ID do desafio</Label>
               <Input
                 placeholder="betterthanyesterdayapp://join/..."
                 value={linkInput}
                 onChange={setLinkInput}
               />
 
-              <Button action={() => searchPlan()} className="mt-3">
+              <Button action={() => searchChallenge()} className="mt-3">
                 Buscar
               </Button>
 
@@ -208,34 +208,34 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
                 <Text style={{ color: getColor('danger') }} className="mt-3 text-sm">{searchError}</Text>
               )}
 
-              {plan && !searching && (
+              {challenge && !searching && (
                 <Card className="flex flex-col gap-2 mt-4">
-                  {plan.coverPhotoUrl ? (
-                    <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: '100%', height: 140, borderRadius: 12 }} />
+                  {challenge.coverPhotoUrl ? (
+                    <Image source={{ uri: challenge.coverPhotoUrl }} style={{ width: '100%', height: 140, borderRadius: 12 }} />
                   ) : null}
                   <Text style={{ color: getColor('black') }} className="text-lg font-bold">
-                    {plan.description ?? plan.habitName}
+                    {challenge.description ?? challenge.habitName}
                   </Text>
                   <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                    {plan.habitName} · {7 - plan.daysOffPerWeek}x/semana
+                    {challenge.habitName} · {7 - challenge.daysOffPerWeek}x/semana
                   </Text>
                   <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                    Multa: {formatMoney(plan.penaltyValue)} · {getDifferenceInDays(plan.startsAt, plan.endsAt)} dias
+                    Multa: {formatMoney(challenge.penaltyValue)} · {getDifferenceInDays(challenge.startsAt, challenge.endsAt)} dias
                   </Text>
                   <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                    Status: {plan.status} · {plan.memberCount} membros
+                    Status: {challenge.status} · {challenge.memberCount} jogadores
                   </Text>
-                  <Button action={joinPlan} className="mt-2" color="success">
+                  <Button action={joinChallenge} className="mt-2" color="success">
                     {joining ? 'Entrando...' : 'Participar'}
                   </Button>
                   <Button
                     action={() => {
                       onClose();
-                      navigation.push(duplicatePlanPath(plan));
+                      navigation.push(duplicateChallengePath(challenge));
                     }}
                     type="outline"
                   >
-                    Duplicar
+                    Repetir desafio
                   </Button>
                 </Card>
               )}

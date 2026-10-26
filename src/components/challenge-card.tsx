@@ -1,52 +1,52 @@
 import { ColorName, getColor } from '@/types/color.type'
-import { PlanToJoin } from '@/types/plan.type'
+import { ChallengeToJoin } from '@/types/challenge.type'
 import React, { useMemo, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import createPlanRepository from '../api/planRepository'
+import createChallengeRepository from '../api/challengeRepository'
 import useNavigation from '../hooks/useNavigation'
 import { formatDateRelativeToToday } from '../utils/dateUtils'
 import { Button } from './button'
 import Icon from './icon'
-import PlanDetailsModal from './plan-details-modal'
+import ChallengeDetailsModal from './challenge-details-modal'
 import InviteLinkModal from './invite-link-modal'
 
 type ButtonRole = 'join' | 'leave' | 'peek';
 
-type PlanCardProps = {
-    plan: PlanToJoin;
+type ChallengeCardProps = {
+    challenge: ChallengeToJoin;
     userId: string;
-    callback?: (planId: string, joined: boolean) => void;
+    callback?: (challengeId: string, joined: boolean) => void;
 }
 
-function PlanCard({
-    plan,
+function ChallengeCard({
+    challenge,
     userId,
     callback = () => Promise.resolve()
-}: PlanCardProps) {
-    const planRepository = useMemo(() => createPlanRepository(), []);
+}: ChallengeCardProps) {
+    const challengeRepository = useMemo(() => createChallengeRepository(), []);
     const navigation = useNavigation();
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [inviteOpen, setInviteOpen] = useState(false);
 
-    const role = getButtonRole(plan);
+    const role = getButtonRole(challenge);
 
     const buttonInfo = getButtonInfo({
         role,
-        planId: plan.id,
+        challengeId: challenge.id,
         userId,
         callback,
-        planRepository,
+        challengeRepository,
         navigation,
     });
 
-    const statusInfo = getStatusInfo(plan.status);
+    const statusInfo = getStatusInfo(challenge.status);
 
-    const dollarSigns = plan.penaltyValue >= 50 ? '$$$' : plan.penaltyValue >= 10 ? '$$' : '$';
+    const dollarSigns = challenge.penaltyValue >= 50 ? '$$$' : challenge.penaltyValue >= 10 ? '$$' : '$';
 
     return (
         <View className="py-2 pb-4 mx-4">
-            <PlanDetailsModal plan={detailsOpen ? plan : null} onClose={() => setDetailsOpen(false)} />
-            <InviteLinkModal visible={inviteOpen} planId={plan.id} onClose={() => setInviteOpen(false)} />
+            <ChallengeDetailsModal challenge={detailsOpen ? challenge : null} onClose={() => setDetailsOpen(false)} />
+            <InviteLinkModal visible={inviteOpen} challengeId={challenge.id} onClose={() => setInviteOpen(false)} />
             <View className="flex flex-row w-full overflow-hidden bg-white shadow-md rounded-2xl">
                 <View
                     style={{ backgroundColor: statusInfo.backgroundColor, width: 22 }}
@@ -81,14 +81,14 @@ function PlanCard({
                                 numberOfLines={1}
                                 ellipsizeMode="tail"
                             >
-                                {plan.habitName}
+                                {challenge.habitName}
                             </Text>
                             <Text className="text-sm" numberOfLines={1}>
-                                {plan.ownerName}
+                                {challenge.ownerName}
                             </Text>
-                            {plan.description ? (
+                            {challenge.description ? (
                                 <Text className="text-sm" numberOfLines={2}>
-                                    {plan.description}
+                                    {challenge.description}
                                 </Text>
                             ) : null}
                         </View>
@@ -96,10 +96,10 @@ function PlanCard({
 
                     <View className="flex flex-row items-center justify-between w-full px-4">
                         <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                            {formatDateRelativeToToday(plan.startsAt)}
+                            {formatDateRelativeToToday(challenge.startsAt)}
                         </Text>
                         <Text style={{ color: getColor('violet') }} className="text-sm font-bold">
-                            {`${dollarSigns} · ${7 - plan.daysOffPerWeek}/7`}
+                            {`${dollarSigns} · ${7 - challenge.daysOffPerWeek}/7`}
                         </Text>
                     </View>
                     </Pressable>
@@ -127,34 +127,34 @@ function PlanCard({
     )
 }
 
-export default React.memo(PlanCard);
+export default React.memo(ChallengeCard);
 
-function getStatusInfo(status: PlanToJoin['status']) {
+function getStatusInfo(status: ChallengeToJoin['status']) {
     switch (status) {
         case 'NotStarted':
             return {
-                label: 'Não iniciado',
+                label: 'No aquecimento',
                 backgroundColor: getColor('light-orange'),
                 textColor: getColor('dark-orange'),
             };
 
         case 'Running':
             return {
-                label: 'Em andamento',
+                label: 'Em jogo',
                 backgroundColor: getColor('light-success'),
                 textColor: getColor('success'),
             };
 
         case 'Finished':
             return {
-                label: 'Finalizado',
+                label: 'Missão cumprida',
                 backgroundColor: getColor('light-info'),
                 textColor: getColor('primary'),
             };
 
         case 'Cancelled':
             return {
-                label: 'Cancelado',
+                label: 'Arena fechada',
                 backgroundColor: getColor('light-danger'),
                 textColor: getColor('danger'),
             };
@@ -165,34 +165,34 @@ function getStatusInfo(status: PlanToJoin['status']) {
     }
 }
 
-function getButtonRole(plan: PlanToJoin): ButtonRole {
-    switch (plan.status) {
+function getButtonRole(challenge: ChallengeToJoin): ButtonRole {
+    switch (challenge.status) {
         case 'Finished':
             return 'peek';
 
         case 'NotStarted':
-            if (plan.joined) return 'leave';
+            if (challenge.joined) return 'leave';
             return 'join';
 
         case 'Running':
-            if (plan.joined) return 'leave';
+            if (challenge.joined) return 'leave';
             return 'peek';
 
         case 'Cancelled':
-            throw new Error('Planos cancelados não devem ser exibidos nessa tela');
+            throw new Error('Desafio cancelado não entra nessa tela');
 
         default:
-            const _exhaustive: never = plan.status;
+            const _exhaustive: never = challenge.status;
             return _exhaustive;
     }
 }
 
 type GetActionOptions = {
     role: ButtonRole;
-    planId: string;
+    challengeId: string;
     userId: string;
-    planRepository: ReturnType<typeof createPlanRepository>;
-    callback: PlanCardProps['callback'];
+    challengeRepository: ReturnType<typeof createChallengeRepository>;
+    callback: ChallengeCardProps['callback'];
     navigation: ReturnType<typeof useNavigation>;
 }
 
@@ -203,7 +203,7 @@ type ButtonInfo = {
     lightColor: ColorName
 }
 
-function getButtonInfo({ role, planId, userId, planRepository, callback, navigation }: GetActionOptions): ButtonInfo {
+function getButtonInfo({ role, challengeId, userId, challengeRepository, callback, navigation }: GetActionOptions): ButtonInfo {
     switch (role) {
         case 'join':
             return {
@@ -211,8 +211,8 @@ function getButtonInfo({ role, planId, userId, planRepository, callback, navigat
                 baseColor: 'success',
                 lightColor: 'light-success',
                 action: async () => {
-                    await planRepository.join({ planId, userId });
-                    callback && await callback(planId, true);
+                    await challengeRepository.join({ challengeId, userId });
+                    callback && await callback(challengeId, true);
                 },
             };
 
@@ -222,8 +222,8 @@ function getButtonInfo({ role, planId, userId, planRepository, callback, navigat
                 baseColor: 'danger',
                 lightColor: 'light-danger',
                 action: async () => {
-                    await planRepository.leave({ planId, userId });
-                    callback && await callback(planId, false);
+                    await challengeRepository.leave({ challengeId, userId });
+                    callback && await callback(challengeId, false);
                 },
             };
 
@@ -233,7 +233,7 @@ function getButtonInfo({ role, planId, userId, planRepository, callback, navigat
                 baseColor: 'info',
                 lightColor: 'light-info',
                 action: async () => {
-                    navigation.push(`/plan-peek?planId=${planId}`);
+                    navigation.push(`/challenge-peek?challengeId=${challengeId}`);
                 },
             };
 

@@ -3,7 +3,7 @@ import { backendApi } from '../utils/apiUtils';
 
 export type AppNotification = {
   id: string;
-  planId: string;
+  challengeId: string;
   kind: string;
   message: string;
   createdAt: string;

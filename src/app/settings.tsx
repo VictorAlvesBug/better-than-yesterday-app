@@ -112,10 +112,10 @@ export default function SettingsScreen() {
         pixKeyType: user.pixKeyType,
       });
 
-      toastSuccessMessage('Dados atualizados com sucesso');
+      toastSuccessMessage('Perfil atualizado. Bora!');
       navigation.back();
     } catch (error) {
-      toastErrorMessage(error instanceof Error ? error.message : 'Não foi possível salvar');
+      toastErrorMessage(error instanceof Error ? error.message : 'Não deu para salvar o perfil');
     } finally {
       setSaving(false);
     }
@@ -216,7 +216,7 @@ export default function SettingsScreen() {
         >
           <GradientView className="flex flex-col items-center justify-center w-full h-full py-3">
             <Text style={{ color: getColor('white') }} className="text-lg font-bold">
-              {saving ? 'Salvando...' : 'Salvar'}
+              {saving ? 'Salvando...' : 'Pronto'}
             </Text>
           </GradientView>
         </Button>

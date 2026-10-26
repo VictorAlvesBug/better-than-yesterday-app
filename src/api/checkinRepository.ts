@@ -5,10 +5,10 @@ import { mapCheckInEnrichedFromApi } from '../utils/apiMappers';
 import { backendApi, ListCheckInsFilter } from '../utils/apiUtils';
 
 export default function createCheckinRepository() {
-    const list = async (filter?: Partial<{ planId: string; userId: string; status: CheckinStatus; date: Date }>): Promise<CheckinEnriched[]> => {
+    const list = async (filter?: Partial<{ challengeId: string; userId: string; status: CheckinStatus; date: Date }>): Promise<CheckinEnriched[]> => {
         console.log("CheckinRepository.list - filter:", filter);
         const checkins = await backendApi.listCheckIns({
-            planId: filter?.planId,
+            challengeId: filter?.challengeId,
             userId: filter?.userId,
             status: filter?.status,
             date: filter?.date ? getDateOnly(filter.date) : undefined,
@@ -16,7 +16,7 @@ export default function createCheckinRepository() {
         return checkins.map(mapCheckInEnrichedFromApi);
     };
 
-    const get = async (filter?: Partial<{ planId: string; userId: string; status: CheckinStatus; id: string }>): Promise<CheckinEnriched> => {
+    const get = async (filter?: Partial<{ challengeId: string; userId: string; status: CheckinStatus; id: string }>): Promise<CheckinEnriched> => {
         console.log("CheckinRepository.get - filter:", filter);
 
         if (filter?.id)
@@ -75,8 +75,8 @@ export default function createCheckinRepository() {
         await backendApi.createCheckInReport({ checkInId, reporterId, reason });
     };
 
-    const listReports = async (planId: string, requesterId: string) => {
-        return backendApi.listCheckInReports(planId, requesterId);
+    const listReports = async (challengeId: string, requesterId: string) => {
+        return backendApi.listCheckInReports(challengeId, requesterId);
     };
 
     return {

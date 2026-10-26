@@ -8,13 +8,13 @@ import Icon from './icon';
 
 type InviteLinkModalProps = {
   visible: boolean;
-  planId: string;
+  challengeId: string;
   onClose: () => void;
 };
 
-export default function InviteLinkModal({ visible, planId, onClose }: InviteLinkModalProps) {
+export default function InviteLinkModal({ visible, challengeId, onClose }: InviteLinkModalProps) {
   // TODO: Criar link acessável via navegador
-  const link = `betterthanyesterdayapp://join/${planId}`;
+  const link = `betterthanyesterdayapp://join/${challengeId}`;
 
   const copy = () => {
     Clipboard.setString(link);
@@ -29,7 +29,7 @@ export default function InviteLinkModal({ visible, planId, onClose }: InviteLink
             <Icon name="close" size={24} color="gray-3" />
           </Pressable>
           <Text style={{ color: getColor('black') }} className="pr-8 text-lg font-bold">
-            Convite do plano
+            Convite do desafio
           </Text>
           <Text style={{ color: getColor('gray-3') }} className="mt-3 text-sm">
             {link}

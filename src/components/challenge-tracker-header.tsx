@@ -1,5 +1,5 @@
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
 import React from 'react';
 import { Animated, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,22 +18,22 @@ const TITLE_TRANSLATE_X = 64;
 const TITLE_HERO_TOP_OFFSET = 8;
 const FREQUENCY_HERO_TOP_OFFSET = 40;
 
-type PlanTrackerHeaderProps = {
-  plan: PlanEnriched;
+type ChallengeTrackerHeaderProps = {
+  challenge: ChallengeEnriched;
   scrollY: Animated.Value;
   onOpenSettings: () => void;
   setIsDrawerOpen: (open: boolean) => void;
 };
 
-export default function PlanTrackerHeader({
-  plan,
+export default function ChallengeTrackerHeader({
+  challenge,
   scrollY,
   onOpenSettings,
   setIsDrawerOpen,
-}: PlanTrackerHeaderProps) {
+}: ChallengeTrackerHeaderProps) {
   const insets = useSafeAreaInsets();
-  const planTitle = plan.description ?? plan.habitName;
-  const frequency = `${7 - plan.daysOffPerWeek}x por semana`;
+  const challengeTitle = challenge.description ?? challenge.habitName;
+  const frequency = `${7 - challenge.daysOffPerWeek}x por semana`;
 
   const titleStartTop = insets.top + TOOLBAR_HEIGHT + TITLE_HERO_TOP_OFFSET;
   const titleCollapsedTop =
@@ -166,7 +166,7 @@ export default function PlanTrackerHeader({
           numberOfLines={1}
           pointerEvents="none"
         >
-          {planTitle}
+          {challengeTitle}
         </Animated.Text>
       </GradientView>
     </Animated.View>

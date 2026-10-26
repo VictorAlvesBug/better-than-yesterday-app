@@ -7,7 +7,7 @@ const habitSchema = baseResourceSchema.extend({
 export type Habit = z.infer<typeof habitSchema>;
 
 export type HabitEnriched = Habit & {
-  planCount: number;
+  challengeCount: number;
 };
 
 export const createHabitSchema = habitSchema.omit({ id: true, createdAt: true })

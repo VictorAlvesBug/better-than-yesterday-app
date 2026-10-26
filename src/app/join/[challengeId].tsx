@@ -1,10 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import JoinPlanModal from '../../components/join-plan-modal';
+import JoinChallengeModal from '../../components/join-challenge-modal';
 
-export default function JoinPlanScreen() {
-  const { planId } = useLocalSearchParams<{ planId: string }>();
+export default function JoinChallengeScreen() {
+  const { challengeId } = useLocalSearchParams<{ challengeId: string }>();
   const router = useRouter();
   const [visible, setVisible] = useState(true);
 
@@ -13,15 +13,15 @@ export default function JoinPlanScreen() {
     if (router.canGoBack())
       router.back();
     else
-      router.replace('/manage-plans');
+      router.replace('/manage-challenges');
   };
 
   return (
     <View className="flex-1">
-      <JoinPlanModal
+      <JoinChallengeModal
         visible={visible}
         onClose={handleClose}
-        initialPlanId={typeof planId === 'string' ? planId : undefined}
+        initialChallengeId={typeof challengeId === 'string' ? challengeId : undefined}
       />
     </View>
   );

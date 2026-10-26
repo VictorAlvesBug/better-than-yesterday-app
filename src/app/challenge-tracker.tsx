@@ -1,50 +1,50 @@
 import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
 import Constants from 'expo-constants';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import PlanTrackerContent from '../components/plan-tracker-content';
+import ChallengeTrackerContent from '../components/challenge-tracker-content';
 import useNavigation from '../hooks/useNavigation';
 import { useRepositories } from '../hooks/useRepositories';
 
 const statusBarHeight = Constants.statusBarHeight;
 
-export default function PlanTrackerScreen() {
-  const { plan: planRepository } = useRepositories();
+export default function ChallengeTrackerScreen() {
+  const { challenge: challengeRepository } = useRepositories();
   const navigation = useNavigation();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [plan, setPlan] = useState<PlanEnriched | null>(null);
+  const [challenge, setChallenge] = useState<ChallengeEnriched | null>(null);
 
   const fetchData = useCallback(async (showLoading = true) => {
     if (showLoading)
       setLoading(true);
 
     try {
-      const planId = await Memory.get('planId');
+      const challengeId = await Memory.get('challengeId');
 
-      if (!planId) {
-        navigation.replace('/manage-plans');
+      if (!challengeId) {
+        navigation.replace('/manage-challenges');
         return;
       }
 
-      const dbPlan = await planRepository.getById(planId);
+      const dbChallenge = await challengeRepository.getById(challengeId);
 
-      if (!dbPlan) {
-        await Memory.remove('planId');
-        navigation.replace('/manage-plans');
+      if (!dbChallenge) {
+        await Memory.remove('challengeId');
+        navigation.replace('/manage-challenges');
         return;
       }
 
-      setPlan(dbPlan);
+      setChallenge(dbChallenge);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [planRepository, navigation]);
+  }, [challengeRepository, navigation]);
 
   useEffect(() => {
     fetchData();
@@ -63,17 +63,17 @@ export default function PlanTrackerScreen() {
         style={{ marginTop: statusBarHeight, backgroundColor: getColor('gray-e') }}
       >
         <ActivityIndicator size="large" color={getColor('gray-6')} />
-        <Text style={{ color: getColor('gray-6') }} className="mt-2 text-sm">Carregando plano...</Text>
+        <Text style={{ color: getColor('gray-6') }} className="mt-2 text-sm">Abrindo a arena...</Text>
       </View>
     );
   }
 
-  if (!plan)
+  if (!challenge)
     return null;
 
   return (
-    <PlanTrackerContent
-      plan={plan}
+    <ChallengeTrackerContent
+      challenge={challenge}
       refreshing={refreshing}
       onRefresh={onRefresh}
       refreshKey={refreshKey}

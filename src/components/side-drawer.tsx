@@ -1,6 +1,6 @@
 import Memory from '@/src/api/memory';
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
 import { User } from '@/types/user.type';
 import { Href } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -31,7 +31,7 @@ type TextBalanceProps = {
   balance: number;
 };
 
-function TextBalanceForFinishedPlan({ balance }: TextBalanceProps) {
+function TextBalanceForFinishedChallenge({ balance }: TextBalanceProps) {
   const isPositive = balance >= 0;
 
   const signal = isPositive ? '+' : '-';
@@ -56,11 +56,11 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const insets = useSafeAreaInsets();
   const { signOut } = useAuth();
   const navigation = useNavigation();
-  const { plan: planRepository, ranking: rankingRepository, user: userRepository } = useRepositories();
+  const { challenge: challengeRepository, ranking: rankingRepository, user: userRepository } = useRepositories();
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [plans, setPlans] = useState<PlanEnriched[]>([]);
+  const [challenges, setChallenges] = useState<ChallengeEnriched[]>([]);
   const [rankingPosition, setRankingPosition] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const mountedRef = useRef(false);
@@ -68,8 +68,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
-  const activePlans = plans.filter(plan => plan.status === 'NotStarted' || plan.status === 'Running');
-  const finishedPlans = plans.filter(plan => plan.status === 'Finished');
+  const activeChallenges = challenges.filter(challenge => challenge.status === 'NotStarted' || challenge.status === 'Running');
+  const finishedChallenges = challenges.filter(challenge => challenge.status === 'Finished');
 
   useEffect(() => {
     if (isOpen) {
@@ -143,14 +143,14 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
 
     setLoading(true);
 
-    const fetchPlans = async () => {
-      const userPlans = await planRepository.listByUserId(user.id);
-      setPlans(userPlans);
+    const fetchChallenges = async () => {
+      const userChallenges = await challengeRepository.listByUserId(user.id);
+      setChallenges(userChallenges);
 
-      const planId = await Memory.get('planId');
-      if (planId) {
+      const challengeId = await Memory.get('challengeId');
+      if (challengeId) {
         try {
-          const ranking = await rankingRepository.getByPlanIdAndUserId(planId, user.id);
+          const ranking = await rankingRepository.getByChallengeIdAndUserId(challengeId, user.id);
           setRankingPosition(ranking.currentUser.position);
         } catch {
           setRankingPosition(null);
@@ -162,8 +162,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
       setLoading(false);
     };
 
-    fetchPlans();
-  }, [planRepository, rankingRepository, user, isOpen]);
+    fetchChallenges();
+  }, [challengeRepository, rankingRepository, user, isOpen]);
 
   if (!mounted)
     return null;
@@ -230,22 +230,22 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           {loading && (
             <ActivityIndicator size="large" color={getColor('gray-6')} />
           )}
-          {!loading && activePlans.length > 0 && (
+          {!loading && activeChallenges.length > 0 && (
             <View className="flex flex-col">
               <Text
                 style={{ color: getColor('gray-3') }}
                 className="px-6 pt-4 pb-2 text-xs font-semibold uppercase"
               >
-                Planos Ativos
+                Desafios em jogo
               </Text>
-              {activePlans.map(plan => (
+              {activeChallenges.map(challenge => (
                 <Pressable
-                  key={plan.id}
+                  key={challenge.id}
                   className="flex flex-row items-center justify-start gap-3 px-8 py-4"
                   onPress={async () => {
-                    const forceReload = (await Memory.get('planId')) !== plan.id;
-                    await Memory.set('planId', plan.id);
-                    navigation.push('/plan-tracker', forceReload);
+                    const forceReload = (await Memory.get('challengeId')) !== challenge.id;
+                    await Memory.set('challengeId', challenge.id);
+                    navigation.push('/challenge-tracker', forceReload);
                     onClose();
                   }}
                 >
@@ -254,42 +254,42 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                     className="w-2 h-2 rounded-full"
                   />
                   <Text style={{ color: getColor('gray-3') }} className="flex-1 font-semibold" numberOfLines={1}>
-                    {plan.description ?? plan.habitName}
+                    {challenge.description ?? challenge.habitName}
                   </Text>
                   <Text
-                    style={{ color: getColor((plan.amountOwed ?? 0) > 0 ? 'danger' : 'success') }}
+                    style={{ color: getColor((challenge.amountOwed ?? 0) > 0 ? 'danger' : 'success') }}
                     className="font-semibold"
                   >
-                    {(plan.amountOwed ?? 0) > 0
-                      ? `-${formatMoney(plan.amountOwed ?? 0)}`
-                      : `+${formatMoney(plan.rewardPool ?? 0)}`}
+                    {(challenge.amountOwed ?? 0) > 0
+                      ? `-${formatMoney(challenge.amountOwed ?? 0)}`
+                      : `+${formatMoney(challenge.rewardPool ?? 0)}`}
                   </Text>
                 </Pressable>
               ))}
             </View>
           )}
-          {!loading && finishedPlans.length > 0 && (
+          {!loading && finishedChallenges.length > 0 && (
             <View className="flex flex-col">
               <Text
                 style={{ color: getColor('gray-3') }}
                 className="px-6 pt-4 pb-2 text-xs font-semibold uppercase"
               >
-                Planos Finalizados
+                Desafios concluídos
               </Text>
-              {finishedPlans.map((plan: PlanEnriched) => (
+              {finishedChallenges.map((challenge: ChallengeEnriched) => (
                 <View
-                  key={plan.id}
+                  key={challenge.id}
                   className="flex flex-row items-center justify-between gap-3 px-8 py-4"
                 >
                   <Text style={{ color: getColor('gray-3') }} className="font-semibold">
-                    {plan.description ?? plan.habitName}
+                    {challenge.description ?? challenge.habitName}
                   </Text>
-                  <TextBalanceForFinishedPlan balance={plan.rewardPool ?? 0} />
+                  <TextBalanceForFinishedChallenge balance={challenge.rewardPool ?? 0} />
                 </View>
               ))}
             </View>
           )}
-          {!loading && plans.length > 0 && (
+          {!loading && challenges.length > 0 && (
             <View
               style={{ backgroundColor: getColor('gray-9'), width: '90%', height: 0.5 }}
               className="mx-auto my-6"
@@ -297,7 +297,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
           )}
           <Pressable
             onPress={() => {
-              navigation.replace('/manage-plans');
+              navigation.replace('/manage-challenges');
               onClose();
             }}
             className="flex flex-row items-center justify-start gap-3 px-8 py-3"
@@ -306,7 +306,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               <Icon name="add-circle-outline" size={16} color="gray-3" />
             </View>
             <Text style={{ color: getColor('gray-3') }} className="font-semibold">
-              Gerenciar Planos
+              Arena
             </Text>
           </Pressable>
           <Pressable

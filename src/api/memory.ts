@@ -6,7 +6,7 @@ import { toastErrorMessage } from '../utils/toastUtils';
 type StoredPairs = {
     'google_idToken' : string;
     'google_user': AuthUser;
-    'planId': string;
+    'challengeId': string;
     'userId': string;
 }
 

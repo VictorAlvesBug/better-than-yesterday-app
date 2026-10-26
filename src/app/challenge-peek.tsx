@@ -1,33 +1,33 @@
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
+import { ChallengeEnriched } from '@/types/challenge.type';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
-import createPlanRepository from '../api/planRepository';
+import createChallengeRepository from '../api/challengeRepository';
 import Ranking from '../components/ranking';
 import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
 
-export default function PlanPeekScreen() {
-  const { planId } = useLocalSearchParams<{ planId: string }>();
-  const planRepository = useMemo(() => createPlanRepository(), []);
-  const [plan, setPlan] = useState<PlanEnriched | null>(null);
+export default function ChallengePeekScreen() {
+  const { challengeId } = useLocalSearchParams<{ challengeId: string }>();
+  const challengeRepository = useMemo(() => createChallengeRepository(), []);
+  const [challenge, setChallenge] = useState<ChallengeEnriched | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPlan = async () => {
-      if (!planId) {
+    const fetchChallenge = async () => {
+      if (!challengeId) {
         setLoading(false);
         return;
       }
 
-      const dbPlan = await planRepository.getById(planId);
-      setPlan(dbPlan);
+      const dbChallenge = await challengeRepository.getById(challengeId);
+      setChallenge(dbChallenge);
       setLoading(false);
     };
 
-    fetchPlan();
-  }, [planId, planRepository]);
+    fetchChallenge();
+  }, [challengeId, challengeRepository]);
 
   if (loading) {
     return (
@@ -41,7 +41,7 @@ export default function PlanPeekScreen() {
     <ScreenLayout
       header={
         <ScreenHeader
-          title={plan?.description ?? plan?.habitName ?? 'Plano'}
+          title={challenge?.description ?? challenge?.habitName ?? 'Desafio'}
           titleSize="text-lg"
           className="pb-6"
         >
@@ -53,7 +53,7 @@ export default function PlanPeekScreen() {
     >
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View className="px-4 mt-4">
-          {planId && <Ranking planId={planId} />}
+          {challengeId && <Ranking challengeId={challengeId} />}
         </View>
       </ScrollView>
     </ScreenLayout>

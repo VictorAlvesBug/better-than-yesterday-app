@@ -14,7 +14,7 @@ export type PaymentMethod = z.infer<typeof paymentMethodSchema>;
 
 const penaltySchema = baseResourceSchema.extend({
   id: z.guid({ error: 'ID da multa é obrigatório' }),
-  planId: z.guid({ error: 'ID do plano é obrigatório' }),
+  challengeId: z.guid({ error: 'Faltou o ID do desafio' }),
   userId: z.guid({ error: 'ID do usuário é obrigatório' }),
   date: z.string().transform((str) => parseDateOnly(str)),
   amount: z.number(),

@@ -19,12 +19,12 @@ export type RankingItemEnriched = RankingItem & {
     days?: RankingDay[];
 };
 
-export type PlanRanking = {
+export type ChallengeRanking = {
     totalCheckinCount: number;
     daysOffAvailable: number;
     items: RankingItemEnriched[];
 };
 
-export type PlanRankingWithCurrentUser = PlanRanking & {
+export type ChallengeRankingWithCurrentUser = ChallengeRanking & {
     currentUser: RankingItemEnriched;
 };

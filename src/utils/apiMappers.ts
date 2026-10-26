@@ -1,19 +1,19 @@
 import { Penalty } from '@/types/penalty.type';
 import { Checkin, CheckinEnriched, CheckinReview, CheckinStatus, CreateCheckin } from '@/types/checkin.type';
-import { PlanRanking, PlanRankingWithCurrentUser, RankingItemEnriched } from '@/types/ranking.type';
+import { ChallengeRanking, ChallengeRankingWithCurrentUser, RankingItemEnriched } from '@/types/ranking.type';
 import { CreateHabit, Habit, HabitEnriched } from '@/types/habit.type';
 import {
-  CreatePlan,
-  Plan,
-  PlanEnriched,
-  PlanMember,
-  PlanMemberEnriched,
-  PlanMemberStatus,
-  PlanStatus,
-  PlanType,
-  PlanWithMembers,
-  UserWithPlans,
-} from '@/types/plan.type';
+  CreateChallenge,
+  Challenge,
+  ChallengeEnriched,
+  ChallengeMember,
+  ChallengeMemberEnriched,
+  ChallengeMemberStatus,
+  ChallengeStatus,
+  ChallengeType,
+  ChallengeWithMembers,
+  UserWithChallenges,
+} from '@/types/challenge.type';
 import { CreateUser, PixKeyType, User } from '@/types/user.type';
 import { AllTypes, DateOnly, DateTime, getDateOnly, getDateTime, parseDateTime, isDateTime } from '@/src/utils/dateUtils';
 
@@ -35,7 +35,7 @@ export type ApiUser = {
   createdAt: string;
 };
 
-export type ApiPlan = {
+export type ApiChallenge = {
   id: string;
   ownerId: string;
   ownerName: string;
@@ -63,8 +63,8 @@ export type ApiReview = {
 
 export type ApiCheckIn = {
   id: string;
-  planId: string;
-  planName: string;
+  challengeId: string;
+  challengeName: string;
   userId: string;
   userName: string;
   userPhotoUrl?: string | null;
@@ -79,22 +79,22 @@ export type ApiCheckIn = {
   isReplacement?: boolean;
 };
 
-export type ApiPlanMemberDetails = {
+export type ApiChallengeMemberDetails = {
   id: string;
   joinedAt: string;
   status: string;
-  plan: ApiPlan;
+  challenge: ApiChallenge;
   user: ApiUser;
 };
 
-export type ApiPlanWithMembers = {
-  plan: ApiPlan;
+export type ApiChallengeWithMembers = {
+  challenge: ApiChallenge;
   users: ApiUser[];
 };
 
-export type ApiUserWithPlans = {
+export type ApiUserWithChallenges = {
   user: ApiUser;
-  plans: ApiPlan[];
+  challenges: ApiChallenge[];
 };
 
 export type PresignedUploadUrl = {
@@ -102,7 +102,7 @@ export type PresignedUploadUrl = {
   fileUrl: string;
 };
 
-export type ApiPlanRankingItem = {
+export type ApiChallengeRankingItem = {
   position: number;
   userId: string;
   userName: string;
@@ -114,19 +114,19 @@ export type ApiPlanRankingItem = {
   days?: { date: string; position: string; tone: string }[];
 };
 
-export type ApiPlanRanking = {
+export type ApiChallengeRanking = {
   totalCheckinCount: number;
   daysOffAvailable: number;
-  items: ApiPlanRankingItem[];
+  items: ApiChallengeRankingItem[];
 };
 
-export type ApiPlanRankingWithCurrentUser = ApiPlanRanking & {
-  currentUser: ApiPlanRankingItem;
+export type ApiChallengeRankingWithCurrentUser = ApiChallengeRanking & {
+  currentUser: ApiChallengeRankingItem;
 };
 
 export type ApiPenalty = {
   id: string;
-  planId: string;
+  challengeId: string;
   userId: string;
   date: string;
   amount: number;
@@ -146,7 +146,7 @@ export function mapPenaltyFromApi(penalty: ApiPenalty): Penalty {
 
   return {
     id: penalty.id,
-    planId: penalty.planId,
+    challengeId: penalty.challengeId,
     userId: penalty.userId,
     date: dateOnly,
     amount: penalty.amount,
@@ -174,25 +174,25 @@ export function mapUserFromApi(user: ApiUser): User {
   };
 }
 
-export function mapPlanFromApi(plan: ApiPlan, memberCount = 0): PlanEnriched {
+export function mapChallengeFromApi(challenge: ApiChallenge, memberCount = 0): ChallengeEnriched {
   return {
-    id: plan.id,
-    ownerId: plan.ownerId,
-    habitId: plan.habitId,
-    description: plan.description ?? undefined,
-    startsAt: plan.startsAt as DateOnly,
-    endsAt: plan.endsAt as DateOnly,
-    type: plan.type as PlanType,
-    daysOffPerWeek: plan.daysOffPerWeek,
-    penaltyValue: plan.penaltyValue as PlanEnriched['penaltyValue'],
-    coverPhotoUrl: plan.coverPhotoUrl ?? undefined,
-    status: plan.status as PlanStatus,
-    createdAt: plan.createdAt as DateTime,
-    ownerName: plan.ownerName,
-    habitName: plan.habitName,
+    id: challenge.id,
+    ownerId: challenge.ownerId,
+    habitId: challenge.habitId,
+    description: challenge.description ?? undefined,
+    startsAt: challenge.startsAt as DateOnly,
+    endsAt: challenge.endsAt as DateOnly,
+    type: challenge.type as ChallengeType,
+    daysOffPerWeek: challenge.daysOffPerWeek,
+    penaltyValue: challenge.penaltyValue as ChallengeEnriched['penaltyValue'],
+    coverPhotoUrl: challenge.coverPhotoUrl ?? undefined,
+    status: challenge.status as ChallengeStatus,
+    createdAt: challenge.createdAt as DateTime,
+    ownerName: challenge.ownerName,
+    habitName: challenge.habitName,
     memberCount,
-    amountOwed: plan.amountOwed ?? 0,
-    rewardPool: plan.rewardPool ?? 0,
+    amountOwed: challenge.amountOwed ?? 0,
+    rewardPool: challenge.rewardPool ?? 0,
   };
 }
 
@@ -200,7 +200,7 @@ export function mapCheckInFromApi(checkIn: ApiCheckIn): Checkin {
   return {
     id: checkIn.id,
     kind: 'checkin',
-    planId: checkIn.planId,
+    challengeId: checkIn.challengeId,
     userId: checkIn.userId,
     date: getDateTime(checkIn.date as AllTypes) as DateTime,
     title: checkIn.title,
@@ -221,45 +221,45 @@ export function mapCheckInFromApi(checkIn: ApiCheckIn): Checkin {
 export function mapCheckInEnrichedFromApi(checkIn: ApiCheckIn): CheckinEnriched {
   return {
     ...mapCheckInFromApi(checkIn),
-    planName: checkIn.planName,
+    challengeName: checkIn.challengeName,
     userName: checkIn.userName,
     userPhotoUrl: checkIn.userPhotoUrl ?? undefined,
   };
 }
 
-export function mapPlanMemberFromDetails(details: ApiPlanMemberDetails): PlanMember {
+export function mapChallengeMemberFromDetails(details: ApiChallengeMemberDetails): ChallengeMember {
   return {
     id: details.id,
-    planId: details.plan.id,
+    challengeId: details.challenge.id,
     userId: details.user.id,
     joinedAt: details.joinedAt as DateTime,
-    status: details.status as PlanMemberStatus,
+    status: details.status as ChallengeMemberStatus,
     createdAt: details.joinedAt as DateTime,
   };
 }
 
-export function mapPlanMemberEnrichedFromDetails(details: ApiPlanMemberDetails): PlanMemberEnriched {
-  const plan = mapPlanFromApi(details.plan);
+export function mapChallengeMemberEnrichedFromDetails(details: ApiChallengeMemberDetails): ChallengeMemberEnriched {
+  const challenge = mapChallengeFromApi(details.challenge);
   const user = mapUserFromApi(details.user);
 
   return {
-    ...mapPlanMemberFromDetails(details),
+    ...mapChallengeMemberFromDetails(details),
     user,
-    plan,
+    challenge,
   };
 }
 
-export function mapPlanWithMembersFromApi(data: ApiPlanWithMembers): PlanWithMembers {
+export function mapChallengeWithMembersFromApi(data: ApiChallengeWithMembers): ChallengeWithMembers {
   return {
-    plan: mapPlanFromApi(data.plan, data.users.length),
+    challenge: mapChallengeFromApi(data.challenge, data.users.length),
     users: data.users.map(mapUserFromApi),
   };
 }
 
-export function mapUserWithPlansFromApi(data: ApiUserWithPlans): UserWithPlans {
+export function mapUserWithChallengesFromApi(data: ApiUserWithChallenges): UserWithChallenges {
   return {
     user: mapUserFromApi(data.user),
-    plans: data.plans.map((plan) => mapPlanFromApi(plan)),
+    challenges: data.challenges.map((challenge) => mapChallengeFromApi(challenge)),
   };
 }
 
@@ -274,11 +274,11 @@ export function mapHabitFromApi(habit: ApiHabit): Habit {
 export function mapHabitEnrichedFromApi(habit: ApiHabit): HabitEnriched {
   return {
     ...mapHabitFromApi(habit),
-    planCount: 0,
+    challengeCount: 0,
   };
 }
 
-function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriched {
+function mapChallengeRankingItemFromApi(item: ApiChallengeRankingItem): RankingItemEnriched {
   return {
     position: item.position,
     userId: item.userId,
@@ -292,25 +292,25 @@ function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriche
   };
 }
 
-export function mapPlanRankingFromApi(ranking: ApiPlanRanking): PlanRanking {
+export function mapChallengeRankingFromApi(ranking: ApiChallengeRanking): ChallengeRanking {
   return {
     totalCheckinCount: ranking.totalCheckinCount,
     daysOffAvailable: ranking.daysOffAvailable,
-    items: ranking.items.map(mapPlanRankingItemFromApi),
+    items: ranking.items.map(mapChallengeRankingItemFromApi),
   };
 }
 
-export function mapPlanRankingWithCurrentUserFromApi(ranking: ApiPlanRankingWithCurrentUser): PlanRankingWithCurrentUser {
+export function mapChallengeRankingWithCurrentUserFromApi(ranking: ApiChallengeRankingWithCurrentUser): ChallengeRankingWithCurrentUser {
   return {
     totalCheckinCount: ranking.totalCheckinCount,
     daysOffAvailable: ranking.daysOffAvailable,
-    items: ranking.items.map(mapPlanRankingItemFromApi),
-    currentUser: mapPlanRankingItemFromApi(ranking.currentUser),
+    items: ranking.items.map(mapChallengeRankingItemFromApi),
+    currentUser: mapChallengeRankingItemFromApi(ranking.currentUser),
   };
 }
 
 export type CreateCheckInPayload = CreateCheckin;
-export type CreatePlanPayload = CreatePlan;
+export type CreateChallengePayload = CreateChallenge;
 export type CreateUserPayload = CreateUser;
 export type CreateHabitPayload = CreateHabit;
 export type UpdateUserPayload = {
@@ -330,6 +330,6 @@ export type ReviewCheckInPayload = {
   date: string;
 };
 
-export type ListPlansFilter = Partial<Pick<Plan, 'ownerId' | 'habitId' | 'status' | 'type'>>;
-export type ListCheckInsFilter = Partial<Pick<Checkin, 'planId' | 'userId' | 'status'>> & { date?: string };export type ListUsersFilter = Partial<Pick<User, 'email'>>;
+export type ListChallengesFilter = Partial<Pick<Challenge, 'ownerId' | 'habitId' | 'status' | 'type'>>;
+export type ListCheckInsFilter = Partial<Pick<Checkin, 'challengeId' | 'userId' | 'status'>> & { date?: string };export type ListUsersFilter = Partial<Pick<User, 'email'>>;
 export type ListHabitsFilter = Partial<Pick<Habit, 'name'>>;

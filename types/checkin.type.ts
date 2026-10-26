@@ -25,7 +25,7 @@ export type CheckinReviewEnriched = CheckinReview & {
 const checkinSchema = baseResourceSchema.extend({
   id: z.guid({ error: "ID do checkin é obrigatório" }),
   kind: z.literal('checkin'),
-  planId: z.guid({ error: "ID do plano deve ser um UUID válido" }),
+  challengeId: z.guid({ error: "Faltou o ID do desafio" }),
   userId: z.guid({ error: "ID do usuário deve ser um UUID válido" }),
   date: z.string().transform((str) => parseDateTime(str)),
   title: z.string().min(3, { error: "Título é obrigatório" }),
@@ -38,7 +38,7 @@ const checkinSchema = baseResourceSchema.extend({
 export type Checkin = z.infer<typeof checkinSchema>;
 
 export type CheckinEnriched = Checkin & {
-  planName: string;
+  challengeName: string;
   userName: string;
   userPhotoUrl?: string;
 };
