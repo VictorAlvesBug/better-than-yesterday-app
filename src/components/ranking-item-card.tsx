@@ -86,7 +86,7 @@ export default function RankingItemCard({
       </View>
       <View
         style={{
-          backgroundColor: getColor('gray-e'),
+          backgroundColor: getColor('gray-c'),
           borderRadius: 9999,
           height: 8,
           width: '100%',

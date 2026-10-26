@@ -148,7 +148,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
         </View>
       </Modal>
       {!readOnly && canReplaceCheckIn(userId, checkinUserId, isReplacement, reviewClosesAt) && (
-        <View className="px-6 mt-3 gap-2">
+        <View className="gap-2 px-6 mt-3">
           {reviews.filter((review) => review.status === 'Rejected').length > Math.floor(reviews.length / 2) && (
             <Text style={{ color: getColor('dark-orange') }} className="text-sm">
               Este check-in não está sendo bem aceito. Recomendamos substituí-lo.
@@ -180,7 +180,7 @@ function renderStatus(status: CheckinStatus) {
 
   if (status === 'Pending')
     return (
-      <Text style={{ backgroundColor: getColor("light-warning"), color: getColor("warning") }} className={`${defaultClasses}`}>
+      <Text style={{ backgroundColor: getColor("light-warning"), color: getColor("dark-orange") }} className={`${defaultClasses}`}>
         Pendente
       </Text>
     );

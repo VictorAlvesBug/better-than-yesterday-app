@@ -276,7 +276,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
               >
                 Planos Finalizados
               </Text>
-              {finishedPlans.map(plan => (
+              {finishedPlans.map((plan: PlanEnriched) => (
                 <View
                   key={plan.id}
                   className="flex flex-row items-center justify-between gap-3 px-8 py-4"
@@ -284,7 +284,7 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                   <Text style={{ color: getColor('gray-3') }} className="font-semibold">
                     {plan.description ?? plan.habitName}
                   </Text>
-                  <TextBalanceForFinishedPlan balance={123} />
+                  <TextBalanceForFinishedPlan balance={plan.rewardPool ?? 0} />
                 </View>
               ))}
             </View>

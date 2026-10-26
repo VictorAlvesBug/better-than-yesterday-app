@@ -28,8 +28,8 @@ export default function MyPlansScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [editing, setEditing] = useState<PlanEnriched | null>(null);
-  const [startsAt, setStartsAt] = useState<DateOnly>('' as DateOnly);
-  const [endsAt, setEndsAt] = useState<DateOnly>('' as DateOnly);
+  const [startsAt, setStartsAt] = useState<DateOnly>(getDateOnly());
+  const [endsAt, setEndsAt] = useState<DateOnly>(getDateOnly());
 
   const load = useCallback(async () => {
     const storedUserId = await Memory.get('userId') || '';
@@ -164,6 +164,7 @@ export default function MyPlansScreen() {
                       <Button
                         action={() => {
                           setEditing(plan);
+                          console.log(JSON.stringify(plan, null, 2));
                           setStartsAt(plan.startsAt);
                           setEndsAt(plan.endsAt);
                         }}
@@ -185,7 +186,7 @@ export default function MyPlansScreen() {
       )}
       <Modal visible={editing !== null} transparent animationType="fade" onRequestClose={() => setEditing(null)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 24 }}>
-          <View className="w-full gap-3 p-4 bg-white rounded-3xl">
+          <View className="gap-3 p-4 bg-white rounded-3xl">
             <Text style={{ color: getColor('black') }} className="text-base font-semibold">Editar período</Text>
             <DateRangeSelect
               startValueLabel="Início"
