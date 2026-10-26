@@ -1,3 +1,4 @@
+import { NotificationPayload } from '@/types/notification.type';
 import { backendApi } from '../utils/apiUtils';
 
 export type AppNotification = {
@@ -6,11 +7,13 @@ export type AppNotification = {
   kind: string;
   message: string;
   createdAt: string;
+  payload?: NotificationPayload;
 };
 
 export default function createNotificationRepository() {
   const generate = async (userId: string): Promise<AppNotification[]> => {
-    return backendApi.generateNotifications(userId);
+    const data = await backendApi.generateNotifications(userId);
+    return data as AppNotification[];
   };
 
   return { generate };

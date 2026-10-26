@@ -30,9 +30,10 @@ function canReplaceCheckIn(
 type CheckinWithReviewsCardProps = {
   checkin: CheckinEnriched;
   onUpdate: (checkin: CheckinEnriched) => void;
+  readOnly?: boolean;
 }
 
-export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWithReviewsCardProps) {
+export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = false }: CheckinWithReviewsCardProps) {
   const { id, userName, userPhotoUrl, date, title, evidencePhotoUrl, status, reviews, userId: checkinUserId, isReplacement, reviewClosesAt } = checkin;
   const navigation = useNavigation();
 
@@ -104,7 +105,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
 
       <Text className="px-6 text-md">{title}</Text>
 
-      {userId && userId !== checkinUserId && (
+      {userId && userId !== checkinUserId && !readOnly && (
         <View className="px-6 mt-3">
           <Button color="danger" type="outline" textSize="text-sm" className="h-10" action={() => setReportOpen(true)}>
             Denunciar
@@ -146,8 +147,13 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
           </View>
         </View>
       </Modal>
-      {canReplaceCheckIn(userId, checkinUserId, isReplacement, reviewClosesAt) && (
-        <View className="px-6 mt-3">
+      {!readOnly && canReplaceCheckIn(userId, checkinUserId, isReplacement, reviewClosesAt) && (
+        <View className="px-6 mt-3 gap-2">
+          {reviews.filter((review) => review.status === 'Rejected').length > Math.floor(reviews.length / 2) && (
+            <Text style={{ color: getColor('dark-orange') }} className="text-sm">
+              Este check-in não está sendo bem aceito. Recomendamos substituí-lo.
+            </Text>
+          )}
           <Button
             color={{ text: 'primary', border: 'primary', background: 'light-primary' }}
             textSize="text-sm"
@@ -164,7 +170,7 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate }: CheckinWit
 
       {reviews.length > 0 && renderReviews(reviews)}
 
-      {status === 'Pending' && userId !== checkinUserId && renderReviewSection(userReview, reviewAsValidated, reviewAsRejected)}
+      {status === 'Pending' && userId !== checkinUserId && !readOnly && renderReviewSection(userReview, reviewAsValidated, reviewAsRejected)}
     </View>
   );
 }

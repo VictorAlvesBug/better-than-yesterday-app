@@ -1,4 +1,5 @@
-import { getColor } from '@/types/color.type';
+import { ColorName, getColor } from '@/types/color.type';
+import { RankingDay } from '@/types/ranking.type';
 import React from 'react';
 import { Text, View } from 'react-native';
 import {
@@ -7,7 +8,6 @@ import {
   formatMoneyCompact,
   formatPercent,
 } from '../utils/numberUtils';
-import GradientView from './gradient-view';
 import Icon from './icon';
 import ProfilePhoto from './profile-photo';
 
@@ -21,6 +21,7 @@ type RankingItemCardProps = {
   penalty: number;
   streak: number;
   totalCount: number;
+  days?: RankingDay[];
 };
 
 export default function RankingItemCard({
@@ -33,9 +34,9 @@ export default function RankingItemCard({
   penalty,
   streak,
   totalCount,
+  days = [],
 }: RankingItemCardProps) {
   const validatedPercent = totalCount > 0 ? checkinCount / totalCount : 0;
-  const pendingPercent = totalCount > 0 ? pendingCheckinCount / totalCount : 0;
 
   return (
     <View className="flex flex-col items-center justify-between w-full gap-1 px-5 py-3 bg-white shadow-md rounded-2xl">
@@ -91,25 +92,19 @@ export default function RankingItemCard({
           width: '100%',
           overflow: 'hidden',
           flexDirection: 'row',
+          gap: 2,
         }}
       >
-        {validatedPercent > 0 && (
-          <GradientView
-            style={{
-              height: '100%',
-              width: `${validatedPercent * 100}%`,
-            }}
-          />
-        )}
-        {pendingPercent > 0 && (
+        {(days).map((day) => (
           <View
+            key={day.date}
             style={{
+              flex: 1,
               height: '100%',
-              width: `${pendingPercent * 100}%`,
-              backgroundColor: getColor('warning'),
+              backgroundColor: getColor(day.tone as ColorName),
             }}
           />
-        )}
+        ))}
       </View>
     </View>
   );

@@ -1,7 +1,7 @@
 import { getColor } from '@/types/color.type';
-import { PlanEnriched } from '@/types/plan.type';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { PlanEnriched, PlanStatus } from '@/types/plan.type';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Alert, Image, Modal, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Memory from '../api/memory';
 import { Button } from '../components/button';
 import DateRangeSelect from '../components/date-range-select';
@@ -9,8 +9,16 @@ import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
 import { useRepositories } from '../hooks/useRepositories';
 import useNavigation from '../hooks/useNavigation';
-import { DateOnly, getDateOnlyWithOffset, getDateToFront } from '../utils/dateUtils';
+import { DateOnly, getDateOnly, getDateOnlyWithOffset, getDateToFront } from '../utils/dateUtils';
+import { commitmentLabel, duplicatePlanPath, elapsedPercent, penaltyScale } from '../utils/planUtils';
 import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
+
+const statusLabel: Record<PlanStatus, string> = {
+  NotStarted: 'Ainda não começou',
+  Running: 'Em andamento',
+  Finished: 'Encerrado',
+  Cancelled: 'Cancelado',
+};
 
 export default function MyPlansScreen() {
   const navigation = useNavigation();
@@ -18,6 +26,7 @@ export default function MyPlansScreen() {
   const [userId, setUserId] = useState('');
   const [plans, setPlans] = useState<PlanEnriched[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [editing, setEditing] = useState<PlanEnriched | null>(null);
   const [startsAt, setStartsAt] = useState<DateOnly>('' as DateOnly);
   const [endsAt, setEndsAt] = useState<DateOnly>('' as DateOnly);
@@ -28,17 +37,24 @@ export default function MyPlansScreen() {
     if (!storedUserId) {
       setPlans([]);
       setLoading(false);
+      setRefreshing(false);
       return;
     }
 
     const owned = await planRepository.list({ ownerId: storedUserId });
     setPlans(owned);
     setLoading(false);
+    setRefreshing(false);
   }, [planRepository]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     load();
   }, [load]);
+
+  const openPlan = async (plan: PlanEnriched) => {
+    await Memory.set('planId', plan.id);
+    navigation.push('/plan-tracker');
+  };
 
   const postpone = async (plan: PlanEnriched) => {
     try {
@@ -58,6 +74,12 @@ export default function MyPlansScreen() {
   const saveDates = async () => {
     if (!editing)
       return;
+
+    const today = getDateOnly();
+    if (startsAt <= today) {
+      toastErrorMessage('A data de início deve ser a partir de amanhã');
+      return;
+    }
 
     try {
       await planRepository.updatePeriod(editing.id, userId, startsAt, endsAt);
@@ -93,7 +115,12 @@ export default function MyPlansScreen() {
       {loading ? (
         <ActivityIndicator className="mt-8" color={getColor('violet')} />
       ) : (
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
+        <ScrollView
+          contentContainerStyle={{ padding: 16, gap: 12 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={getColor('violet')} />
+          }
+        >
           {plans.length === 0 && (
             <Text style={{ color: getColor('gray-3') }} className="text-base">
               Você ainda não criou um plano.
@@ -101,65 +128,80 @@ export default function MyPlansScreen() {
           )}
           {plans.map((plan) => {
             const canEdit = plan.status === 'NotStarted';
-            const waitingForMembers = canEdit && plan.startsAt <= getDateOnlyWithOffset(0);
+            const today = getDateOnly();
+            const tomorrow = getDateOnlyWithOffset(1);
+            const missingQuorumAndStartsTomorrow = plan.memberCount < 2 && plan.startsAt === tomorrow;
+            const percent = elapsedPercent(plan.startsAt, plan.endsAt, today);
             return (
-              <View key={plan.id} className="w-full gap-3 p-4 bg-white shadow-md rounded-2xl">
-                <Text style={{ color: getColor('black') }} className="text-base font-semibold">
-                  {plan.habitName}
-                </Text>
-                <Text style={{ color: getColor('gray-3') }} className="text-sm">
-                  {`${getDateToFront(plan.startsAt)} até ${getDateToFront(plan.endsAt)} · ${plan.memberCount} membros`}
-                </Text>
-                {waitingForMembers && (
+              <Pressable key={plan.id} onPress={() => openPlan(plan)} className="w-full gap-3 p-4 bg-white shadow-md rounded-2xl">
+                <View className="flex flex-row gap-3">
+                  {plan.coverPhotoUrl ? (
+                    <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: 72, height: 72, borderRadius: 12 }} />
+                  ) : (
+                    <View style={{ width: 72, height: 72, borderRadius: 12, backgroundColor: getColor('gray-e') }} />
+                  )}
+                  <View className="flex-1 gap-1">
+                    <Text style={{ color: getColor('black') }} className="text-base font-semibold">
+                      {plan.description || plan.habitName}
+                    </Text>
+                    <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                      {`${getDateToFront(plan.startsAt)} até ${getDateToFront(plan.endsAt)} · ${percent}%`}
+                    </Text>
+                    <Text style={{ color: getColor('gray-3') }} className="text-sm">
+                      {`${plan.memberCount} membros · ${penaltyScale(plan.penaltyValue)} · ${commitmentLabel(plan.daysOffPerWeek)} · ${statusLabel[plan.status]}`}
+                    </Text>
+                  </View>
+                </View>
+                {missingQuorumAndStartsTomorrow && (
                   <Text style={{ color: getColor('dark-orange') }} className="text-sm">
-                    O plano precisa de pelo menos dois membros para iniciar. Convide amigos ou adie o plano.
+                    Convide mais amigos e poderemos iniciar amanhã.
                   </Text>
                 )}
-                {canEdit && (
-                  <View className="gap-2">
-                    <Button action={() => postpone(plan)} type="outline">Adiar 7 dias</Button>
-                    <Button
-                      action={() => {
-                        setEditing(plan);
-                        setStartsAt(plan.startsAt);
-                        setEndsAt(plan.endsAt);
-                      }}
-                      type="outline"
-                    >
-                      Editar datas
-                    </Button>
-                    <Button action={() => cancelPlan(plan)} color="danger" type="outline">Cancelar</Button>
-                    <Button
-                      action={() => navigation.push(
-                        `/create-plan?habitId=${plan.habitId}&description=${encodeURIComponent(plan.description ?? '')}&type=${plan.type}&daysOffPerWeek=${plan.daysOffPerWeek}&penaltyValue=${plan.penaltyValue}`
-                      )}
-                    >
-                      Duplicar
-                    </Button>
-                  </View>
-                )}
-              </View>
+                <View className="gap-2">
+                  {canEdit && (
+                    <>
+                      <Button action={() => postpone(plan)} type="outline">Adiar 7 dias</Button>
+                      <Button
+                        action={() => {
+                          setEditing(plan);
+                          setStartsAt(plan.startsAt);
+                          setEndsAt(plan.endsAt);
+                        }}
+                        type="outline"
+                      >
+                        Editar datas
+                      </Button>
+                      <Button action={() => cancelPlan(plan)} color="danger" type="outline">Cancelar</Button>
+                    </>
+                  )}
+                  <Button action={() => navigation.push(duplicatePlanPath(plan))}>
+                    Duplicar
+                  </Button>
+                </View>
+              </Pressable>
             );
           })}
-          {editing && (
-            <View className="w-full gap-3 p-4 bg-white shadow-md rounded-2xl">
-              <Text style={{ color: getColor('black') }} className="text-base font-semibold">Editar período</Text>
-              <DateRangeSelect
-                startValueLabel="Início"
-                startValue={getDateToFront(startsAt)}
-                setStartValue={(value) => setStartsAt(value.split('/').reverse().join('-') as DateOnly)}
-                endValueLabel="Término"
-                endValue={getDateToFront(endsAt)}
-                setEndValue={(value) => setEndsAt(value.split('/').reverse().join('-') as DateOnly)}
-              />
-              <Button action={saveDates}>Salvar</Button>
-              <Pressable onPress={() => setEditing(null)}>
-                <Text style={{ color: getColor('gray-3') }} className="text-center">Fechar</Text>
-              </Pressable>
-            </View>
-          )}
         </ScrollView>
       )}
+      <Modal visible={editing !== null} transparent animationType="fade" onRequestClose={() => setEditing(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 24 }}>
+          <View className="w-full gap-3 p-4 bg-white rounded-3xl">
+            <Text style={{ color: getColor('black') }} className="text-base font-semibold">Editar período</Text>
+            <DateRangeSelect
+              startValueLabel="Início"
+              startValue={getDateToFront(startsAt)}
+              setStartValue={(value) => setStartsAt(value.split('/').reverse().join('-') as DateOnly)}
+              endValueLabel="Término"
+              endValue={getDateToFront(endsAt)}
+              setEndValue={(value) => setEndsAt(value.split('/').reverse().join('-') as DateOnly)}
+            />
+            <Button action={saveDates}>Salvar</Button>
+            <Pressable onPress={() => setEditing(null)}>
+              <Text style={{ color: getColor('gray-3') }} className="text-center">Fechar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </ScreenLayout>
   );
 }

@@ -1,14 +1,18 @@
 import createHabitRepository from '@/src/api/habitRepository';
 import Memory from '@/src/api/memory';
 import createPlanRepository from '@/src/api/planRepository';
+import createS3Repository from '@/src/api/s3Repository';
 import Card from '@/src/components/card';
 import { getColor } from '@/types/color.type';
 import { Habit, HabitWithJustAdded } from '@/types/habit.type';
 import { CreatePlan, createPlanSchema, parsePenaltyValue, PenaltyOption, penaltyValueOptions, PlanType } from '@/types/plan.type';
 import { useLocalSearchParams } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
+  Pressable,
   Switch,
   Text,
   View
@@ -25,7 +29,7 @@ import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
 import Select from '../components/select';
 import useNavigation from '../hooks/useNavigation';
-import { formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
+import { DateOnly, formatDateRelativeToToday, getDateOnly, getDateOnlyWithOffset, getDateTime, getDateToFront, getDateToFrontWithOffset } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
 import { generateId } from '../utils/stringUtils';
 import { checkIfIsValidAndToast, toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
@@ -38,6 +42,9 @@ export default function CreatePlanScreen() {
     type?: string;
     daysOffPerWeek?: string;
     penaltyValue?: string;
+    startsAt?: string;
+    endsAt?: string;
+    coverPhotoUrl?: string;
   }>();
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +54,9 @@ export default function CreatePlanScreen() {
 
   const [joinAfterCreated, setJoinAfterCreated] = useState(false);
 
+  const [localCoverUri, setLocalCoverUri] = useState<string | null>(null);
   const [habitList, setHabitList] = useState<HabitWithJustAdded[]>([]);
+  const s3Repository = useMemo(() => createS3Repository(), []);
 
   const habitRepository = useMemo(() => createHabitRepository(), []);
   const planRepository = useMemo(() => createPlanRepository(), []);
@@ -99,11 +108,12 @@ export default function CreatePlanScreen() {
           ownerId: userId,
           habitId: params.habitId || '',
           description: params.description || undefined,
-          startsAt: getDateOnlyWithOffset(1),
-          endsAt: getDateOnlyWithOffset(8),
+          startsAt: (params.startsAt || getDateOnlyWithOffset(1)) as DateOnly,
+          endsAt: (params.endsAt || getDateOnlyWithOffset(8)) as DateOnly,
           daysOffPerWeek: Number.isFinite(duplicatedDaysOff) ? duplicatedDaysOff : daysPerWeek,
           penaltyValue: params.penaltyValue ? parsePenaltyValue(String(params.penaltyValue)) : 10,
           type: params.type === 'Public' ? 'Public' : 'Private',
+          coverPhotoUrl: params.coverPhotoUrl || undefined,
         });
 
         setLoading(false);
@@ -138,6 +148,14 @@ export default function CreatePlanScreen() {
 
 
     plan.daysOffPerWeek = 7 - daysPerWeek;
+
+    if (localCoverUri) {
+      plan.coverPhotoUrl = await s3Repository.uploadFile({
+        filePath: localCoverUri,
+        fileName: `covers/${plan.ownerId}/${generateId()}.jpg`,
+        fileType: 'image/jpeg',
+      });
+    }
 
     if (!checkIfIsValidAndToast(createPlanSchema, plan)) {
       return;
@@ -197,6 +215,30 @@ export default function CreatePlanScreen() {
                   value={plan.description}
                   onChange={(value) => setPlan({ ...plan, description: value })}
                 />
+              </Card>
+
+              <Card className="flex flex-col items-start justify-center w-full gap-2">
+                <Label>Capa (opcional)</Label>
+                {(localCoverUri || plan.coverPhotoUrl) && (
+                  <Image
+                    source={{ uri: localCoverUri || plan.coverPhotoUrl }}
+                    style={{ width: '100%', height: 140, borderRadius: 12 }}
+                  />
+                )}
+                <Pressable
+                  onPress={async () => {
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ['images'],
+                      quality: 0.8,
+                    });
+                    if (!result.canceled && result.assets[0])
+                      setLocalCoverUri(result.assets[0].uri);
+                  }}
+                >
+                  <Text style={{ color: getColor('violet') }} className="text-sm font-semibold">
+                    Escolher foto
+                  </Text>
+                </Pressable>
               </Card>
 
               <Card className="flex flex-col items-start justify-center w-full gap-1">

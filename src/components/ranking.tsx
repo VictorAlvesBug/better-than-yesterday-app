@@ -77,6 +77,7 @@ export default function Ranking({ planId, userId: userIdProp, refreshKey = 0 }: 
           penalty={item.penalty}
           streak={item.streak}
           totalCount={ranking.totalCheckinCount}
+          days={item.days}
         />
       ))}
     </View>

@@ -1,6 +1,8 @@
 import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Image, Modal, Pressable, Text, View } from 'react-native';
+import useNavigation from '../hooks/useNavigation';
+import { duplicatePlanPath } from '../utils/planUtils';
 import { formatDateRelativeToToday, getDateToFront, getDifferenceInDays } from '../utils/dateUtils';
 import { formatIntegerCompact, formatMoney } from '../utils/numberUtils';
 import { Button } from './button';
@@ -12,6 +14,7 @@ type PlanDetailsModalProps = {
 };
 
 export default function PlanDetailsModal({ plan, onClose }: PlanDetailsModalProps) {
+  const navigation = useNavigation();
   return (
     <Modal visible={plan !== null} animationType="fade" transparent onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}>
@@ -23,6 +26,9 @@ export default function PlanDetailsModal({ plan, onClose }: PlanDetailsModalProp
             <Text style={{ color: getColor('black') }} className="pr-10 text-lg font-bold">
               {plan.habitName}
             </Text>
+            {plan.coverPhotoUrl ? (
+              <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: '100%', height: 140, borderRadius: 12, marginTop: 12 }} />
+            ) : null}
             <Text style={{ color: getColor('gray-3') }} className="mt-1 text-sm">
               {plan.ownerName}
             </Text>
@@ -40,7 +46,16 @@ export default function PlanDetailsModal({ plan, onClose }: PlanDetailsModalProp
             <Text style={{ color: getColor('gray-3') }} className="mt-1 text-sm">
               {`Multa ${formatMoney(plan.penaltyValue)} · ${7 - plan.daysOffPerWeek}/7 · ${formatIntegerCompact(plan.memberCount)} membros`}
             </Text>
-            <Button action={onClose} type="outline" className="mt-4">
+            <Button
+              action={() => {
+                onClose();
+                navigation.push(duplicatePlanPath(plan));
+              }}
+              className="mt-4"
+            >
+              Duplicar
+            </Button>
+            <Button action={onClose} type="outline" className="mt-2">
               Fechar
             </Button>
           </View>

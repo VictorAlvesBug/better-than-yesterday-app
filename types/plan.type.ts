@@ -51,6 +51,7 @@ const planSchema = baseResourceSchema.extend({
     type: planTypeSchema,
     daysOffPerWeek: z.number("Folgas por semana é obrigatório").min(0, { error: "Selecione um número positivo para as folgas por semana" }).max(6, { error: "Selecione até 6 para as folgas por semana" }),
     penaltyValue: penaltyValueSchema,
+    coverPhotoUrl: z.string().optional(),
     status: planStatusSchema,
 })
 
@@ -66,6 +67,8 @@ export type PlanEnriched = Plan & {
     ownerName: string;
     habitName: string;
     memberCount: number;
+    amountOwed?: number;
+    rewardPool?: number;
 };
 
 const planMemberSchema = baseResourceSchema.extend({

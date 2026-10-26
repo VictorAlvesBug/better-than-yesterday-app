@@ -307,12 +307,22 @@ export const backendApi = {
     ),
 
   listCheckInReports: (planId: string, requesterId: string) =>
-    getListData<{ id: string; checkInId: string; reporterId: string; targetUserId: string; reason: string; createdAt: string }>(
+    getListData<{
+      id: string;
+      checkInId: string;
+      reporterId: string;
+      reporterName?: string;
+      targetUserId: string;
+      reason: string;
+      createdAt: string;
+      checkInTitle?: string;
+      evidencePhotoUrl?: string;
+    }>(
       `${API_URL}/CheckInReports${buildQueryString({ planId, requesterId })}`
     ),
 
   generateNotifications: (userId: string) =>
-    postData<undefined, { id: string; planId: string; kind: string; message: string; createdAt: string }[]>(
+    postData<undefined, { id: string; planId: string; kind: string; message: string; createdAt: string; payload?: { type: string; planId: string; checkInId?: string; reviewerId?: string; authorId?: string; reporterId?: string; targetUserId?: string } }[]>(
       `${API_URL}/Users/${userId}/Notifications`
     ),
 };

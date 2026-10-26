@@ -3,6 +3,7 @@ import { PlanEnriched } from '@/types/plan.type';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Keyboard,
   KeyboardEvent,
   Modal,
@@ -23,6 +24,7 @@ import Label from './label';
 import useNavigation from '../hooks/useNavigation';
 import { getDifferenceInDays } from '../utils/dateUtils';
 import { formatMoney } from '../utils/numberUtils';
+import { duplicatePlanPath } from '../utils/planUtils';
 import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
 type JoinPlanModalProps = {
@@ -208,6 +210,9 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
 
               {plan && !searching && (
                 <Card className="flex flex-col gap-2 mt-4">
+                  {plan.coverPhotoUrl ? (
+                    <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: '100%', height: 140, borderRadius: 12 }} />
+                  ) : null}
                   <Text style={{ color: getColor('black') }} className="text-lg font-bold">
                     {plan.description ?? plan.habitName}
                   </Text>
@@ -222,6 +227,15 @@ export default function JoinPlanModal({ visible, onClose, initialPlanId = '' }: 
                   </Text>
                   <Button action={joinPlan} className="mt-2" color="success">
                     {joining ? 'Entrando...' : 'Participar'}
+                  </Button>
+                  <Button
+                    action={() => {
+                      onClose();
+                      navigation.push(duplicatePlanPath(plan));
+                    }}
+                    type="outline"
+                  >
+                    Duplicar
                   </Button>
                 </Card>
               )}

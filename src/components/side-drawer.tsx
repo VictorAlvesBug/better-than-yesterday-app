@@ -20,7 +20,6 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAuth } from '../context/auth';
 import useNavigation from '../hooks/useNavigation';
 import { useRepositories } from '../hooks/useRepositories';
-import { getDateOnly } from '../utils/dateUtils';
 import { formatInteger, formatMoney } from '../utils/numberUtils';
 import GradientView from './gradient-view';
 import Icon from './icon';
@@ -69,8 +68,8 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
   const translateX = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
-  const activePlans = plans.filter(plan => plan.endsAt >= getDateOnly());
-  const finishedPlans = plans.filter(plan => plan.endsAt < getDateOnly());
+  const activePlans = plans.filter(plan => plan.status === 'NotStarted' || plan.status === 'Running');
+  const finishedPlans = plans.filter(plan => plan.status === 'Finished');
 
   useEffect(() => {
     if (isOpen) {
@@ -254,8 +253,16 @@ export default function SideDrawer({ isOpen, onClose }: SideDrawerProps) {
                     style={{ backgroundColor: getColor('lime') }}
                     className="w-2 h-2 rounded-full"
                   />
-                  <Text style={{ color: getColor('gray-3') }} className="font-semibold">
+                  <Text style={{ color: getColor('gray-3') }} className="flex-1 font-semibold" numberOfLines={1}>
                     {plan.description ?? plan.habitName}
+                  </Text>
+                  <Text
+                    style={{ color: getColor((plan.amountOwed ?? 0) > 0 ? 'danger' : 'success') }}
+                    className="font-semibold"
+                  >
+                    {(plan.amountOwed ?? 0) > 0
+                      ? `-${formatMoney(plan.amountOwed ?? 0)}`
+                      : `+${formatMoney(plan.rewardPool ?? 0)}`}
                   </Text>
                 </Pressable>
               ))}

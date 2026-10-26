@@ -44,6 +44,9 @@ export default function CreateCheckinScreen() {
 
   const [selectedDate, setSelectedDate] = useState(getDateOnly());
   const [planStartsAt, setPlanStartsAt] = useState('');
+  const [dateLocked, setDateLocked] = useState(false);
+  const [takenToday, setTakenToday] = useState(false);
+  const [takenYesterday, setTakenYesterday] = useState(false);
   const [checkin, setCheckin] = useState<Omit<CreateCheckin, 'date'>>({
     userId: '',
     planId: '',
@@ -98,6 +101,8 @@ export default function CreateCheckinScreen() {
             evidencePhotoUrl: existing.evidencePhotoUrl,
             title: existing.title,
           });
+          setSelectedDate(getDateOnly(existing.date));
+          setDateLocked(true);
         } catch {
           setMissing('checkin');
         }
@@ -135,6 +140,19 @@ export default function CreateCheckinScreen() {
       }
 
       setPlanStartsAt(plan.startsAt);
+
+      const mine = await checkinRepository.list({ planId, userId });
+      const todayDate = getDateOnly();
+      const yesterdayDate = getDateOnlyWithOffset(-1);
+      const hasToday = mine.some((item) => getDateOnly(item.date) === todayDate);
+      const hasYesterday = mine.some((item) => getDateOnly(item.date) === yesterdayDate);
+      setTakenToday(hasToday);
+      setTakenYesterday(hasYesterday);
+      const yesterdayAllowed = yesterdayDate >= plan.startsAt;
+      if (!hasToday)
+        setSelectedDate(todayDate);
+      else if (yesterdayAllowed && !hasYesterday)
+        setSelectedDate(yesterdayDate);
 
       setCheckin({
         ...checkin,
@@ -232,9 +250,18 @@ export default function CreateCheckinScreen() {
 
   const today = getDateOnly();
   const yesterday = getDateOnlyWithOffset(-1);
+  const yesterdayBeforeStart = planStartsAt !== '' && yesterday < planStartsAt;
   const dateOptions = [
-    { label: 'Hoje', date: today, disabled: false },
-    { label: 'Ontem', date: yesterday, disabled: planStartsAt !== '' && yesterday < planStartsAt },
+    {
+      label: 'Ontem',
+      date: yesterday,
+      disabled: dateLocked || yesterdayBeforeStart || takenYesterday,
+    },
+    {
+      label: 'Hoje',
+      date: today,
+      disabled: dateLocked || takenToday,
+    },
   ];
 
   return (
@@ -272,7 +299,6 @@ export default function CreateCheckinScreen() {
               onChange={(value) => setCheckin({ ...checkin, title: value })}
             />
           </Card>
-          {!replacingCheckInId && (
           <Card className="flex flex-col items-start justify-center w-full gap-3">
             <Label>Data</Label>
             <View className="flex flex-row w-full gap-3">
@@ -295,7 +321,6 @@ export default function CreateCheckinScreen() {
               ))}
             </View>
           </Card>
-          )}
           <Button className="p-0 overflow-hidden" action={createCheckin} disabled={submitting}>
             <GradientView className="flex flex-col items-center justify-center w-full h-full py-4">
               {submitting ? (

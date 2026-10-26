@@ -6,13 +6,8 @@ import { getColor } from '@/types/color.type';
 import { PlanEnriched } from '@/types/plan.type';
 import { PlanRankingWithCurrentUser } from '@/types/ranking.type';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Pressable,
-  RefreshControl,
-  Text,
-  View,
-} from 'react-native';
+import { Animated, Image, Pressable, RefreshControl, Text, View } from 'react-native';
+import { Button } from './button';
 import CheckinWithReviewsCard from './checkin-with-reviews-card';
 import DaysOffCard from './days-off-card';
 import PenaltiesCard from './penalties-card';
@@ -29,10 +24,12 @@ import {
   formatRelativeDateOnly,
   getDate,
   getDateOnly,
+  getDateOnlyWithOffset,
   getDateToFront,
   getDifferenceInDays,
 } from '../utils/dateUtils';
 import { formatInteger, formatPercentCompact } from '../utils/numberUtils';
+import { duplicatePlanPath } from '../utils/planUtils';
 
 type PlanTrackerContentProps = {
   plan: PlanEnriched;
@@ -59,11 +56,14 @@ export default function PlanTrackerContent({
   const [ranking, setRanking] = useState<PlanRankingWithCurrentUser | null>(null);
   const [memberPenalties, setMemberPenalties] = useState<Penalty[]>([]);
   const [isMemberBlocked, setIsMemberBlocked] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState('');
+  const [isViewer, setIsViewer] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const fetchContentData = useCallback(async () => {
     const userId = (await Memory.get('userId')) || '';
+    setCurrentUserId(userId);
 
     if (plan.status === 'Running') {
       const planCheckins = await checkinRepository.list({ planId: plan.id });
@@ -79,7 +79,17 @@ export default function PlanTrackerContent({
       const planRanking = await rankingRepository.getByPlanIdAndUserId(plan.id, userId);
       setRanking(planRanking);
 
-      const memberDetails = await planRepository.getPlanMemberDetails(plan.id, userId);
+      let memberDetails;
+      try {
+        memberDetails = await planRepository.getPlanMemberDetails(plan.id, userId);
+      } catch {
+        setIsViewer(true);
+        setIsMemberBlocked(false);
+        setMemberPenalties([]);
+        return;
+      }
+
+      setIsViewer(false);
       setIsMemberBlocked(memberDetails.status === 'Blocked');
 
       if (memberDetails.status === 'Blocked' || planRanking.currentUser.penalty > 0) {
@@ -117,6 +127,14 @@ export default function PlanTrackerContent({
   };
 
   const isRunning = plan.status === 'Running';
+  const today = getDateOnly();
+  const yesterday = getDateOnlyWithOffset(-1);
+  const yesterdayAllowed = yesterday >= plan.startsAt;
+  const ownCheckins = checkins.filter((checkin) => checkin.userId === currentUserId);
+  const hasToday = ownCheckins.some((checkin) => getDateOnly(checkin.date) === today);
+  const hasYesterday = ownCheckins.some((checkin) => getDateOnly(checkin.date) === yesterday);
+  const pendingDaysDone = hasToday && (!yesterdayAllowed || hasYesterday);
+  const showCheckinFab = isRunning && !isMemberBlocked && !isViewer && !!currentUserId && !pendingDaysDone;
 
   return (
     <View className="flex-1">
@@ -148,6 +166,10 @@ export default function PlanTrackerContent({
           }
         >
           <View className="flex flex-col gap-5 justify-center items-start px-4 mt-4">
+            {plan.coverPhotoUrl ? (
+              <Image source={{ uri: plan.coverPhotoUrl }} style={{ width: '100%', height: 160, borderRadius: 16 }} />
+            ) : null}
+            <Button action={() => navigation.push(duplicatePlanPath(plan))} type="outline">Duplicar</Button>
             {plan.status === 'NotStarted' && <NotStartedPlanView plan={plan} />}
             {plan.status === 'Running' && (
               <RunningPlanView
@@ -156,6 +178,7 @@ export default function PlanTrackerContent({
                 checkins={checkins}
                 memberPenalties={memberPenalties}
                 isMemberBlocked={isMemberBlocked}
+                readOnly={isViewer}
                 onUpdateCheckIn={handleUpdateCheckIn}
               />
             )}
@@ -166,7 +189,7 @@ export default function PlanTrackerContent({
           </View>
         </Animated.ScrollView>
 
-        {isRunning && !isMemberBlocked && (
+        {showCheckinFab && (
           <Pressable
             style={{ backgroundColor: getColor('violet') }}
             onPress={() => navigation.push('/create-checkin')}
@@ -188,6 +211,8 @@ export default function PlanTrackerContent({
 
 function NotStartedPlanView({ plan }: { plan: PlanEnriched }) {
   const startHasArrived = plan.startsAt <= getDateOnly();
+  const startsTomorrow = plan.startsAt === getDateOnlyWithOffset(1);
+  const lacksQuorum = plan.memberCount < 2;
   return (
     <Card className="flex flex-col gap-1 justify-center items-start w-full">
       <Text style={{ color: getColor('black') }} className="text-lg font-bold">
@@ -196,7 +221,12 @@ function NotStartedPlanView({ plan }: { plan: PlanEnriched }) {
       <Text style={{ color: getColor('gray-3') }} className="text-base">
         O desafio começa {formatRelativeDateOnly(plan.startsAt).toLowerCase()} ({getDateToFront(plan.startsAt)})
       </Text>
-      {startHasArrived && (
+      {lacksQuorum && startsTomorrow && (
+        <Text style={{ color: getColor('dark-orange') }} className="text-sm">
+          O plano ainda não tem dois membros. O início está previsto para amanhã.
+        </Text>
+      )}
+      {lacksQuorum && startHasArrived && (
         <Text style={{ color: getColor('dark-orange') }} className="text-sm">
           O plano precisa de pelo menos dois membros para começar. O dono pode adiar ou cancelar em Meus planos.
         </Text>
@@ -211,6 +241,7 @@ function RunningPlanView({
   checkins,
   memberPenalties,
   isMemberBlocked,
+  readOnly = false,
   onUpdateCheckIn,
 }: {
   plan: PlanEnriched;
@@ -218,6 +249,7 @@ function RunningPlanView({
   checkins: CheckinEnriched[];
   memberPenalties: Penalty[];
   isMemberBlocked: boolean;
+  readOnly?: boolean;
   onUpdateCheckIn: (checkin: CheckinEnriched) => void;
 }) {
   const [pixCode, setPixCode] = useState<string | null>(null);
@@ -328,7 +360,7 @@ function RunningPlanView({
         </View>
       </Card>
 
-      <DaysOffCard daysOffAvailable={daysOffAvailable} />
+      {!readOnly && <DaysOffCard daysOffAvailable={daysOffAvailable} />}
 
       {(isMemberBlocked || memberPenalties.some((p) => p.status === 'Pending')) && (
         <PenaltiesCard
@@ -363,6 +395,7 @@ function RunningPlanView({
           key={checkin.id}
           checkin={checkin}
           onUpdate={onUpdateCheckIn}
+          readOnly={readOnly}
         />
       ))}
     </>

@@ -48,6 +48,9 @@ export type ApiPlan = {
   type: string;
   daysOffPerWeek: number;
   penaltyValue: number;
+  coverPhotoUrl?: string | null;
+  amountOwed?: number;
+  rewardPool?: number;
   createdAt: string;
 };
 
@@ -108,6 +111,7 @@ export type ApiPlanRankingItem = {
   pendingCheckinCount: number;
   penalty: number;
   streak: number;
+  days?: { date: string; position: string; tone: string }[];
 };
 
 export type ApiPlanRanking = {
@@ -181,11 +185,14 @@ export function mapPlanFromApi(plan: ApiPlan, memberCount = 0): PlanEnriched {
     type: plan.type as PlanType,
     daysOffPerWeek: plan.daysOffPerWeek,
     penaltyValue: plan.penaltyValue as PlanEnriched['penaltyValue'],
+    coverPhotoUrl: plan.coverPhotoUrl ?? undefined,
     status: plan.status as PlanStatus,
     createdAt: plan.createdAt as DateTime,
     ownerName: plan.ownerName,
     habitName: plan.habitName,
     memberCount,
+    amountOwed: plan.amountOwed ?? 0,
+    rewardPool: plan.rewardPool ?? 0,
   };
 }
 
@@ -281,6 +288,7 @@ function mapPlanRankingItemFromApi(item: ApiPlanRankingItem): RankingItemEnriche
     pendingCheckinCount: item.pendingCheckinCount ?? 0,
     penalty: item.penalty,
     streak: item.streak,
+    days: item.days ?? [],
   };
 }
 
