@@ -1,7 +1,7 @@
 import { CheckinEnriched, CheckinReview, CheckinStatus } from '@/types/checkin.type';
 import { getColor } from '@/types/color.type';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, Pressable, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import createCheckinRepository from '../api/checkinRepository';
 import Memory from '../api/memory';
 import { formatRelativeDateTime } from '../utils/dateUtils';
@@ -11,6 +11,7 @@ import Icon from './icon';
 import ProfilePhoto from './profile-photo';
 import useNavigation from '../hooks/useNavigation';
 import { Button } from './button';
+import ModalCloseButton from './modal-close-button';
 import { toastErrorMessage, toastSuccessMessage } from '../utils/toastUtils';
 
 const REPLACE_LEAD_MS = 4 * 60 * 60 * 1000;
@@ -34,13 +35,28 @@ type CheckinWithReviewsCardProps = {
 }
 
 export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = false }: CheckinWithReviewsCardProps) {
-  const { id, userName, userPhotoUrl, date, title, evidencePhotoUrl, status, reviews, userId: checkinUserId, isReplacement, reviewClosesAt } = checkin;
+  const { id, userName, userPhotoUrl, date, title, evidencePhotoUrl, status, reviews, userId: checkinUserId, isReplacement, reviewClosesAt, createdAt } = checkin;
   const navigation = useNavigation();
 
   const [userId, setUserId] = useState('');
   const [userReview, setUserReview] = useState<CheckinReview | undefined>();
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [pendingHintOpen, setPendingHintOpen] = useState(false);
+  const [hintAnchor, setHintAnchor] = useState({ x: 0, y: 0, height: 0 });
+  const pendingBadgeRef = useRef<View>(null);
+
+  const reviewDeadline = reviewClosesAt
+    ? new Date(reviewClosesAt)
+    : new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000);
+  const pendingHint = `Recebendo avaliações até ${formatRelativeDateTime(reviewDeadline)}`;
+
+  const openPendingHint = () => {
+    pendingBadgeRef.current?.measureInWindow((x, y, _width, height) => {
+      setHintAnchor({ x, y, height });
+      setPendingHintOpen(true);
+    });
+  };
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -100,7 +116,13 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
             {formatRelativeDateTime(date)}
           </Text>
         </View>
-        {renderStatus(status)}
+        {status === 'Pending' ? (
+          <View ref={pendingBadgeRef} collapsable={false}>
+            <Pressable onPress={openPendingHint}>
+              {renderStatus(status)}
+            </Pressable>
+          </View>
+        ) : renderStatus(status)}
       </View>
 
       <Text className="px-6 text-md">{title}</Text>
@@ -115,8 +137,9 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
 
       <Modal visible={reportOpen} transparent animationType="fade" onRequestClose={() => setReportOpen(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', paddingHorizontal: 24 }}>
-          <View className="gap-3 p-4 bg-white rounded-3xl">
-            <Text style={{ color: getColor('black') }} className="text-lg font-bold">Denunciar check-in</Text>
+          <View className="relative gap-3 p-4 bg-white rounded-3xl">
+            <ModalCloseButton onPress={() => setReportOpen(false)} />
+            <Text style={{ color: getColor('black') }} className="pr-8 text-lg font-bold">Denunciar check-in</Text>
             <TextInput
               value={reportReason}
               onChangeText={setReportReason}
@@ -141,9 +164,23 @@ export default function CheckinWithReviewsCard({ checkin, onUpdate, readOnly = f
             }}>
               Enviar
             </Button>
-            <Pressable onPress={() => setReportOpen(false)}>
-              <Text style={{ color: getColor('gray-3') }} className="text-center">Fechar</Text>
-            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Modal visible={pendingHintOpen} transparent animationType="fade" onRequestClose={() => setPendingHintOpen(false)}>
+        <View style={{ flex: 1 }}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setPendingHintOpen(false)} />
+          <View
+            className="px-3 py-2 rounded-xl"
+            style={{
+              position: 'absolute',
+              top: hintAnchor.y + hintAnchor.height + 8,
+              left: Math.max(16, hintAnchor.x - 140),
+              width: 220,
+              backgroundColor: getColor('black'),
+            }}
+          >
+            <Text style={{ color: getColor('white') }} className="text-xs">{pendingHint}</Text>
           </View>
         </View>
       </Modal>

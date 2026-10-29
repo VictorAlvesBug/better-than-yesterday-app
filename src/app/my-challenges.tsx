@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import Memory from '../api/memory';
 import { Button } from '../components/button';
+import ModalCloseButton from '../components/modal-close-button';
 import DateRangeSelect from '../components/date-range-select';
 import ScreenHeader from '../components/screen-header';
 import ScreenLayout from '../components/screen-layout';
@@ -186,8 +187,9 @@ export default function MyChallengesScreen() {
       )}
       <Modal visible={editing !== null} transparent animationType="fade" onRequestClose={() => setEditing(null)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', padding: 24 }}>
-          <View className="gap-3 p-4 bg-white rounded-3xl">
-            <Text style={{ color: getColor('black') }} className="text-base font-semibold">Ajustar o calendário</Text>
+          <View className="relative gap-3 p-4 bg-white rounded-3xl">
+            <ModalCloseButton onPress={() => setEditing(null)} />
+            <Text style={{ color: getColor('black') }} className="pr-8 text-base font-semibold">Ajustar o calendário</Text>
             <DateRangeSelect
               startValueLabel="Início"
               startValue={getDateToFront(startsAt)}
@@ -197,9 +199,6 @@ export default function MyChallengesScreen() {
               setEndValue={(value) => setEndsAt(value.split('/').reverse().join('-') as DateOnly)}
             />
             <Button action={saveDates}>Pronto</Button>
-            <Pressable onPress={() => setEditing(null)}>
-              <Text style={{ color: getColor('gray-3') }} className="text-center">Fechar</Text>
-            </Pressable>
           </View>
         </View>
       </Modal>

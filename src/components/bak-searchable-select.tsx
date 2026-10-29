@@ -112,19 +112,14 @@ export default function SearchableSelect<TBaseOption extends BaseOption>({
           <Pressable
             onPress={() => { }}
             android_disableSound={false}
-            className="w-full max-w-[420px] rounded-2xl bg-white"
+            className="relative w-full max-w-[420px] rounded-2xl bg-white"
           >
+            <Pressable onPress={onClose} hitSlop={10} className="absolute z-10 items-center justify-center w-8 h-8 top-3 right-3">
+              <Icon name="times" size={22} color="gray-3" />
+            </Pressable>
             <View className="max-h-[35vh] p-4 overflow-scroll">
-              <View className="flex-row items-center justify-between mb-3">
+              <View className="pr-8 mb-3">
                 <Label>{label || 'Selecionar opção'}</Label>
-
-                <Pressable className="p-1" onPress={onClose}>
-                  <Icon
-                    name="close"
-                    size={22}
-                    color={'gray-7'}
-                  />
-                </Pressable>
               </View>
 
               <View className="flex-row items-center mb-3">

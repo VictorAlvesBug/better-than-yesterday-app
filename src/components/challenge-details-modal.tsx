@@ -1,12 +1,12 @@
 import { getColor } from '@/types/color.type';
 import { ChallengeEnriched } from '@/types/challenge.type';
-import { Image, Modal, Pressable, Text, View } from 'react-native';
+import { Image, Modal, Text, View } from 'react-native';
 import useNavigation from '../hooks/useNavigation';
 import { duplicateChallengePath } from '../utils/challengeUtils';
 import { formatDateRelativeToToday, getDateToFront, getDifferenceInDays } from '../utils/dateUtils';
 import { formatIntegerCompact, formatMoney } from '../utils/numberUtils';
 import { Button } from './button';
-import Icon from './icon';
+import ModalCloseButton from './modal-close-button';
 
 type ChallengeDetailsModalProps = {
   challenge: ChallengeEnriched | null;
@@ -20,9 +20,7 @@ export default function ChallengeDetailsModal({ challenge, onClose }: ChallengeD
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}>
         {challenge && (
           <View className="relative w-full px-4 pt-4 pb-6 bg-white rounded-3xl">
-            <Pressable onPress={onClose} className="absolute z-10 items-center justify-center w-8 h-8 top-4 right-4">
-              <Icon name="close" size={22} color="gray-3" />
-            </Pressable>
+            <ModalCloseButton onPress={onClose} />
             <Text style={{ color: getColor('black') }} className="pr-10 text-lg font-bold">
               {challenge.habitName}
             </Text>
@@ -54,9 +52,6 @@ export default function ChallengeDetailsModal({ challenge, onClose }: ChallengeD
               className="mt-4"
             >
               Repetir desafio
-            </Button>
-            <Button action={onClose} type="outline" className="mt-2">
-              Fechar
             </Button>
           </View>
         )}

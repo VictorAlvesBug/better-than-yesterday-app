@@ -104,10 +104,10 @@ export default function ChallengeTrackerHeader({
           <SideDrawerOpenButton setIsDrawerOpen={setIsDrawerOpen} />
           <View className="flex-1" />
           <Pressable
-            className="flex justify-center items-center w-20 h-20"
+            className="flex items-center justify-center w-20 h-20"
             onPress={onOpenSettings}
           >
-            <Icon name="people" size={24} color="white" />
+            <Icon name="gear" size={24} color="white" />
           </Pressable>
         </View>
 

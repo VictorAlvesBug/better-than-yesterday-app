@@ -18,7 +18,7 @@ import Memory from '../api/memory';
 import createChallengeRepository from '../api/challengeRepository';
 import { Button } from './button';
 import Card from './card';
-import Icon from './icon';
+import ModalCloseButton from './modal-close-button';
 import Input from './input';
 import Label from './label';
 import useNavigation from '../hooks/useNavigation';
@@ -169,24 +169,18 @@ export default function JoinChallengeModal({ visible, onClose, initialChallengeI
             className="relative w-full px-4 pt-4 pb-6 bg-white rounded-3xl"
             style={{ maxHeight: '85%' }}
           >
+            <ModalCloseButton onPress={handleClose} />
             <ScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <View className="flex flex-row items-start justify-between mb-4">
+              <View className="mb-4">
                 <Text
                   style={{ color: getColor('black') }}
-                  className="flex-1 pr-3 text-lg font-bold"
+                  className="pr-8 text-lg font-bold"
                 >
                   Entrar com convite
                 </Text>
-                <Pressable
-                  onPress={handleClose}
-                  hitSlop={10}
-                  className="items-center justify-center w-8 h-8"
-                >
-                  <Icon name="close" size={24} color="gray-3" />
-                </Pressable>
               </View>
 
               <Label>Cola o convite ou o ID do desafio</Label>
